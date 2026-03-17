@@ -48,18 +48,19 @@ npx --version 2>&1 || echo "NPX_NOT_FOUND"
 | 阶段 | 对应文档 | 前置条件 | 需要用户确认的情况 |
 |------|----------|----------|-------------------|
 | 阶段 1：环境检查 | 前置条件 | 无 | Kiro CLI 未安装/未登录时暂停；`uvx` 未安装时暂停并提供安装命令 |
-| 阶段 2：备份与配置 AWS Docs | Step 1-2 | 阶段 1 通过 | 已有 MCP 配置时，告知用户将备份后修改 |
-| 阶段 3：配置 Exa Search | Step 3 | 阶段 2 完成 | **必须询问用户**：选择远程模式（免 Key）还是本地模式（需 API Key）；选本地模式时需用户提供 API Key |
+| 阶段 2：备份与配置 AWS Docs | Step 1-2 | 阶段 1 通过 | 已有 MCP 配置时先备份；若 `awslabs.aws-documentation-mcp-server` 已存在则跳过，不做任何修改 |
+| 阶段 3：配置 Exa Search | Step 3 | 阶段 2 完成 | 若 `exa` 已存在则跳过，不做任何修改；若不存在，**必须询问用户**选择远程模式（免 Key）还是本地模式（需 API Key） |
 | 阶段 4：验证与测试 | Step 4-5 | 阶段 3 完成 | 测试失败时展示错误并等待用户决策 |
 | 阶段 5：更新路由规则 | Step 6 | 阶段 4 通过 | SKILL.md 不存在时提示先完成 ACP 集成 |
 
 ### 执行原则
 
 1. **先诊断，后执行** — 不要跳过状态检查直接修改配置文件
-2. **Exa 模式必须用户选择** — 不要自行决定使用远程还是本地模式，这涉及 API Key 和费用
-3. **遇到异常立即暂停** — 任何命令返回非零退出码或意外输出时，停下来向用户说明情况
-4. **每阶段汇报** — 完成一个阶段后，用简短的 ✅/❌ 汇总该阶段结果，再询问是否继续
-5. **已完成的步骤可跳过** — 如果诊断发现 MCP Server 已配置且内容一致，直接标记 ✅ 跳过
+2. **幂等性优先** — 修改 MCP 配置前必须先检查目标 Server 是否已存在，已存在则跳过，不做任何修改
+3. **Exa 模式必须用户选择** — 不要自行决定使用远程还是本地模式，这涉及 API Key 和费用
+4. **遇到异常立即暂停** — 任何命令返回非零退出码或意外输出时，停下来向用户说明情况
+5. **每阶段汇报** — 完成一个阶段后，用简短的 ✅/❌ 汇总该阶段结果，再询问是否继续
+6. **已完成的步骤可跳过** — 如果诊断发现 MCP Server 已配置且内容一致，直接标记 ✅ 跳过
 
 ---
 
@@ -126,22 +127,26 @@ except (FileNotFoundError, json.JSONDecodeError):
 if 'mcpServers' not in config:
     config['mcpServers'] = {}
 
-config['mcpServers']['awslabs.aws-documentation-mcp-server'] = {
-    'command': 'uvx',
-    'args': ['awslabs.aws-documentation-mcp-server@latest'],
-    'env': {
-        'FASTMCP_LOG_LEVEL': 'ERROR',
-        'AWS_DOCUMENTATION_PARTITION': 'aws'
-    },
-    'disabled': False,
-    'autoApprove': []
-}
+server_key = 'awslabs.aws-documentation-mcp-server'
+if server_key in config['mcpServers']:
+    print('⏭ AWS Documentation MCP Server 已存在，跳过配置（不做任何修改）')
+else:
+    config['mcpServers'][server_key] = {
+        'command': 'uvx',
+        'args': ['awslabs.aws-documentation-mcp-server@latest'],
+        'env': {
+            'FASTMCP_LOG_LEVEL': 'ERROR',
+            'AWS_DOCUMENTATION_PARTITION': 'aws'
+        },
+        'disabled': False,
+        'autoApprove': []
+    }
 
-with open(mcp_path, 'w') as f:
-    json.dump(config, f, indent=2)
-    f.write('\n')
+    with open(mcp_path, 'w') as f:
+        json.dump(config, f, indent=2)
+        f.write('\n')
 
-print('✔ AWS Documentation MCP Server 已配置')
+    print('✔ AWS Documentation MCP Server 已配置')
 "
 ```
 
@@ -181,15 +186,18 @@ except (FileNotFoundError, json.JSONDecodeError):
 if 'mcpServers' not in config:
     config['mcpServers'] = {}
 
-config['mcpServers']['exa'] = {
-    'url': 'https://mcp.exa.ai/mcp'
-}
+if 'exa' in config['mcpServers']:
+    print('⏭ Exa MCP Server 已存在，跳过配置（不做任何修改）')
+else:
+    config['mcpServers']['exa'] = {
+        'url': 'https://mcp.exa.ai/mcp'
+    }
 
-with open(mcp_path, 'w') as f:
-    json.dump(config, f, indent=2)
-    f.write('\n')
+    with open(mcp_path, 'w') as f:
+        json.dump(config, f, indent=2)
+        f.write('\n')
 
-print('✔ Exa Search MCP Server 已配置（远程模式，无 API Key）')
+    print('✔ Exa Search MCP Server 已配置（远程模式，无 API Key）')
 "
 ```
 
@@ -215,21 +223,24 @@ except (FileNotFoundError, json.JSONDecodeError):
 if 'mcpServers' not in config:
     config['mcpServers'] = {}
 
-config['mcpServers']['exa'] = {
-    'command': 'npx',
-    'args': ['-y', 'exa-mcp-server'],
-    'env': {
-        'EXA_API_KEY': sys.argv[1]
-    },
-    'disabled': False,
-    'autoApprove': []
-}
+if 'exa' in config['mcpServers']:
+    print('⏭ Exa MCP Server 已存在，跳过配置（不做任何修改）')
+else:
+    config['mcpServers']['exa'] = {
+        'command': 'npx',
+        'args': ['-y', 'exa-mcp-server'],
+        'env': {
+            'EXA_API_KEY': sys.argv[1]
+        },
+        'disabled': False,
+        'autoApprove': []
+    }
 
-with open(mcp_path, 'w') as f:
-    json.dump(config, f, indent=2)
-    f.write('\n')
+    with open(mcp_path, 'w') as f:
+        json.dump(config, f, indent=2)
+        f.write('\n')
 
-print('✔ Exa Search MCP Server 已配置（本地模式，带 API Key）')
+    print('✔ Exa Search MCP Server 已配置（本地模式，带 API Key）')
 " "$EXA_KEY"
 fi
 ```
