@@ -1,6 +1,91 @@
 # Google Chrome 自动安装与配置指南 — Ubuntu
 
-> 本文档供 AI Agent（如 OpenClaw）读取并在本机自动执行，完成 Google Chrome 浏览器的检测、安装/升级及默认浏览器设置。
+> 本文档供 AI Agent（如 OpenClaw）读取并在本机自动执行，完成 Google Chrome 浏览器的检测、安装/升级、默认浏览器设置，以及 OpenClaw Browser 能力配置。
+>
+> 幂等性原则：所有操作执行前先检查当前状态，已安装的组件只验证不重复安装，重复执行不会产生副作用。
+
+---
+
+## ⚙️ Agent 执行指引（OpenClaw 请先读此段）
+
+> **本段是给你（执行 Agent）的操作规范，不是给人类用户看的文档。请严格遵循。**
+
+### 第一步：通读全文，理解全貌
+
+在执行任何命令之前，请先完整阅读本文档所有章节，理解：
+- 文档分两大部分：Chrome 安装（Step 0-5）和 OpenClaw Browser 配置（Part 1-3, Step 6-14）
+- Step 0 的环境检测结果决定后续所有配置路径（headless / headed / ARM64 attachOnly）
+- 有一键脚本 `setup-devtools-mcp.sh` 可自动完成 Part 2 的全部配置
+- 可选扩展：`web-article-saver` Skill
+- 最终验收标准：Chrome/Chromium 已安装、OpenClaw `browser.enabled = true`、截图测试通过
+
+### 第二步：检查当前环境状态
+
+通读完成后，先执行以下诊断命令，收集当前状态：
+
+```bash
+# 1. 操作系统和架构
+lsb_release -d 2>/dev/null || cat /etc/os-release | grep PRETTY_NAME
+ARCH=$(dpkg --print-architecture)
+echo "架构: $ARCH"
+
+# 2. 显示环境（如果 detect-display-env.sh 存在）
+if [ -f detect-display-env.sh ]; then
+  bash detect-display-env.sh
+else
+  echo "DETECT_SCRIPT_NOT_FOUND"
+fi
+
+# 3. Chrome / Chromium 是否已安装
+for b in google-chrome-stable chromium-browser; do
+  command -v "$b" >/dev/null 2>&1 && echo "INSTALLED: $b $($b --version 2>/dev/null)" || true
+done
+
+# 4. OpenClaw 是否已安装
+openclaw --version 2>/dev/null || echo "OPENCLAW_NOT_FOUND"
+
+# 5. OpenClaw browser 配置状态
+python3 -c "
+import json, os
+try:
+    cfg = json.load(open(os.path.expanduser('~/.openclaw/openclaw.json')))
+    b = cfg.get('browser', {})
+    print(f'browser.enabled={b.get(\"enabled\", True)}')
+    print(f'browser.headless={b.get(\"headless\", False)}')
+    print(f'browser.profiles={list(b.get(\"profiles\", {}).keys()) or \"none\"}')
+except Exception as e:
+    print(f'OPENCLAW_CONFIG_READ_FAILED: {e}')
+" 2>/dev/null
+
+# 6. Node.js 版本（Part 2 依赖）
+node --version 2>/dev/null || echo "NODE_NOT_FOUND"
+
+# 7. Gateway 状态
+openclaw gateway status 2>/dev/null || echo "GATEWAY_STATUS_UNKNOWN"
+```
+
+### 第三步：根据状态制定分阶段计划
+
+根据诊断结果，将执行拆分为以下阶段。**每个阶段完成后向用户汇报结果，再进入下一阶段：**
+
+| 阶段 | 对应文档 | 前置条件 | 需要用户确认的情况 |
+|------|----------|----------|-------------------|
+| 阶段 1：环境检测 | Step 0 | 无 | 非 Ubuntu 系统时暂停；无 `sudo` 权限时暂停 |
+| 阶段 2：Chrome 安装 | Step 1-5 | 阶段 1 完成 | Chrome/Chromium 已安装时跳过安装，仅验证版本；headless 模式跳过 Step 4-5 |
+| 阶段 3：Browser 能力启用 | Part 1 (Step 6-9) | Chrome 已安装 + OpenClaw 已安装 | `browser.enabled` 已为 `true` 时跳过，仅验证 |
+| 阶段 4：DevTools 配置 | Part 2 (Step 10-12) | 阶段 3 完成 | `setup-devtools-mcp.sh` 已执行过且 browser profiles 已配置时跳过，仅验证 |
+| 阶段 5：双 Profile | Part 3 (Step 13-14) | 阶段 4 完成 + headed 模式 | headless / ARM64 attachOnly 模式跳过整个阶段；Remote Debugging 需用户手动操作 |
+| 阶段 6：web-article-saver | 扩展 Skill 章节 | 阶段 4 完成 | 用户未要求时可跳过；Skill 已安装时跳过 |
+
+### 执行原则
+
+1. **先诊断，后执行** — 不要跳过 Step 0 环境检测直接安装 Chrome
+2. **幂等性优先** — Chrome 已安装时不重复安装，browser 配置已存在时不覆盖
+3. **环境检测结果决定路径** — `recommended_mode` 为 `headless` 时跳过 Step 4-5 和 Part 3
+4. **优先使用一键脚本** — Part 2 优先用 `setup-devtools-mcp.sh`，它内部已包含幂等检查
+5. **遇到异常立即暂停** — `sudo` 权限不足、网络不通、Gateway 重启失败等情况，停下来向用户说明
+6. **每阶段汇报** — 完成一个阶段后，用简短的 ✅/❌ 汇总该阶段结果，再询问是否继续
+7. **Step 13 需用户手动操作** — Remote Debugging 需要在 Chrome 地址栏手动输入 `chrome://inspect`，Agent 无法代为执行
 
 ---
 
