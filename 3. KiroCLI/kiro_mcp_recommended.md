@@ -8,6 +8,61 @@
 > - [AWS Documentation MCP Server](https://awslabs.github.io/mcp/servers/aws-documentation-mcp-server)
 > - [Exa MCP 文档](https://exa.ai/docs/reference/exa-mcp#kiro)
 
+---
+
+## ⚙️ Agent 执行指引（OpenClaw 请先读此段）
+
+> **本段是给你（执行 Agent）的操作规范，不是给人类用户看的文档。请严格遵循。**
+
+### 第一步：通读全文，理解全貌
+
+在执行任何命令之前，请先完整阅读本文档所有 Step（Step 1 ~ Step 6），理解：
+- 目标：为 Kiro CLI 配置 AWS Documentation 和 Exa Search 两个 MCP Server
+- 配置文件位置：`~/.kiro/settings/mcp.json`（全局）
+- Exa 有两种模式（远程免 Key / 本地带 Key），需要用户选择
+- 最终验收标准：Step 5 的功能测试通过
+
+### 第二步：检查当前环境状态
+
+通读完成后，先执行以下诊断命令，收集当前状态：
+
+```bash
+# 1. Kiro CLI 是否已安装并登录
+kiro-cli version 2>&1 || echo "KIRO_CLI_NOT_FOUND"
+kiro-cli auth status 2>&1 || echo "KIRO_AUTH_UNKNOWN"
+
+# 2. uvx 是否可用（AWS Documentation Server 依赖）
+uvx --version 2>&1 || echo "UVX_NOT_FOUND"
+
+# 3. 现有 MCP 配置
+cat ~/.kiro/settings/mcp.json 2>/dev/null || echo "MCP_CONFIG_NOT_EXISTS"
+
+# 4. npx 是否可用（Exa 本地模式依赖，可选）
+npx --version 2>&1 || echo "NPX_NOT_FOUND"
+```
+
+### 第三步：根据状态制定分阶段计划
+
+根据诊断结果，将执行拆分为以下阶段。**每个阶段完成后向用户汇报结果，再进入下一阶段：**
+
+| 阶段 | 对应文档 | 前置条件 | 需要用户确认的情况 |
+|------|----------|----------|-------------------|
+| 阶段 1：环境检查 | 前置条件 | 无 | Kiro CLI 未安装/未登录时暂停；`uvx` 未安装时暂停并提供安装命令 |
+| 阶段 2：备份与配置 AWS Docs | Step 1-2 | 阶段 1 通过 | 已有 MCP 配置时，告知用户将备份后修改 |
+| 阶段 3：配置 Exa Search | Step 3 | 阶段 2 完成 | **必须询问用户**：选择远程模式（免 Key）还是本地模式（需 API Key）；选本地模式时需用户提供 API Key |
+| 阶段 4：验证与测试 | Step 4-5 | 阶段 3 完成 | 测试失败时展示错误并等待用户决策 |
+| 阶段 5：更新路由规则 | Step 6 | 阶段 4 通过 | SKILL.md 不存在时提示先完成 ACP 集成 |
+
+### 执行原则
+
+1. **先诊断，后执行** — 不要跳过状态检查直接修改配置文件
+2. **Exa 模式必须用户选择** — 不要自行决定使用远程还是本地模式，这涉及 API Key 和费用
+3. **遇到异常立即暂停** — 任何命令返回非零退出码或意外输出时，停下来向用户说明情况
+4. **每阶段汇报** — 完成一个阶段后，用简短的 ✅/❌ 汇总该阶段结果，再询问是否继续
+5. **已完成的步骤可跳过** — 如果诊断发现 MCP Server 已配置且内容一致，直接标记 ✅ 跳过
+
+---
+
 ## 背景
 
 Kiro CLI 通过 MCP（Model Context Protocol）连接外部工具和数据源，扩展 Agent 的能力边界。以下两个 MCP Server 推荐所有 Kiro CLI 用户配置：
