@@ -6,11 +6,15 @@
 
 ## 前置条件（需用户提前完成）
 
-以下操作需要用户在 AWS 控制台或通过 CLI 手动完成，Agent 无法代为执行：
+以下操作需要用户提前完成，Agent 无法代为执行：
 
 1. 当前实例为 Ubuntu 24.04 LTS（建议至少 t3.medium）
-2. 安全组入站规则已放行 TCP 8443（DCV 远程桌面端口）
-3. 如需 GPU 加速，需使用 G4dn / G5 实例并提前安装 NVIDIA 驱动
+2. 实例已安装并启用 SSM Agent（Amazon Linux / Ubuntu 官方 AMI 默认已安装）
+3. 实例 IAM Role 包含 `AmazonSSMManagedInstanceCore` 策略
+4. 用户本地已安装 AWS CLI 和 [Session Manager 插件](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html)
+5. 如需 GPU 加速，需使用 G4dn / G5 实例并提前安装 NVIDIA 驱动
+
+> 无需在安全组中开放 8443 端口，我们通过 SSM Port Forwarding 安全访问 DCV 桌面。
 
 ## 安装流程
 
@@ -90,28 +94,60 @@ dcv list-sessions
 sudo dcv create-session --type=console --owner ubuntu my-session
 ```
 
-### Step 4: 向用户输出连接信息
+### Step 4: 获取 EC2 Instance ID
 
-所有验证通过后，获取本机公网 IP：
+所有验证通过后，通过 OpenClaw 获取本机 Instance ID：
+
+![alt text](image.png)
+
+将 Instance ID 输出给用户，用于下一步建立 SSM 端口转发。
+
+### Step 5: 通过 SSM Port Forwarding 连接 DCV 桌面
+
+以下操作由用户在本地电脑终端执行（不是在服务器上）。
+
+先设置环境变量：
 
 ```bash
-curl -s http://169.254.169.254/latest/meta-data/public-ipv4
+export INSTANCE_ID=<Step 4 获取的 Instance ID>
+export AWS_REGION=<区域，如 us-west-2>
 ```
 
-然后向用户输出：
+建立 SSM 端口转发，将服务器的 8443 端口映射到本地 8443：
+
+```bash
+aws ssm start-session \
+  --target $INSTANCE_ID \
+  --region $AWS_REGION \
+  --document-name AWS-StartPortForwardingSession \
+  --parameters '{"portNumber":["8443"],"localPortNumber":["8443"]}'
+```
+
+> 保持此终端窗口不要关闭，端口转发会持续运行。
+
+### Step 6: 浏览器访问远程桌面
+
+端口转发建立后，在本地浏览器打开：
+
+```
+https://localhost:8443
+```
+![alt text](image-1.png)
+
+向用户输出完整连接信息：
 
 ```
 DCV 远程桌面已就绪。
 
-连接方式：
-  浏览器访问: https://<公网IP>:8443
-  DCV 客户端下载: https://download.amazondcv.com
+连接步骤：
+  1. 在本地终端运行上述 SSM 端口转发命令（保持窗口不关闭）
+  2. 浏览器访问: https://localhost:8443
 
 登录凭据：
   用户名: <--user 参数值，默认 ubuntu>
   密码: <安装时设置的密码>
 
-注意: 首次浏览器访问会提示证书不受信任（自签名证书），选择继续访问即可。
+注意: 浏览器会提示证书不受信任（自签名证书），选择继续访问即可。
 ```
 
 ## 脚本参数参考
@@ -150,6 +186,8 @@ DCV 远程桌面已就绪。
 | 无 DCV 会话 | `dcv list-sessions` | `sudo dcv create-session --type=console --owner ubuntu my-session` |
 | X Server 未运行 | `ps aux \| grep X \| grep -v grep` | `sudo systemctl isolate multi-user.target && sudo systemctl isolate graphical.target` |
 | Wayland 未禁用 | `grep WaylandEnable /etc/gdm3/custom.conf` | 应含 `WaylandEnable=false`，否则手动添加后 `sudo systemctl restart gdm3` |
+| SSM 端口转发失败 | `aws ssm describe-instance-information --filters Key=InstanceIds,Values=<Instance-ID>` | 确认实例 SSM Agent 在线，IAM Role 包含 `AmazonSSMManagedInstanceCore` |
+| localhost:8443 无法访问 | 确认 SSM 端口转发终端仍在运行 | 重新执行 `aws ssm start-session` 命令 |
 
 ## 参考链接
 
@@ -157,3 +195,5 @@ DCV 远程桌面已就绪。
 - [Amazon DCV 前提条件](https://docs.aws.amazon.com/dcv/latest/adminguide/setting-up-installing-linux-prereq.html)
 - [Amazon DCV 安装后检查](https://docs.aws.amazon.com/dcv/latest/adminguide/setting-up-installing-linux-checks.html)
 - [Amazon DCV 客户端下载](https://download.amazondcv.com)
+- [SSM Session Manager 端口转发](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-sessions-start.html#sessions-start-port-forwarding)
+- [安装 Session Manager 插件](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html)
