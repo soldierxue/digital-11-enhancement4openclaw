@@ -63,7 +63,7 @@ OpenClaw 使用 Claude API 处理所有任务，包括编码。编码任务的�
 
 ## 前置条件
 
-1. Kiro CLI 已安装并登录（参见同目录 `kiro_install_config.md`）
+1. Kiro CLI 已安装并登录（参见 [kiro_install_config.md](./kiro_install_config.md)）
 2. Python 3.10+ 已安装（`python3 --version`）
 3. OpenClaw 已安装并可正常运行
 4. 工作目录默认为 `~/kiro-projects/`，在其下按项目名分目录存储
@@ -111,7 +111,7 @@ kiro-cli auth status
 
 ```bash
 SKILL_DIR="$HOME/.openclaw/workspace/skills/kiro-cli"
-mkdir -p "$SKILL_DIR"
+mkdir -p "$SKILL_DIR/scripts"
 echo "✔ 技能目录已创建: $SKILL_DIR"
 ```
 
@@ -119,21 +119,25 @@ echo "✔ 技能目录已创建: $SKILL_DIR"
 
 ```
 ~/.openclaw/skills/kiro-cli/
-├── acp_client.py       # 核心 ACP 客户端（纯 stdlib，零依赖）
-├── kiro_bridge.py      # 生产级封装（会话管理 + 用量追踪）
-├── usage_tracker.py    # 双轨计费追踪：Kiro Credits + Claude Token
-├── test_acp.py         # 端到端集成测试
-└── SKILL.md            # OpenClaw 任务路由规则
+├── SKILL.md                # OpenClaw 任务路由规则
+└── scripts/
+    ├── acp_client.py       # 核心 ACP 客户端（纯 stdlib，零依赖）
+    ├── kiro_bridge.py      # 生产级封装（会话管理 + 用量追踪）
+    ├── usage_tracker.py    # 双轨计费追踪：Kiro Credits + Claude Token
+    └── test_acp.py         # 端到端集成测试
 ```
+
+> 此布局与 `2. Chrome_DevTool/web-article-saver/` 保持一致：`SKILL.md` 在技能根目录，脚本文件统一放在 `scripts/` 子目录。
 
 ### 文件关联与依赖关系
 
 ```
                     ┌─────────────────┐
-                    │    SKILL.md     │  ← OpenClaw 读取，决定是否将任务路由给 Kiro
+                    │    SKILL.md     │  ← 技能根目录，OpenClaw 读取，决定任务路由
                     │  (路由规则，独立) │
                     └─────────────────┘
 
+              scripts/
                     ┌─────────────────┐
                     │  acp_client.py  │  ← 最底层，零外部依赖（纯 Python stdlib）
                     │  ACPClient 类   │     管理 kiro-cli 子进程 + JSON-RPC 通信
@@ -157,17 +161,17 @@ echo "✔ 技能目录已创建: $SKILL_DIR"
 
 依赖链总结：
 
-- `acp_client.py` 是核心基础层，仅使用 Python 标准库（json、subprocess、threading），不依赖任何其他文件
-- `kiro_bridge.py` 导入 `acp_client.py` 中的 `ACPClient`、`PromptResult`、`PermissionRequest`，是唯一存在硬依赖的文件
-- `usage_tracker.py` 完全独立，不 import 任何项目内文件；由调用方（如 OpenClaw 主 Agent）在获取 `KiroBridge.prompt()` 返回的用量数据后，手动调用 `record_task()` 记录
-- `test_acp.py` 导入 `acp_client.py`，用于端到端验证 ACP 握手和会话功能
-- `SKILL.md` 是纯文本配置，供 OpenClaw 主 Agent 读取以决定任务路由策略，不参与 Python 运行时
+- `SKILL.md` 位于技能根目录，供 OpenClaw 主 Agent 读取以决定任务路由策略，不参与 Python 运行时
+- `scripts/acp_client.py` 是核心基础层，仅使用 Python 标准库（json、subprocess、threading），不依赖任何其他文件
+- `scripts/kiro_bridge.py` 导入 `acp_client.py` 中的 `ACPClient`、`PromptResult`、`PermissionRequest`，是唯一存在硬依赖的文件
+- `scripts/usage_tracker.py` 完全独立，不 import 任何项目内文件；由调用方（如 OpenClaw 主 Agent）在获取 `KiroBridge.prompt()` 返回的用量数据后，手动调用 `record_task()` 记录
+- `scripts/test_acp.py` 导入 `acp_client.py`，用于端到端验证 ACP 握手和会话功能
 
 ### Step 4: 部署 ACP 客户端 (acp_client.py)
 
 纯 Python 标准库实现，零 pip 依赖，约 300 行。
 
-> 📄 源文件：[acp_client.py](./acp_client.py)
+> 📄 源文件：[acp_client.py](./kiro-cli-acp-agent/scripts/acp_client.py)
 
 核心类与数据结构：
 - `ACPClient` — JSON-RPC 2.0 over stdio 客户端，管理 kiro-cli 子进程生命周期
@@ -176,7 +180,7 @@ echo "✔ 技能目录已创建: $SKILL_DIR"
 - `PermissionRequest` — Kiro 请求敏感操作授权时的回调参数
 
 ```bash
-cp acp_client.py "$SKILL_DIR/acp_client.py"
+cp kiro-cli-acp-agent/scripts/acp_client.py "$SKILL_DIR/scripts/acp_client.py"
 echo "✔ acp_client.py 已部署"
 ```
 
@@ -184,7 +188,7 @@ echo "✔ acp_client.py 已部署"
 
 封装会话管理、懒启动、上下文自动管理。
 
-> 📄 源文件：[kiro_bridge.py](./kiro_bridge.py)
+> 📄 源文件：[kiro_bridge.py](./kiro-cli-acp-agent/scripts/kiro_bridge.py)
 
 核心功能：
 - `KiroBridge` — 生产级封装，支持懒启动、会话复用、上下文 80% 自动切换新会话
@@ -192,7 +196,7 @@ echo "✔ acp_client.py 已部署"
 - 支持 `with` 上下文管理器，自动清理子进程
 
 ```bash
-cp kiro_bridge.py "$SKILL_DIR/kiro_bridge.py"
+cp kiro-cli-acp-agent/scripts/kiro_bridge.py "$SKILL_DIR/scripts/kiro_bridge.py"
 echo "✔ kiro_bridge.py 已部署"
 ```
 
@@ -200,7 +204,7 @@ echo "✔ kiro_bridge.py 已部署"
 
 双轨追踪 Kiro Credits 和 Claude API Token 消耗。
 
-> 📄 源文件：[usage_tracker.py](./usage_tracker.py)
+> 📄 源文件：[usage_tracker.py](./kiro-cli-acp-agent/scripts/usage_tracker.py)
 
 核心功能：
 - `record_task()` — 记录每次任务的 Kiro Credits 和 Claude API Token 消耗
@@ -208,7 +212,7 @@ echo "✔ kiro_bridge.py 已部署"
 - 数据持久化到 `usage_stats.json`
 
 ```bash
-cp usage_tracker.py "$SKILL_DIR/usage_tracker.py"
+cp kiro-cli-acp-agent/scripts/usage_tracker.py "$SKILL_DIR/scripts/usage_tracker.py"
 echo "✔ usage_tracker.py 已部署"
 ```
 
@@ -216,7 +220,7 @@ echo "✔ usage_tracker.py 已部署"
 
 这是 OpenClaw 的核心路由规则，决定哪些任务发送给 Kiro。
 
-> 📄 源文件：[SKILL.md](./SKILL.md)
+> 📄 源文件：[SKILL.md](./kiro-cli-acp-agent/SKILL.md)
 
 定义了：
 - 触发关键词（"kiro"、"写代码"、"编程"、"开发"等）
@@ -224,7 +228,7 @@ echo "✔ usage_tracker.py 已部署"
 - 由 OpenClaw 主 Agent 直接处理的任务类型（对话、消息、非编码任务等）
 
 ```bash
-cp SKILL.md "$SKILL_DIR/SKILL.md"
+cp kiro-cli-acp-agent/SKILL.md "$SKILL_DIR/SKILL.md"
 echo "✔ SKILL.md 已部署"
 ```
 
@@ -277,19 +281,19 @@ ACP 会话持久化到磁盘：
 
 创建一个测试脚本验证完整的 ACP 流程：
 
-> 📄 源文件：[test_acp.py](./test_acp.py)
+> 📄 源文件：[test_acp.py](./kiro-cli-acp-agent/scripts/test_acp.py)
 
 测试流程：初始化 ACP 连接 → 创建新会话 → 发送测试 prompt → 验证响应。
 
 ```bash
-cp test_acp.py "$SKILL_DIR/test_acp.py"
+cp kiro-cli-acp-agent/scripts/test_acp.py "$SKILL_DIR/scripts/test_acp.py"
 echo "✔ test_acp.py 已部署"
 ```
 
 执行测试：
 
 ```bash
-python3 "$SKILL_DIR/test_acp.py"
+python3 "$SKILL_DIR/scripts/test_acp.py"
 ```
 
 期望输出包含 `All tests passed`。如果失败，检查：
@@ -302,7 +306,7 @@ python3 "$SKILL_DIR/test_acp.py"
 ```bash
 python3 -c "
 import sys, os
-sys.path.insert(0, os.path.expanduser('~/.openclaw/workspace/skills/kiro-cli'))
+sys.path.insert(0, os.path.expanduser('~/.openclaw/workspace/skills/kiro-cli/scripts'))
 from kiro_bridge import KiroBridge
 
 with KiroBridge() as bridge:
@@ -326,9 +330,10 @@ with KiroBridge() as bridge:
 
 ```bash
 ls -la ~/.openclaw/workspace/skills/kiro-cli/
+ls -la ~/.openclaw/workspace/skills/kiro-cli/scripts/
 ```
 
-期望输出包含 `acp_client.py`、`kiro_bridge.py`、`usage_tracker.py`、`SKILL.md`。
+期望输出包含 `SKILL.md`（根目录）和 `acp_client.py`、`kiro_bridge.py`、`usage_tracker.py`、`test_acp.py`（scripts/ 目录）。
 
 ### Step 11: 配置环境变量
 
