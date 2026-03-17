@@ -107,16 +107,29 @@ fi
 
 CHROME_INSTALLED=false
 CHROME_VERSION=""
+CHROME_BINARY=""
 if command -v google-chrome-stable &>/dev/null; then
   CHROME_INSTALLED=true
+  CHROME_BINARY="google-chrome-stable"
   CHROME_VERSION=$(google-chrome-stable --version 2>/dev/null | sed 's/Google Chrome //' | tr -d '[:space:]')
 elif command -v google-chrome &>/dev/null; then
   CHROME_INSTALLED=true
+  CHROME_BINARY="google-chrome"
   CHROME_VERSION=$(google-chrome --version 2>/dev/null | sed 's/Google Chrome //' | tr -d '[:space:]')
 elif command -v chromium-browser &>/dev/null; then
   CHROME_INSTALLED=true
+  CHROME_BINARY="chromium-browser"
   CHROME_VERSION=$(chromium-browser --version 2>/dev/null | sed 's/Chromium //' | tr -d '[:space:]')
 fi
+
+# --- 架构检测 ---
+
+ARCH=$(dpkg --print-architecture 2>/dev/null || uname -m)
+# 统一命名: amd64 / arm64
+case "$ARCH" in
+  x86_64) ARCH="amd64" ;;
+  aarch64) ARCH="arm64" ;;
+esac
 
 # --- Node.js 检测 ---
 
@@ -139,9 +152,11 @@ fi
 
 cat <<EOF
 {
+  "arch": "$ARCH",
   "has_display": $HAS_DISPLAY,
   "display_type": "$DISPLAY_TYPE",
   "chrome_installed": $CHROME_INSTALLED,
+  "chrome_binary": "$CHROME_BINARY",
   "chrome_version": "$CHROME_VERSION",
   "node_installed": $NODE_INSTALLED,
   "node_version": "$NODE_VERSION",

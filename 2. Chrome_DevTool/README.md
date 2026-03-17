@@ -18,9 +18,11 @@ bash detect-display-env.sh
 
 ```json
 {
+  "arch": "arm64",
   "has_display": true,
   "display_type": "dcv",
   "chrome_installed": true,
+  "chrome_binary": "chromium-browser",
   "chrome_version": "136.0.7103.92",
   "node_installed": true,
   "node_version": "v22.15.0",
@@ -33,8 +35,10 @@ bash detect-display-env.sh
 
 | 字段 | 含义 | 可能的值 |
 |------|------|----------|
+| `arch` | CPU 架构 | `amd64` / `arm64` |
 | `has_display` | 是否有可用的图形显示 | `true` / `false` |
 | `display_type` | 显示环境类型 | `dcv` / `x11` / `wayland` / `vnc` / `none` |
+| `chrome_binary` | 实际使用的浏览器命令 | `google-chrome-stable` / `chromium-browser` / 空 |
 | `recommended_mode` | 推荐的 Chrome 运行模式 | `headed`（有桌面）/ `headless`（无桌面） |
 
 ### 根据检测结果选择配置路径
@@ -98,10 +102,12 @@ bash setup-devtools-mcp.sh --headed     # 强制桌面模式
 
 ## 前置条件（需用户提前完成）
 
-1. 当前系统为 Ubuntu 20.04 / 22.04 / 24.04 LTS
+1. 当前系统为 Ubuntu 20.04 / 22.04 / 24.04 LTS（支持 amd64 和 arm64/Graviton）
 2. 用户具有 `sudo` 权限
 3. 系统已安装桌面环境（如 GNOME）— 如果是无显示器服务器，Step 0 检测后会自动使用 headless 模式
-4. 网络可正常访问 `dl.google.com`
+4. 网络可正常访问 `dl.google.com`（amd64）或 Ubuntu APT 源（arm64）
+
+> **ARM64 注意**: Google Chrome 官方不提供 ARM64 `.deb` 包，ARM64 环境（如 AWS Graviton 实例）将自动安装 Chromium 替代。
 
 ## 执行流程
 
@@ -123,12 +129,21 @@ for browser in google-chrome-stable chromium-browser firefox microsoft-edge-stab
 done
 ```
 
-### Step 2: 安装或升级 Google Chrome
+### Step 2: 安装或升级 Google Chrome / Chromium
 
-**如果未安装 Chrome：**
+> Google Chrome 官方仅提供 x86_64（amd64）的 `.deb` 包，**不支持 ARM64（aarch64/Graviton）**。ARM64 环境请安装 Chromium。
+
+**首先检测 CPU 架构：**
 
 ```bash
-# 下载最新版 Google Chrome .deb 包
+ARCH=$(dpkg --print-architecture)
+echo "当前架构: $ARCH"
+```
+
+**amd64 架构 — 安装 Google Chrome：**
+
+```bash
+# 下载最新版 Google Chrome .deb 包（仅 amd64）
 wget -q -O /tmp/google-chrome-stable.deb \
   "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
 
@@ -141,37 +156,55 @@ rm -f /tmp/google-chrome-stable.deb
 
 > 安装过程会自动添加 Google 官方 APT 源，后续可通过 `apt upgrade` 持续更新。
 
-**如果已安装 Chrome：**
+**arm64 架构 — 安装 Chromium：**
 
 ```bash
-# 刷新软件源（含 Google Chrome 源）
 sudo apt-get update
+sudo apt-get install -y chromium-browser
+```
 
-# 升级 Chrome 到最新版本
+> Chromium 是 Chrome 的开源上游项目，功能基本一致，支持 ARM64。在 Ubuntu 24.04 上 `chromium-browser` 为 snap 包，如需 deb 版本可使用 PPA 或手动编译。
+
+**如果已安装，升级到最新版本：**
+
+```bash
+# amd64: 升级 Chrome
+sudo apt-get update
 sudo apt-get install -y --only-upgrade google-chrome-stable
+
+# arm64: 升级 Chromium
+sudo apt-get update
+sudo apt-get install -y --only-upgrade chromium-browser
 ```
 
 ### Step 3: 验证安装结果
 
 ```bash
+# amd64
 google-chrome-stable --version
+
+# arm64
+chromium-browser --version
 ```
 
-期望输出类似：`Google Chrome 13x.x.xxxx.xx`。如果命令不存在，说明安装失败，检查 Step 2 的输出日志。
+期望输出类似：`Google Chrome 13x.x.xxxx.xx` 或 `Chromium 13x.x.xxxx.xx`。
 
-### Step 4: 设置 Chrome 为默认浏览器
+### Step 4: 设置为默认浏览器
 
-**方法一：通过 `update-alternatives` 设置（推荐）：**
+**amd64（Chrome）：**
 
 ```bash
 sudo update-alternatives --set x-www-browser /usr/bin/google-chrome-stable
 sudo update-alternatives --set gnome-www-browser /usr/bin/google-chrome-stable
+xdg-settings set default-web-browser google-chrome.desktop 2>/dev/null || true
 ```
 
-**方法二：通过 `xdg-settings` 设置（GNOME 桌面）：**
+**arm64（Chromium）：**
 
 ```bash
-xdg-settings set default-web-browser google-chrome.desktop
+sudo update-alternatives --set x-www-browser /usr/bin/chromium-browser
+sudo update-alternatives --set gnome-www-browser /usr/bin/chromium-browser
+xdg-settings set default-web-browser chromium-browser.desktop 2>/dev/null || true
 ```
 
 ### Step 5: 验证默认浏览器设置
@@ -180,11 +213,7 @@ xdg-settings set default-web-browser google-chrome.desktop
 xdg-settings get default-web-browser
 ```
 
-期望输出：`google-chrome.desktop`。如果输出不同，手动确认 `.desktop` 文件是否存在：
-
-```bash
-ls /usr/share/applications/google-chrome.desktop
-```
+期望输出：`google-chrome.desktop`（amd64）或 `chromium-browser.desktop`（arm64）。
 
 ## 完整一键脚本
 
@@ -194,6 +223,10 @@ ls /usr/share/applications/google-chrome.desktop
 #!/bin/bash
 set -e
 
+ARCH=$(dpkg --print-architecture)
+echo "=== 当前架构: $ARCH ==="
+
+echo ""
 echo "=== 检测已安装的浏览器 ==="
 for browser in google-chrome-stable chromium-browser firefox microsoft-edge-stable; do
   if command -v "$browser" &>/dev/null; then
@@ -201,29 +234,56 @@ for browser in google-chrome-stable chromium-browser firefox microsoft-edge-stab
   fi
 done
 
-if command -v google-chrome-stable &>/dev/null; then
+if [ "$ARCH" = "arm64" ]; then
+  # --- ARM64: 使用 Chromium ---
+  if command -v chromium-browser &>/dev/null; then
+    echo ""
+    echo "=== Chromium 已安装，尝试升级 ==="
+    sudo apt-get update -qq
+    sudo apt-get install -y --only-upgrade chromium-browser
+  else
+    echo ""
+    echo "=== ARM64 架构，安装 Chromium（Google Chrome 不支持 ARM64）==="
+    sudo apt-get update -qq
+    sudo apt-get install -y chromium-browser
+  fi
+
   echo ""
-  echo "=== Chrome 已安装，尝试升级 ==="
-  sudo apt-get update -qq
-  sudo apt-get install -y --only-upgrade google-chrome-stable
+  echo "=== 当前 Chromium 版本 ==="
+  chromium-browser --version
+
+  echo ""
+  echo "=== 设置 Chromium 为默认浏览器 ==="
+  sudo update-alternatives --set x-www-browser /usr/bin/chromium-browser 2>/dev/null || true
+  sudo update-alternatives --set gnome-www-browser /usr/bin/chromium-browser 2>/dev/null || true
+  xdg-settings set default-web-browser chromium-browser.desktop 2>/dev/null || true
+
 else
+  # --- amd64: 使用 Google Chrome ---
+  if command -v google-chrome-stable &>/dev/null; then
+    echo ""
+    echo "=== Chrome 已安装，尝试升级 ==="
+    sudo apt-get update -qq
+    sudo apt-get install -y --only-upgrade google-chrome-stable
+  else
+    echo ""
+    echo "=== Chrome 未安装，开始安装 ==="
+    wget -q -O /tmp/google-chrome-stable.deb \
+      "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
+    sudo apt-get install -y /tmp/google-chrome-stable.deb
+    rm -f /tmp/google-chrome-stable.deb
+  fi
+
   echo ""
-  echo "=== Chrome 未安装，开始安装 ==="
-  wget -q -O /tmp/google-chrome-stable.deb \
-    "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
-  sudo apt-get install -y /tmp/google-chrome-stable.deb
-  rm -f /tmp/google-chrome-stable.deb
+  echo "=== 当前 Chrome 版本 ==="
+  google-chrome-stable --version
+
+  echo ""
+  echo "=== 设置 Chrome 为默认浏览器 ==="
+  sudo update-alternatives --set x-www-browser /usr/bin/google-chrome-stable 2>/dev/null || true
+  sudo update-alternatives --set gnome-www-browser /usr/bin/google-chrome-stable 2>/dev/null || true
+  xdg-settings set default-web-browser google-chrome.desktop 2>/dev/null || true
 fi
-
-echo ""
-echo "=== 当前 Chrome 版本 ==="
-google-chrome-stable --version
-
-echo ""
-echo "=== 设置 Chrome 为默认浏览器 ==="
-sudo update-alternatives --set x-www-browser /usr/bin/google-chrome-stable 2>/dev/null || true
-sudo update-alternatives --set gnome-www-browser /usr/bin/google-chrome-stable 2>/dev/null || true
-xdg-settings set default-web-browser google-chrome.desktop 2>/dev/null || true
 
 echo ""
 echo "=== 验证默认浏览器 ==="
@@ -231,7 +291,7 @@ default=$(xdg-settings get default-web-browser 2>/dev/null || echo "无法获取
 echo "  默认浏览器: $default"
 
 echo ""
-echo "✔ Chrome 安装/升级完成，已设为默认浏览器。"
+echo "✔ 浏览器安装/升级完成，已设为默认浏览器。"
 ```
 
 Agent 可将此脚本保存为 `install-chrome.sh` 并执行：
@@ -413,9 +473,11 @@ bash detect-display-env.sh
 
 ```json
 {
+  "arch": "arm64",
   "has_display": true,
   "display_type": "dcv",
   "chrome_installed": true,
+  "chrome_binary": "chromium-browser",
   "chrome_version": "136.0.7103.92",
   "node_installed": true,
   "node_version": "v22.15.0",
