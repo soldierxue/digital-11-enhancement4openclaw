@@ -697,6 +697,93 @@ bash setup-devtools-mcp.sh --headed     # DCV / 远程桌面 / 本地开发机
 | 网络 | `list_network_requests`, `get_network_request` | 网络请求监控 |
 | 调试 | `take_screenshot`, `take_snapshot`, `evaluate_script`, `list_console_messages` 等 | 截图、DOM 快照、JS 执行、控制台日志 |
 
+## 扩展 Skill: web-article-saver（网页文章保存）
+
+> 本目录附带 `web-article-saver` Skill，可让 OpenClaw 从用户浏览器中抓取文章（含图片），保存为 Markdown 和 PDF。特别支持微信公众号等有防盗链的网站。
+
+### 功能特点
+
+- 通过 CDP 在浏览器上下文中 fetch 图片，绕过微信公众号等防盗链限制
+- 自动识别微信公众号、知乎专栏、通用网页
+- 输出 Markdown（含本地图片引用）+ PDF（图片内嵌）
+- 自动滚动触发懒加载图片
+
+### 安装步骤
+
+**Step 1: 安装 Python 依赖**
+
+```bash
+pip3 install --break-system-packages websocket-client
+```
+
+**Step 2: 将 Skill 安装到 OpenClaw**
+
+将 `web-article-saver` 目录复制到 OpenClaw 的 Skill 目录：
+
+```bash
+# OpenClaw Skill 目录（按实际路径调整）
+SKILL_DIR="${HOME}/.openclaw/skills/web-article-saver"
+
+# 复制 Skill 文件
+mkdir -p "$SKILL_DIR"
+cp -r web-article-saver/* "$SKILL_DIR/"
+
+echo "✔ Skill 已安装到 $SKILL_DIR"
+```
+
+> Skill 目录结构：
+> ```
+> ~/.openclaw/skills/web-article-saver/
+> ├── SKILL.md              # Skill 描述文件（OpenClaw 自动识别）
+> └── scripts/
+>     └── save_article.py   # 文章抓取脚本
+> ```
+
+**Step 3: 确认浏览器 CDP 端口可用**
+
+Skill 需要连接到用户浏览器的 CDP 端口。根据你的环境：
+
+- ARM64 Snap Chromium（已配置 systemd 服务）：CDP 端口 `18800`
+- 标准 Chrome/Chromium：需启动时加 `--remote-debugging-port=9222 --remote-allow-origins=*`
+
+```bash
+# 验证 CDP 端口
+curl -s http://127.0.0.1:9222/json/version || curl -s http://127.0.0.1:18800/json/version
+```
+
+### 使用方式
+
+安装完成后，在 OpenClaw 对话中直接说：
+
+```
+保存这篇微信公众号文章
+```
+
+```
+把浏览器里打开的文章存下来，保存到 ~/Artical/Weixin
+```
+
+也可以手动运行脚本：
+
+```bash
+python3 ~/.openclaw/skills/web-article-saver/scripts/save_article.py \
+  --cdp-url http://127.0.0.1:9222 \
+  --tab-url "mp.weixin.qq.com" \
+  --output-dir ~/Artical/Weixin \
+  --format both
+```
+
+### 脚本参数
+
+| 参数 | 默认值 | 说明 |
+|------|--------|------|
+| `--cdp-url` | `http://127.0.0.1:9222` | 浏览器 CDP 地址 |
+| `--tab-url` | 自动选择 | 匹配标签页 URL 的关键词 |
+| `--output-dir` | `~/Artical/Weixin` | 保存目录 |
+| `--format` | `both` | `md`、`pdf` 或 `both` |
+| `--no-images` | — | 不下载图片 |
+| `--no-scroll` | — | 不滚动触发懒加载 |
+
 ## 参考链接
 
 - [Google Chrome 官方下载](https://www.google.com/chrome/)

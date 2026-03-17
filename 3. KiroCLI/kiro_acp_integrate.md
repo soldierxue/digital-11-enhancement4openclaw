@@ -118,7 +118,7 @@ echo "✔ 技能目录已创建: $SKILL_DIR"
 推荐目录布局：
 
 ```
-~/.openclaw/workspace/skills/kiro-cli/
+~/.openclaw/skills/kiro-cli/
 ├── acp_client.py       # 核心 ACP 客户端（纯 stdlib，零依赖）
 ├── kiro_bridge.py      # 生产级封装（会话管理 + 用量追踪）
 ├── usage_tracker.py    # 双轨计费追踪：Kiro Credits + Claude Token
