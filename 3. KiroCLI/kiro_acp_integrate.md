@@ -110,7 +110,7 @@ kiro-cli auth status
 ### Step 3: 创建技能目录结构
 
 ```bash
-SKILL_DIR="$HOME/.openclaw/workspace/skills/kiro-cli"
+SKILL_DIR="$HOME/.openclaw/skills/kiro-cli"
 mkdir -p "$SKILL_DIR/scripts"
 echo "✔ 技能目录已创建: $SKILL_DIR"
 ```
@@ -306,7 +306,7 @@ python3 "$SKILL_DIR/scripts/test_acp.py"
 ```bash
 python3 -c "
 import sys, os
-sys.path.insert(0, os.path.expanduser('~/.openclaw/workspace/skills/kiro-cli/scripts'))
+sys.path.insert(0, os.path.expanduser('~/.openclaw/skills/kiro-cli/scripts'))
 from kiro_bridge import KiroBridge
 
 with KiroBridge() as bridge:
@@ -329,8 +329,8 @@ with KiroBridge() as bridge:
 确认技能目录已正确放置：
 
 ```bash
-ls -la ~/.openclaw/workspace/skills/kiro-cli/
-ls -la ~/.openclaw/workspace/skills/kiro-cli/scripts/
+ls -la ~/.openclaw/skills/kiro-cli/
+ls -la ~/.openclaw/skills/kiro-cli/scripts/
 ```
 
 期望输出包含 `SKILL.md`（根目录）和 `acp_client.py`、`kiro_bridge.py`、`usage_tracker.py`、`test_acp.py`（scripts/ 目录）。
@@ -345,7 +345,7 @@ ENV_FILE="$HOME/.openclaw/.env"
 # 需要配置的变量（根据实际安装路径调整）
 KIRO_CLI_VALUE="$(which kiro-cli 2>/dev/null || echo "$HOME/.local/bin/kiro-cli")"
 KIRO_WORKDIR_VALUE="$HOME/kiro-projects"
-KIRO_STATS_VALUE="$HOME/.openclaw/workspace/skills/kiro-cli/usage_stats.json"
+KIRO_STATS_VALUE="$HOME/.openclaw/skills/kiro-cli/usage_stats.json"
 
 # 确保 .env 文件存在
 mkdir -p "$(dirname "$ENV_FILE")"
