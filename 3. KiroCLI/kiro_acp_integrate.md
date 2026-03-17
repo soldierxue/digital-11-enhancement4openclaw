@@ -4,6 +4,63 @@
 >
 > 参考: [Integrate Kiro CLI into Your AI Agent via ACP](https://dev.to/aws-builders/integrate-kiro-cli-into-your-ai-agent-via-acp-10jn) | [Kiro ACP 官方文档](https://kiro.dev/docs/cli/acp/)
 
+---
+
+## ⚙️ Agent 执行指引（OpenClaw 请先读此段）
+
+> **本段是给你（执行 Agent）的操作规范，不是给人类用户看的文档。请严格遵循。**
+
+### 第一步：通读全文，理解全貌
+
+在执行任何命令之前，请先完整阅读本文档的所有 Part（Part 1 ~ Part 6），理解：
+- 整体目标：将 Kiro CLI 通过 ACP 协议集成为 OpenClaw 的 Peer Agent
+- 依赖关系：哪些步骤依赖前置步骤的输出
+- 文件关系：`acp_client.py` → `kiro_bridge.py` → `usage_tracker.py` 的依赖链
+- 最终验收标准：Step 9 的 KiroBridge 端到端测试通过
+
+### 第二步：检查当前服务器状态
+
+通读完成后，先执行以下诊断命令，收集当前环境状态：
+
+```bash
+# 1. Kiro CLI 是否已安装并登录
+kiro-cli version 2>&1 || echo "KIRO_CLI_NOT_FOUND"
+kiro-cli auth status 2>&1 || echo "KIRO_AUTH_UNKNOWN"
+
+# 2. Python 版本
+python3 --version 2>&1 || echo "PYTHON3_NOT_FOUND"
+
+# 3. OpenClaw 技能目录是否已存在
+ls -la ~/.openclaw/skills/kiro-cli/ 2>&1 || echo "SKILL_DIR_NOT_EXISTS"
+
+# 4. 环境变量是否已配置
+grep -E "^KIRO_|^USAGE_STATS" ~/.openclaw/.env 2>/dev/null || echo "ENV_NOT_CONFIGURED"
+
+# 5. OpenClaw Gateway 状态
+openclaw gateway status 2>&1 || echo "GATEWAY_STATUS_UNKNOWN"
+```
+
+### 第三步：根据状态制定分阶段计划
+
+根据诊断结果，将执行拆分为以下阶段。**每个阶段完成后向用户汇报结果，再进入下一阶段：**
+
+| 阶段 | 对应文档 | 前置条件 | 需要用户确认的情况 |
+|------|----------|----------|-------------------|
+| 阶段 1：环境验证 | Part 1 (Step 1-2) | 无 | Kiro CLI 未安装或未登录时，暂停并告知用户手动完成登录 |
+| 阶段 2：部署文件 | Part 2 (Step 3-7) | 阶段 1 通过 | 目标目录已存在旧文件时，确认是否覆盖 |
+| 阶段 3：端到端测试 | Part 4 (Step 8-9) | 阶段 2 完成 | 测试失败时，展示错误日志并等待用户决策 |
+| 阶段 4：OpenClaw 集成 | Part 5 (Step 10-12) | 阶段 3 通过 | `.env` 已有不同的 `KIRO_CLI_PATH` 值时，确认是否覆盖 |
+
+### 执行原则
+
+1. **先诊断，后执行** — 不要跳过状态检查直接执行部署命令
+2. **遇到异常立即暂停** — 任何命令返回非零退出码或意外输出时，停下来向用户说明情况，等待指示
+3. **需要用户确认时第一时间提出** — 不要自行决定覆盖文件、修改配置或跳过失败的步骤
+4. **每阶段汇报** — 完成一个阶段后，用简短的 ✅/❌ 汇总该阶段结果，再询问是否继续
+5. **已完成的步骤可跳过** — 如果诊断发现某步骤已完成（如文件已存在且内容一致），直接标记 ✅ 跳过
+
+---
+
 ## 背景与价值
 
 ### 为什么需要 ACP 集成？
