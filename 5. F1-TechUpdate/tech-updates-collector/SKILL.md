@@ -48,48 +48,68 @@ description: >
 
 按 `topics-definition.md` 中定义的 6 个搜索策略维度（Dimension A-F）执行。
 
-**⏰ 时间窗口（强制）**: 所有搜索必须限制为当前系统时间倒推 24 小时内的内容。
-- 计算方式: 取当前 UTC 时间，减去 24 小时，格式化为 ISO 8601（`YYYY-MM-DDTHH:MM:SS.000Z`）
-- 传参: Exa twitter_search 使用 `startPublishedDate`，Exa web_search 使用 `startPublishedDate`
-- 示例: 若当前为 `2026-03-17T10:00:00Z`，则 `startPublishedDate='2026-03-16T10:00:00.000Z'`
+**⏰ 搜索时间窗口（增量模式）**:
 
-**Search A — General AI/Tech News (Twitter/X)**:
+搜索窗口基于 `state.json` 中的 `lastCollectorCheck` 动态计算，而非固定 24 小时：
+
+```
+now = 当前 UTC 时间
+lastCheck = state.json → lastCollectorCheck（Unix 时间戳）
+
+if lastCheck == 0 OR (now - lastCheck) > 86400:
+    startDate = now - 24h          # 首次运行 / 宕机恢复：兜底搜最近 24h
+else:
+    startDate = lastCheck           # 增量：只搜上次检查之后的新内容
+
+endDate = now
+```
+
+- 格式化为 ISO 8601: `YYYY-MM-DDTHH:MM:SS.000Z`
+- 传参: `web_search_advanced_exa` 使用 `startPublishedDate` + `endPublishedDate`
+- 示例（增量）: 上次 `10:00`，当前 `11:00` → 搜索窗口仅 1 小时
+- 示例（首次）: `lastCheck=0` → 搜索窗口 24 小时
+
+> 增量模式的核心价值：每次只搜 ~1 小时新内容（而非重复搜 24 小时），节省 Kiro Credits，减少重复结果。
+
+**Search A — General AI/Tech News (Web + Twitter)**:
 ```bash
 kiro-cli chat --no-interactive --trust-all-tools \
-  "use Exa twitter_search: query='AI OR GenAI OR Anthropic OR Claude OR OpenAI OR DeepSeek OR semiconductors OR AI chips OR layoffs OR workforce', numResults=20, startPublishedDate='<24h-ago-ISO>'"
+  "use web_search_advanced_exa: query='AI OR GenAI OR Anthropic OR Claude OR OpenAI OR DeepSeek OR semiconductors OR AI chips OR layoffs OR workforce', numResults=20, startPublishedDate='<startDate-ISO>', endPublishedDate='<endDate-ISO>'"
 ```
 
 **Search B — Industry Leaders (Twitter/X)**:
 ```bash
 kiro-cli chat --no-interactive --trust-all-tools \
-  "use Exa twitter_search: query='from:sama OR from:elonmusk OR from:satyanadella OR from:sundarpichai OR from:karpathy OR from:ylecun AI OR tech OR announcement', numResults=15, startPublishedDate='<24h-ago-ISO>'"
+  "use twitter_search_exa: query='from:sama OR from:elonmusk OR from:satyanadella OR from:sundarpichai OR from:karpathy OR from:ylecun AI OR tech OR announcement', numResults=15, startPublishedDate='<startDate-ISO>'"
 ```
 
-**Search C — Enterprise AI (Twitter/X + Web)**:
+**Search C — Enterprise AI (Web + Twitter)**:
 ```bash
 kiro-cli chat --no-interactive --trust-all-tools \
-  "use Exa twitter_search: query='Palantir OR Salesforce OR ServiceNow OR Workday OR Agentforce', numResults=15, startPublishedDate='<24h-ago-ISO>'"
+  "use web_search_advanced_exa: query='Palantir OR Salesforce OR ServiceNow OR Workday OR Agentforce AI agent', numResults=15, startPublishedDate='<startDate-ISO>', endPublishedDate='<endDate-ISO>'"
 ```
 
 **Search D — Gary Marcus 博客**:
 ```bash
 kiro-cli chat --no-interactive --trust-all-tools \
-  "use Exa web_search: query='Gary Marcus AI', numResults=5, startPublishedDate='<24h-ago-ISO>'"
+  "use web_search_exa: query='Gary Marcus AI', numResults=5, startPublishedDate='<startDate-ISO>'"
 ```
 
-**Search E — AI Native 创业公司 (Twitter/X)**:
+**Search E — AI Native 创业公司 (Web + Twitter)**:
 ```bash
 kiro-cli chat --no-interactive --trust-all-tools \
-  "use Exa twitter_search: query='AI startup OR AI native OR YC AI OR seed round OR series A OR funding', numResults=15, startPublishedDate='<24h-ago-ISO>'"
+  "use web_search_advanced_exa: query='AI startup OR AI native OR YC AI OR seed round OR series A OR funding', numResults=15, startPublishedDate='<startDate-ISO>', endPublishedDate='<endDate-ISO>'"
 ```
 
-**Search F — AWS Cloud (Twitter/X + Web)**:
+**Search F — AWS Cloud (Web + Twitter)**:
 ```bash
 kiro-cli chat --no-interactive --trust-all-tools \
-  "use Exa twitter_search: query='AWS OR Amazon Web Services OR Bedrock OR SageMaker OR AWS AI', numResults=15, startPublishedDate='<24h-ago-ISO>'"
+  "use web_search_advanced_exa: query='AWS OR Amazon Web Services OR Bedrock OR SageMaker OR AWS AI', numResults=15, startPublishedDate='<startDate-ISO>', endPublishedDate='<endDate-ISO>'"
 ```
 
-> `<24h-ago-ISO>` 为占位符，执行时由 Agent 根据当前系统时间动态计算替换。
+> `<startDate-ISO>` / `<endDate-ISO>` 为占位符，执行时由 Agent 根据增量窗口逻辑动态计算替换。
+>
+> ⚠️ **工具名注意**：远程 URL 模式下工具名带 `_exa` 后缀。优先使用 `web_search_advanced_exa`（支持 `endPublishedDate`），Twitter 搜索使用 `twitter_search_exa`，通用搜索使用 `web_search_exa`。
 
 ### Step 2: 按六大主题分类
 
@@ -180,11 +200,35 @@ kiro-cli chat --no-interactive --trust-all-tools \
 
 ### Step 4: 更新状态
 
-更新 `state.json` 中的 `lastCollectorCheck` 为当前 Unix 时间戳。
+更新 `state.json`，记录本次采集的完整状态：
 
-### Step 5: 通知
+```json
+{
+  "lastCollectorCheck": <当前 Unix 时间戳>,
+  "todayFile": "output/YYYY-MM-DD.md",
+  "todayBatchCount": <当日累计执行次数>,
+  "todayTotalItems": <当日累计条目总数>
+}
+```
 
-主动发送日报给 human（Feishu 消息 + markdown 文件附件）。
+更新逻辑：
+- `lastCollectorCheck`: 始终更新为当前 Unix 时间戳
+- `todayFile`: 如果日期变了（跨日），重置为新日期文件名，`todayBatchCount` 重置为 1
+- `todayBatchCount`: 同一天内每次执行 +1
+- `todayTotalItems`: 读取当天日报文件中的实际条目总数
+
+### Step 5: 通知（分级策略）
+
+根据本次采集结果决定通知方式：
+
+| 场景 | 通知行为 |
+|------|----------|
+| 当天首次采集（`todayBatchCount == 1`） | 发飞书消息 + markdown 文件附件（完整日报） |
+| 增量 ≥ 5 条新条目 | 发飞书消息，摘要列出新增条目标题 |
+| 增量 1~4 条新条目 | 静默追加，不发通知 |
+| 增量 0 条（无新内容） | 不通知，不修改日报内容（仅更新 state.json 时间戳） |
+
+> 分级通知避免每小时都给用户发消息，只在有实质性新内容时才打扰。
 
 ## State
 
@@ -192,9 +236,19 @@ kiro-cli chat --no-interactive --trust-all-tools \
 
 ```json
 {
-  "lastCollectorCheck": 0
+  "lastCollectorCheck": 0,
+  "todayFile": "",
+  "todayBatchCount": 0,
+  "todayTotalItems": 0
 }
 ```
+
+| 字段 | 说明 | 更新时机 |
+|------|------|----------|
+| `lastCollectorCheck` | 上次采集完成的 Unix 时间戳 | 每次采集后更新 |
+| `todayFile` | 当天日报文件路径 | 跨日时重置为新日期文件名 |
+| `todayBatchCount` | 当天累计采集次数 | 同一天 +1，跨日重置为 1 |
+| `todayTotalItems` | 当天日报累计条目总数 | 每次采集后重新统计 |
 
 ## Output
 
@@ -214,5 +268,10 @@ output/
 |------|------|
 | kiro-cli 未安装 | `kiro-cli auth status` 检查，参考 `3. KiroCLI/kiro_install_config.md` |
 | Exa 搜索无结果 | 检查 `~/.kiro/settings/mcp.json` 中 exa 配置 |
+| 工具名报错 (twitter_search 不存在) | 远程 URL 模式工具名带 `_exa` 后缀：`twitter_search_exa`、`web_search_advanced_exa` |
 | 搜索超时 | 拆分为更小的查询批次；检查网络连接 |
 | 日报格式异常 | 参考 `output/` 中的历史日报样例 |
+| 搜索窗口过大（首次运行搜 24h） | 正常行为 — `lastCollectorCheck=0` 时兜底搜 24h，后续自动切换为增量窗口 |
+| 每次都搜 24h 没有增量 | 检查 `state.json` 的 `lastCollectorCheck` 是否正常更新；值为 0 或过期 >24h 会触发兜底 |
+| 通知过于频繁 | 检查分级通知逻辑：增量 <5 条应静默，0 条不通知 |
+| 出现 YYYY-MM-DD-evening.md 等异常文件名 | 日报文件名必须严格为 `YYYY-MM-DD.md`，不允许后缀变体；删除异常文件，确认 `todayFile` 字段正确 |

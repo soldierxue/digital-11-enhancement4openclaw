@@ -1,10 +1,10 @@
-# OpenClaw Gateway 自愈机制配置指南 — Kiro CLI 版
+# OpenClaw 自愈机制配置指南 — Kiro CLI 版
 
-> 当 OpenClaw Gateway 反复崩溃时，自动调用 Kiro CLI 分析日志、修复问题、重启服务，并发送通知。
+> 当 OpenClaw Gateway 或其依赖服务（LiteLLM、Chromium 等）异常时，自动检测、修复、重启，并发送通知。
 >
 > 基于 [auto-fix-setup-guide.md](https://github.com/kingdoooo/openclaw-setup-guides/blob/main/auto-fix-setup-guide.md) 改编，将 Claude Code 替换为 Kiro CLI 作为自动修复引擎。
 >
-> 参考: [Kiro CLI 安装与配置](../3.%20KiroCLI/kiro_install_config.md) | [Kiro CLI ACP 集成](../3.%20KiroCLI/kiro_acp_integrate.md)
+> 参考: [Kiro CLI 安装与配置](../3.%20KiroCLI/kiro_install_config.md) | [Kiro CLI ACP 集成](../3.%20KiroCLI/kiro_acp_integrate.md) | [Memory Search 配置](../0.%20Base/README.md) | [Chrome DevTool 配置](../2.%20Chrome_DevTool/README.md)
 >
 > 幂等性原则：所有操作执行前先检查当前状态，已存在的配置只验证不重复写入，重复执行不会产生副作用。
 
@@ -16,12 +16,13 @@
 
 ### 第一步：通读全文，理解全貌
 
-在执行任何命令之前，请先完整阅读本文档所有章节（步骤 1 ~ 步骤 6），理解：
-- 目标：配置 systemd 自愈机制 — Gateway 反复崩溃时自动调用 Kiro CLI 修复
-- 核心组件：`openclaw-gateway.service`（主服务）+ `openclaw-fix.service`（修复服务）+ `openclaw-fix.sh`（修复脚本）
+在执行任何命令之前，请先完整阅读本文档所有章节（步骤 1 ~ 步骤 7），理解：
+- 目标：配置 systemd 自愈机制 — Gateway 反复崩溃时自动调用 Kiro CLI 修复；依赖服务异常时自动检测并重启
+- 核心组件：`openclaw-gateway.service`（主服务）+ `openclaw-fix.service`（修复服务）+ `openclaw-fix.sh`（修复脚本）+ `openclaw-deps-check.sh`（依赖服务健康检查脚本）
+- 依赖服务发现：通过解析 `openclaw.json` 自动识别 LiteLLM（memorySearch）、Chromium（browser CDP）等依赖
 - 前置依赖：OpenClaw Gateway 以 systemd user service 方式运行 + Kiro CLI 已安装并登录
-- 触发条件：60 秒内崩溃 5 次 → OnFailure 触发修复
-- 最终验收标准：Gateway 服务运行正常、OnFailure 配置就位、修复脚本可执行、Kiro CLI 认证通过
+- 触发条件：Gateway — 60 秒内崩溃 5 次 → OnFailure 触发修复；依赖服务 — HEARTBEAT 定时健康检查
+- 最终验收标准：Gateway 服务运行正常、OnFailure 配置就位、修复脚本可执行、依赖服务健康检查脚本就位、Kiro CLI 认证通过
 
 ### 第二步：检查当前环境状态
 
@@ -40,18 +41,57 @@ cat ~/.config/systemd/user/openclaw-fix.service 2>/dev/null || echo "FIX_SERVICE
 # 4. 修复脚本是否已存在且可执行
 ls -la ~/scripts/openclaw-fix.sh 2>/dev/null || echo "FIX_SCRIPT_NOT_FOUND"
 
-# 5. Kiro CLI 是否已安装并认证
+# 5. 依赖服务健康检查脚本是否已存在且可执行
+ls -la ~/scripts/openclaw-deps-check.sh 2>/dev/null || echo "DEPS_CHECK_SCRIPT_NOT_FOUND"
+
+# 6. Kiro CLI 是否已安装并认证
 kiro-cli version 2>/dev/null || echo "KIRO_CLI_NOT_FOUND"
 kiro-cli auth status 2>/dev/null || echo "KIRO_AUTH_UNKNOWN"
 
-# 6. loginctl linger 是否已启用
+# 7. loginctl linger 是否已启用
 loginctl show-user "$USER" --property=Linger 2>/dev/null || echo "LINGER_UNKNOWN"
 
-# 7. Python3 是否可用（JSON 验证依赖）
+# 8. Python3 是否可用（JSON 验证依赖）
 python3 --version 2>/dev/null || echo "PYTHON3_NOT_FOUND"
 
-# 8. 通知渠道是否已配置
+# 9. 通知渠道是否已配置
 openclaw notification list 2>/dev/null | head -1 || echo "NOTIFICATION_NOT_CONFIGURED"
+
+# 10. 依赖服务发现 — 从 openclaw.json 解析依赖
+python3 -c "
+import json, os
+cfg_path = os.path.expanduser('~/.openclaw/openclaw.json')
+try:
+    cfg = json.load(open(cfg_path))
+    deps = []
+    # memorySearch → LiteLLM
+    ms = cfg.get('memorySearch', {})
+    if ms.get('enabled') and ms.get('remote', {}).get('baseUrl'):
+        url = ms['remote']['baseUrl']
+        port = url.split(':')[-1].rstrip('/')
+        deps.append(f'litellm-proxy.service (port {port})')
+    # browser → Chromium headless
+    browser = cfg.get('browser', {})
+    for pname, profile in browser.get('profiles', {}).items():
+        cdp = profile.get('cdpUrl', '')
+        if '18800' in cdp:
+            deps.append(f'chromium-headless.service (port 18800, profile={pname})')
+    if deps:
+        print('DEPS_DISCOVERED: ' + ', '.join(deps))
+    else:
+        print('DEPS_NONE_FOUND')
+except Exception as e:
+    print(f'DEPS_DISCOVERY_FAILED: {e}')
+"
+
+# 11. 依赖服务运行状态
+systemctl --user is-active litellm-proxy.service 2>/dev/null || echo "LITELLM_SERVICE_NOT_FOUND"
+curl -s --max-time 3 http://localhost:4000/health >/dev/null 2>&1 && echo "LITELLM_HEALTH_OK" || echo "LITELLM_HEALTH_FAIL"
+systemctl --user is-active chromium-headless.service 2>/dev/null || echo "CHROMIUM_SERVICE_NOT_FOUND"
+curl -s --max-time 3 http://localhost:18800/json/version >/dev/null 2>&1 && echo "CHROMIUM_CDP_OK" || echo "CHROMIUM_CDP_FAIL"
+
+# 12. HEARTBEAT.md 中是否已有依赖服务健康检查任务
+grep -c "依赖服务健康检查" "$HOME/.openclaw/HEARTBEAT.md" 2>/dev/null || echo "DEPS_HEARTBEAT_NOT_FOUND"
 ```
 
 ### 第三步：根据状态制定分阶段计划
@@ -65,7 +105,8 @@ openclaw notification list 2>/dev/null | head -1 || echo "NOTIFICATION_NOT_CONFI
 | 阶段 3：配置 OnFailure 触发 | 步骤 2 | 阶段 2 完成 | `auto-fix.conf` 已存在时跳过，仅验证 |
 | 阶段 4：创建修复服务和脚本 | 步骤 3-4 | 阶段 3 完成 | `openclaw-fix.service` 和 `openclaw-fix.sh` 已存在时跳过，仅验证 |
 | 阶段 5：启用服务 | 步骤 6 | 阶段 4 完成 | linger 已启用且服务已 enable 时跳过 |
-| 阶段 6：验证 | 测试 | 阶段 5 完成 | 验证失败时展示错误并等待用户决策 |
+| 阶段 6：依赖服务健康检查 | 步骤 7 | 阶段 5 完成 | `openclaw-deps-check.sh` 已存在时跳过创建，仅验证；HEARTBEAT 任务已存在时跳过写入 |
+| 阶段 7：验证 | 测试 | 阶段 6 完成 | 验证失败时展示错误并等待用户决策 |
 
 ### 执行原则
 
@@ -110,9 +151,25 @@ Gateway 正常运行
                       │
                       ├── 收集错误日志（日志文件 + journalctl）
                       ├── 验证配置 JSON 合法性
-                      ├── 调用 Kiro CLI 分析 + 修复（最多2轮）
+                      ├── ★ 检查依赖服务健康状态（调用 openclaw-deps-check.sh）
+                      │     ├── 解析 openclaw.json 发现依赖
+                      │     ├── litellm-proxy.service → HTTP /health
+                      │     └── chromium-headless.service → CDP /json/version
+                      ├── 依赖异常 → 先修复依赖，再重启 Gateway
+                      ├── 依赖正常 → 调用 Kiro CLI 分析 + 修复（最多2轮）
                       ├── 修复后验证 JSON + 重启 Gateway
                       └── 发送通知（成功/失败）
+
+HEARTBEAT 定时健康检查（每 30 分钟）
+    │
+    ▼
+  openclaw-deps-check.sh
+    │
+    ├── 解析 openclaw.json 发现依赖服务
+    ├── 逐个检查健康状态
+    ├── 异常 → 尝试 systemctl --user restart
+    ├── 重启后仍异常 → 通知用户
+    └── 全部正常 → 静默通过
 ```
 
 ## 前置条件
@@ -139,6 +196,7 @@ Gateway 正常运行
 
 ~/scripts/
 ├── openclaw-fix.sh                       # 自动修复主脚本（Kiro CLI 版）
+├── openclaw-deps-check.sh                # 依赖服务健康检查与自愈脚本
 └── safe-gateway-restart.sh               # 安全重启脚本（可选）
 ```
 
@@ -337,6 +395,25 @@ if [[ -f "$OPENCLAW_CONFIG_PATH" ]] && ! validate_config_json; then
   exit 1
 fi
 
+# ---- Check dependency services first ----
+# Gateway failure may be caused by a dependency being down (e.g., LiteLLM, Chromium).
+# Try to fix dependencies before invoking Kiro CLI for Gateway-level diagnosis.
+DEPS_CHECK_SCRIPT="$HOME/scripts/openclaw-deps-check.sh"
+if [[ -x "$DEPS_CHECK_SCRIPT" ]]; then
+  echo "[openclaw-fix] Checking dependency services..."
+  deps_output=$("$DEPS_CHECK_SCRIPT" --from-fix 2>&1 || true)
+  echo "$deps_output"
+  if echo "$deps_output" | grep -q "DEPS_FIXED"; then
+    echo "[openclaw-fix] Dependencies were fixed. Attempting Gateway restart before Kiro CLI..."
+    if restart_and_check; then
+      notify "✅ Gateway recovered after dependency fix (no Kiro CLI needed)."
+      exit 0
+    fi
+    echo "[openclaw-fix] Gateway still failing after dependency fix. Proceeding to Kiro CLI..."
+    ERROR_CONTEXT="$(collect_errors)"
+  fi
+fi
+
 # Find Kiro CLI
 KIRO_CLI="$(find_kiro_cli)"
 if [[ -z "$KIRO_CLI" ]]; then
@@ -507,6 +584,234 @@ loginctl enable-linger $USER
 systemctl --user enable --now openclaw-gateway.service
 ```
 
+## 步骤 7：依赖服务健康检查与自愈
+
+> **设计变更 (v1.1)**：AutoFix 从仅修复 Gateway 扩展为覆盖所有 OpenClaw 依赖服务。通过解析 `openclaw.json` 自动发现依赖，无需硬编码服务列表。
+
+### 设计思路
+
+Gateway 崩溃的根因可能不是 Gateway 本身，而是它依赖的服务挂了（如 LiteLLM 停止导致 memorySearch 超时、Chromium 进程退出导致 CDP 连接失败）。因此：
+
+1. **被动触发**：`openclaw-fix.sh` 在调用 Kiro CLI 之前，先检查依赖服务。如果依赖异常，先修复依赖再重启 Gateway，可能无需 Kiro CLI 介入。
+2. **主动巡检**：HEARTBEAT 定时执行 `openclaw-deps-check.sh`，在依赖服务异常但 Gateway 尚未崩溃时提前修复，避免级联故障。
+
+### 服务发现机制
+
+从 `~/.openclaw/openclaw.json` 解析依赖关系：
+
+| 配置路径 | 依赖服务 | systemd 服务名 | 健康检查方式 | 端口 |
+|----------|----------|----------------|-------------|------|
+| `memorySearch.remote.baseUrl` | LiteLLM Proxy | `litellm-proxy.service` | HTTP GET `/health` | 4000 |
+| `browser.profiles.*.cdpUrl` (含 18800) | Chromium Headless | `chromium-headless.service` | HTTP GET `/json/version` | 18800 |
+
+> 服务发现是动态的 — 如果 `openclaw.json` 中未启用 `memorySearch` 或未配置 CDP profile，对应的服务检查会自动跳过。未来新增依赖只需在脚本的 `discover_deps()` 函数中添加解析规则。
+
+### 创建依赖服务健康检查脚本
+
+`~/scripts/openclaw-deps-check.sh`：
+
+```bash
+#!/usr/bin/env bash
+# openclaw-deps-check.sh — Discover and health-check OpenClaw dependency services.
+# Called by: HEARTBEAT (proactive) or openclaw-fix.sh (reactive, with --from-fix flag).
+set -euo pipefail
+
+OPENCLAW_CONFIG_PATH="${OPENCLAW_CONFIG_PATH:-$HOME/.openclaw/openclaw.json}"
+FROM_FIX=false
+[[ "${1:-}" == "--from-fix" ]] && FROM_FIX=true
+
+# ---- Notification (reuse openclaw notification if available) ----
+detect_notify_channel() {
+  local channel_info
+  channel_info="$(openclaw notification list 2>/dev/null | head -1 || true)"
+  if [[ -z "$channel_info" ]]; then
+    NOTIFY_CHANNEL=""
+    NOTIFY_TARGET=""
+    return
+  fi
+  NOTIFY_CHANNEL="$(echo "$channel_info" | awk '{print $1}' || true)"
+  NOTIFY_TARGET="$(echo "$channel_info" | awk '{print $2}' || true)"
+}
+
+notify() {
+  local msg="$1"
+  [[ -z "${NOTIFY_CHANNEL:-}" || -z "${NOTIFY_TARGET:-}" ]] && return 0
+  openclaw message send --channel "$NOTIFY_CHANNEL" --target "$NOTIFY_TARGET" --message "$msg" 2>/dev/null || true
+}
+
+# ---- Service Discovery from openclaw.json ----
+discover_deps() {
+  # Output: one line per dependency in format "SERVICE_NAME|HEALTH_URL|DESCRIPTION"
+  python3 -c "
+import json, os, sys
+cfg_path = os.path.expanduser('$OPENCLAW_CONFIG_PATH')
+if not os.path.isfile(cfg_path):
+    sys.exit(0)
+cfg = json.load(open(cfg_path))
+
+# memorySearch → LiteLLM
+ms = cfg.get('memorySearch', {})
+if ms.get('enabled') and ms.get('remote', {}).get('baseUrl'):
+    base = ms['remote']['baseUrl'].rstrip('/')
+    print(f'litellm-proxy.service|{base}/health|LiteLLM Proxy (memorySearch)')
+
+# browser profiles → Chromium headless (port 18800)
+browser = cfg.get('browser', {})
+for pname, profile in browser.get('profiles', {}).items():
+    cdp = profile.get('cdpUrl', '')
+    if '18800' in cdp:
+        host = cdp.rstrip('/')
+        print(f'chromium-headless.service|{host}/json/version|Chromium Headless (browser CDP, profile={pname})')
+        break  # only need one entry for chromium
+" 2>/dev/null || true
+}
+
+# ---- Health Check & Restart ----
+check_and_fix_service() {
+  local svc_name="$1"
+  local health_url="$2"
+  local description="$3"
+  local fixed=false
+
+  # Step 1: HTTP health check
+  if curl -s --max-time 5 "$health_url" >/dev/null 2>&1; then
+    echo "  ✔ $description — healthy"
+    return 0
+  fi
+
+  echo "  ✘ $description — health check failed ($health_url)"
+
+  # Step 2: Check systemd service status
+  local svc_status
+  svc_status="$(systemctl --user is-active "$svc_name" 2>/dev/null || echo "unknown")"
+  echo "    systemd status: $svc_status"
+
+  # Step 3: Attempt restart
+  if systemctl --user cat "$svc_name" >/dev/null 2>&1; then
+    echo "    Restarting $svc_name..."
+    systemctl --user restart "$svc_name" 2>/dev/null || true
+    sleep 5
+
+    # Step 4: Re-check after restart
+    if curl -s --max-time 5 "$health_url" >/dev/null 2>&1; then
+      echo "    ✔ $description — recovered after restart"
+      fixed=true
+    else
+      echo "    ✘ $description — still unhealthy after restart"
+    fi
+  else
+    echo "    ⚠ $svc_name not found as systemd user service, cannot auto-restart"
+  fi
+
+  if $fixed; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+# ---- Main ----
+detect_notify_channel
+
+echo "[openclaw-deps-check] Discovering dependencies from $OPENCLAW_CONFIG_PATH..."
+DEPS="$(discover_deps)"
+
+if [[ -z "$DEPS" ]]; then
+  echo "[openclaw-deps-check] No dependency services found in config. Done."
+  exit 0
+fi
+
+echo "[openclaw-deps-check] Found dependencies:"
+echo "$DEPS" | while IFS='|' read -r svc url desc; do
+  echo "  - $desc ($svc → $url)"
+done
+
+ALL_OK=true
+ANY_FIXED=false
+
+while IFS='|' read -r svc_name health_url description; do
+  if check_and_fix_service "$svc_name" "$health_url" "$description"; then
+    # Check if it was fixed (not originally healthy)
+    :
+  else
+    ALL_OK=false
+  fi
+done <<< "$DEPS"
+
+# Detect if any service was restarted (for --from-fix caller)
+# Re-check all services to see if any were fixed
+RECHECK_DEPS="$(discover_deps)"
+FIXED_COUNT=0
+while IFS='|' read -r svc_name health_url description; do
+  if curl -s --max-time 3 "$health_url" >/dev/null 2>&1; then
+    :
+  else
+    FIXED_COUNT=-1  # still broken
+  fi
+done <<< "$RECHECK_DEPS"
+
+if $FROM_FIX; then
+  # Signal to openclaw-fix.sh whether dependencies were fixed
+  if [[ $FIXED_COUNT -ge 0 ]] && ! $ALL_OK; then
+    echo "DEPS_FIXED"
+  fi
+else
+  # HEARTBEAT mode: notify on failures
+  if ! $ALL_OK; then
+    notify "🔴 OpenClaw 依赖服务异常，部分服务重启后仍不健康。请检查: $(echo "$DEPS" | grep -v '^$' | cut -d'|' -f3 | tr '\n' ', ')"
+  fi
+fi
+
+echo "[openclaw-deps-check] Done."
+```
+
+```bash
+chmod +x ~/scripts/openclaw-deps-check.sh
+```
+
+### HEARTBEAT.md 写入定时健康检查任务
+
+先检查是否已存在，不存在时才追加：
+
+```bash
+HEARTBEAT_FILE="$HOME/.openclaw/HEARTBEAT.md"
+if grep -q "依赖服务健康检查" "$HEARTBEAT_FILE" 2>/dev/null; then
+  echo "✔ 依赖服务健康检查任务已存在，跳过写入"
+else
+  cat >> "$HEARTBEAT_FILE" << 'EOF'
+
+## 依赖服务健康检查 🏥 (every 30 min)
+If 30+ minutes since last check:
+1. 执行 `~/scripts/openclaw-deps-check.sh`
+2. 脚本自动从 `~/.openclaw/openclaw.json` 发现依赖服务（LiteLLM、Chromium 等）
+3. 逐个执行 HTTP 健康检查
+4. 异常服务自动尝试 `systemctl --user restart`
+5. 重启后仍异常 → 通知用户
+6. 全部正常 → 静默通过，不通知
+EOF
+  echo "✔ 依赖服务健康检查任务已写入 $HEARTBEAT_FILE"
+fi
+```
+
+### 与 openclaw-fix.sh 的集成
+
+`openclaw-fix.sh`（步骤 4）已包含依赖检查调用逻辑。当 Gateway 崩溃触发 OnFailure 时：
+
+```
+openclaw-fix.sh 启动
+  → 收集错误日志
+  → 验证 JSON 合法性
+  → ★ 调用 openclaw-deps-check.sh --from-fix
+      ├── 依赖异常 → 修复依赖 → 尝试重启 Gateway
+      │     ├── Gateway 恢复 → 通知成功，退出（无需 Kiro CLI）
+      │     └── Gateway 仍失败 → 继续进入 Kiro CLI 修复流程
+      └── 依赖正常 → 直接进入 Kiro CLI 修复流程
+```
+
+> 这种"先修依赖、再修 Gateway"的策略可以显著减少 Kiro CLI 调用次数（节省 Credits），因为很多 Gateway 崩溃的根因是依赖服务挂了。
+
+---
+
 ## 环境变量
 
 | 变量 | 默认值 | 说明 |
@@ -523,8 +828,10 @@ systemctl --user enable --now openclaw-gateway.service
 1. **systemd Restart=always** — 普通崩溃直接重启，5 秒间隔
 2. **StartLimitBurst=5 / StartLimitIntervalSec=60** — 60 秒内崩 5 次进入 failed
 3. **OnFailure=openclaw-fix.service** — failed 后触发修复
-4. **openclaw-fix.sh** — 收集日志 → Kiro CLI 分析 → 最小修复 → 验证 JSON → 重启 → 通知
-5. **flock 单实例锁** — 防止多个修复进程同时跑
+4. **openclaw-fix.sh** — 收集日志 → 检查依赖服务 → 依赖异常先修依赖 → 依赖正常则 Kiro CLI 分析 → 最小修复 → 验证 JSON → 重启 → 通知
+5. **openclaw-deps-check.sh** — 解析 `openclaw.json` 发现依赖 → HTTP 健康检查 → 异常自动重启 → 仍异常则通知
+6. **flock 单实例锁** — 防止多个修复进程同时跑
+7. **HEARTBEAT 主动巡检** — 每 30 分钟检查依赖服务健康状态，在 Gateway 崩溃前提前修复
 
 ## 关键设计
 
@@ -577,12 +884,29 @@ with KiroBridge() as bridge:
 # 手动触发修复（模拟）
 bash ~/scripts/openclaw-fix.sh
 
+# 手动执行依赖服务健康检查
+bash ~/scripts/openclaw-deps-check.sh
+
 # 安全重启
 bash ~/scripts/safe-gateway-restart.sh "测试重启"
 
 # 验证 Kiro CLI 可用性
 kiro-cli auth status
 kiro-cli version
+
+# 验证依赖服务发现
+python3 -c "
+import json, os
+cfg = json.load(open(os.path.expanduser('~/.openclaw/openclaw.json')))
+ms = cfg.get('memorySearch', {})
+if ms.get('enabled'):
+    print(f'memorySearch → {ms.get(\"remote\", {}).get(\"baseUrl\", \"N/A\")}')
+browser = cfg.get('browser', {})
+for pname, p in browser.get('profiles', {}).items():
+    cdp = p.get('cdpUrl', '')
+    if cdp:
+        print(f'browser.profiles.{pname} → {cdp}')
+"
 ```
 
 ## 故障排查
@@ -597,6 +921,12 @@ kiro-cli version
 | 通知未发送 | `openclaw notification list` | 确认至少配置了一个通知渠道（Telegram/Discord/Feishu 等） |
 | Kiro Credits 不足 | Kiro CLI 返回错误 | 检查 Kiro 订阅状态；升级到 Pro |
 | 修复质量不佳 | 检查 Kiro CLI 模型配置 | 在 `~/.kiro/settings/settings.json` 中设置 `defaultModel` 为 `claude-opus-4-6` |
+| LiteLLM 健康检查失败 | `curl -s http://localhost:4000/health` | `systemctl --user restart litellm-proxy.service`；检查 AWS Credentials |
+| Chromium CDP 无响应 | `curl -s http://localhost:18800/json/version` | `systemctl --user restart chromium-headless.service`；检查 Snap AppArmor |
+| 依赖服务发现为空 | `python3 -c "import json; ..."` 检查 openclaw.json | 确认 `memorySearch.enabled=true` 或 `browser.profiles` 中有 CDP 配置 |
+| Gateway 崩溃但依赖检查正常 | `bash ~/scripts/openclaw-deps-check.sh` | 依赖正常说明问题在 Gateway 本身，Kiro CLI 修复流程会接管 |
+| 依赖修复后 Gateway 仍崩溃 | 检查 `openclaw-fix.sh` 日志 | 依赖已修复但 Gateway 有独立问题，Kiro CLI 会继续分析 |
+| `openclaw-deps-check.sh` 找不到 systemd 服务 | `systemctl --user list-units \| grep -E 'litellm\|chromium'` | 确认依赖服务已按对应文档配置为 systemd user service |
 
 ## 参考
 
@@ -606,3 +936,11 @@ kiro-cli version
 - [Kiro 官方网站](https://kiro.dev/)
 - [OpenClaw 文档](https://docs.openclaw.ai)
 - [systemd OnFailure](https://www.freedesktop.org/software/systemd/man/systemd.unit.html#OnFailure=)
+- [Memory Search 配置（LiteLLM）](../0.%20Base/README.md)
+- [Chrome DevTool 配置（Chromium Headless）](../2.%20Chrome_DevTool/README.md)
+
+---
+
+**版本**: v1.1
+**更新时间**: 2026-03-18
+**变更**: 从仅修复 Gateway 扩展为覆盖所有 OpenClaw 依赖服务；新增 `openclaw-deps-check.sh` 依赖服务健康检查脚本；`openclaw-fix.sh` 增加依赖检查前置步骤；新增 HEARTBEAT 定时健康巡检任务；服务发现基于 `openclaw.json` 动态解析

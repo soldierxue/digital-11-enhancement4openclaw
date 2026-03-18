@@ -40,7 +40,7 @@ python3 -c "
 import json, os
 p = os.path.expanduser('$OC_DIR/skills/tech-updates-collector/state.json')
 d = json.load(open(p))
-print(f'STATE_OK lastCollectorCheck={d.get(\"lastCollectorCheck\", \"MISSING\")}')
+print(f'STATE_OK lastCollectorCheck={d.get(\"lastCollectorCheck\", \"MISSING\")} todayFile={d.get(\"todayFile\", \"MISSING\")} batchCount={d.get(\"todayBatchCount\", \"MISSING\")} totalItems={d.get(\"todayTotalItems\", \"MISSING\")}')
 " 2>/dev/null || echo "STATE_JSON_INVALID_OR_MISSING"
 
 # 5. output 目录是否存在
@@ -104,7 +104,7 @@ grep -c "Tech Updates 采集" "$OC_DIR/HEARTBEAT.md" 2>/dev/null || echo "HEARTB
 
 `tech-updates-collector` 是一个 AI 资讯采集 Skill，按六大主题（openclaw、ai-org-structure、agentic-cases、agentic-commerce、enterprise-ai、ai-dlc）从博客、新闻等来源自动采集资讯，生成结构化日报 `output/YYYY-MM-DD.md`。每日多次执行时采用增量追加去重模式：按 URL 去重，仅追加新条目到对应主题章节末尾，不覆盖已有内容。
 
-搜索能力通过宿主机上的 Kiro CLI 调用 Exa MCP Server 实现（远程 URL 模式，工具名带 `_exa` 后缀）。推荐使用 `web_search_advanced_exa` 的日期过滤功能精确限制 24h 采集窗口。
+搜索能力通过宿主机上的 Kiro CLI 调用 Exa MCP Server 实现（远程 URL 模式，工具名带 `_exa` 后缀）。推荐使用 `web_search_advanced_exa` 的日期过滤功能，配合增量搜索窗口（`lastCheck → now`）精确限制采集范围，避免重复搜索。
 
 ---
 
@@ -114,7 +114,7 @@ grep -c "Tech Updates 采集" "$OC_DIR/HEARTBEAT.md" 2>/dev/null || echo "HEARTB
 skills/tech-updates-collector/
 ├── SKILL.md                 # Skill 定义（触发条件、搜索策略、输出格式）
 ├── topics-definition.md     # 六大主题权威定义（Single Source of Truth）
-├── state.json               # 采集状态 {"lastCollectorCheck": <unix_timestamp>}
+├── state.json               # 采集状态 {"lastCollectorCheck", "todayFile", "todayBatchCount", "todayTotalItems"}
 └── output/                  # 日报输出目录（每日一个文件，增量追加去重）
     └── 2026-03-16.md        # 历史日报样例（多次采集的累积结果）
 ```
@@ -254,10 +254,11 @@ else
 If 1+ hour since last check (see `skills/tech-updates-collector/state.json` → `lastCollectorCheck`):
 - 参考 `skills/tech-updates-collector/SKILL.md` 执行采集流程
 - 通过 kiro-cli 调用 Exa MCP 工具搜索 AI 资讯
-- 优先使用 `web_search_advanced_exa` 限制搜索窗口为过去 24 小时
+- 搜索窗口：增量模式（lastCheck → now），首次/宕机恢复兜底 24h
+- 优先使用 `web_search_advanced_exa` 精确限制搜索时间范围
 - 按六大主题分类，增量追加去重写入日报: `skills/tech-updates-collector/output/YYYY-MM-DD.md`
-- 更新 `skills/tech-updates-collector/state.json` 中的 `lastCollectorCheck` 时间戳
-- 主动发送日报给 human（Feishu 消息 + markdown 文件附件）
+- 更新 `skills/tech-updates-collector/state.json`（时间戳 + 批次计数 + 条目总数）
+- 分级通知：首次采集发完整日报，增量 ≥5 条发摘要，<5 条静默，0 条不通知
 EOF
   echo "✔ Tech Updates 采集任务已写入 $HEARTBEAT_FILE"
 fi
@@ -277,14 +278,15 @@ fi
 HEARTBEAT.md 触发
   → Agent 读取 SKILL.md
   → 检查 state.json（是否需要执行）
+  → 计算搜索窗口（增量: lastCheck → now，兜底: now-24h → now）
   → 按 6 组搜索策略调用 kiro-cli → Exa MCP
-    （优先使用 web_search_advanced_exa 限制 24h 时间窗口）
+    （使用 web_search_advanced_exa / twitter_search_exa 限制时间窗口）
   → 搜索结果按 topics-definition.md 分类
   → 增量追加去重写入 output/YYYY-MM-DD.md
     （首次创建新文件；后续执行按 URL 去重，仅追加新条目）
   → 更新统计和趋势章节
-  → 更新 state.json
-  → 发送日报给 human
+  → 更新 state.json（时间戳 + todayFile + batchCount + totalItems）
+  → 分级通知（首次→完整日报，≥5条→摘要，<5条→静默，0条→不通知）
 ```
 
 ---
@@ -296,15 +298,19 @@ HEARTBEAT.md 触发
 | kiro-cli 未安装 | `kiro-cli --version`，参考安装文档 |
 | Exa 搜索无结果 | 检查 `~/.kiro/settings/mcp.json` 中 Exa 配置；确认使用远程 URL 模式而非本地 npx |
 | Exa 只有 2 个工具 | 本地 npx 模式（v3.1.9+）已不支持 `--tools` 参数，切换到远程 URL 模式 |
+| 工具名报错 (twitter_search 不存在) | 远程 URL 模式工具名带 `_exa` 后缀：`twitter_search_exa`、`web_search_advanced_exa` |
 | 缺少日期过滤能力 | 确认远程 URL 中包含 `web_search_advanced_exa` 工具 |
 | 搜索超时 | 拆分为更小的查询批次；检查网络连接 |
 | 日报格式异常 | 参考 `output/2026-03-16.md` 样例对比 |
 | 日报条目重复 | 检查去重逻辑是否按 URL 精确匹配；确认未手动修改条目链接 |
 | 多次执行后条目序号不连续 | 正常现象 — 新条目序号接续该主题已有最大序号，不会重新编号 |
 | state.json 时间戳不更新 | 检查 Agent 是否有文件写入权限 |
+| 每次都搜 24h 没有增量效果 | 检查 `state.json` 的 `lastCollectorCheck` 是否正常更新；值为 0 或过期 >24h 会触发兜底全量搜索 |
+| 出现 YYYY-MM-DD-evening.md 等异常文件名 | 日报文件名必须严格为 `YYYY-MM-DD.md`，不允许后缀变体；删除异常文件 |
+| 通知过于频繁 | 分级通知：增量 <5 条应静默追加，0 条不通知；检查 SKILL.md Step 5 通知策略 |
 
 ---
 
-**版本**: v1.2  
-**更新时间**: 2026-03-17  
-**变更**: 日报输出策略从覆盖写入改为增量追加去重模式；Exa MCP 配置从本地 npx 模式更新为远程 URL 模式；新增 `web_search_advanced_exa` 日期过滤说明
+**版本**: v1.3  
+**更新时间**: 2026-03-18  
+**变更**: 搜索窗口从固定 24h 改为增量模式（lastCheck → now，兜底 cap 24h）；工具名更新为远程 `_exa` 后缀；state.json 新增 todayFile/todayBatchCount/todayTotalItems 字段；新增分级通知策略
