@@ -56,8 +56,23 @@ python3 -c "
 import json, os
 cfg = json.load(open(os.path.expanduser('~/.kiro/settings/mcp.json')))
 servers = cfg.get('mcpServers', {})
-exa_found = any('exa' in k.lower() for k in servers)
-print(f'EXA_CONFIGURED={exa_found}')
+exa = servers.get('exa', {})
+if exa:
+    if 'url' in exa:
+        url = exa['url']
+        has_key = 'exaApiKey=' in url and 'exaApiKey=<' not in url
+        has_tools = 'tools=' in url
+        print(f'EXA_CONFIGURED=remote url_mode key={has_key} tools_param={has_tools}')
+        if has_tools and 'web_search_advanced_exa' in url:
+            print('EXA_ADVANCED_SEARCH=available')
+        else:
+            print('EXA_ADVANCED_SEARCH=missing_or_default')
+    elif 'command' in exa:
+        print('EXA_CONFIGURED=local_npx (⚠️ 不推荐，v3.1.9+ 仅暴露 2 个工具)')
+    else:
+        print('EXA_CONFIGURED=unknown_format')
+else:
+    print('EXA_NOT_CONFIGURED')
 " 2>/dev/null || echo "MCP_CONFIG_READ_FAILED"
 
 # 8. HEARTBEAT.md 中是否已有采集任务
@@ -87,9 +102,9 @@ grep -c "Tech Updates 采集" "$OC_DIR/HEARTBEAT.md" 2>/dev/null || echo "HEARTB
 
 ## 1. Skill 简介
 
-`tech-updates-collector` 是一个 AI 资讯采集 Skill，按六大主题（openclaw、ai-org-structure、agentic-cases、agentic-commerce、enterprise-ai、ai-dlc）从 Twitter/X、博客、论文等来源自动采集资讯，生成结构化日报 `output/YYYY-MM-DD.md`。
+`tech-updates-collector` 是一个 AI 资讯采集 Skill，按六大主题（openclaw、ai-org-structure、agentic-cases、agentic-commerce、enterprise-ai、ai-dlc）从博客、新闻等来源自动采集资讯，生成结构化日报 `output/YYYY-MM-DD.md`。每日多次执行时采用增量追加去重模式：按 URL 去重，仅追加新条目到对应主题章节末尾，不覆盖已有内容。
 
-搜索能力通过宿主机上的 Kiro CLI 调用 Exa MCP Server 实现。
+搜索能力通过宿主机上的 Kiro CLI 调用 Exa MCP Server 实现（远程 URL 模式，工具名带 `_exa` 后缀）。推荐使用 `web_search_advanced_exa` 的日期过滤功能精确限制 24h 采集窗口。
 
 ---
 
@@ -100,8 +115,8 @@ skills/tech-updates-collector/
 ├── SKILL.md                 # Skill 定义（触发条件、搜索策略、输出格式）
 ├── topics-definition.md     # 六大主题权威定义（Single Source of Truth）
 ├── state.json               # 采集状态 {"lastCollectorCheck": <unix_timestamp>}
-└── output/                  # 日报输出目录
-    └── 2026-03-16.md        # 历史日报样例
+└── output/                  # 日报输出目录（每日一个文件，增量追加去重）
+    └── 2026-03-16.md        # 历史日报样例（多次采集的累积结果）
 ```
 
 ---
@@ -126,27 +141,62 @@ kiro-cli auth status
 
 Kiro CLI 的 MCP 配置中必须包含 Exa Search Server。
 
-检查配置文件 `~/.kiro/settings/mcp.json`，确认存在 `exa` 相关条目：
+> ⚠️ **重要变更**：`exa-mcp-server` npm 本地包（v3.1.9+）已不再支持 `--tools` 参数，仅暴露 2 个默认工具。**推荐使用远程 URL 模式**，可获得完整的 5 个工具，且工具名带 `_exa` 后缀。
+
+检查配置文件 `~/.kiro/settings/mcp.json`，确认存在 `exa` 相关条目。
+
+**推荐配置 — 远程 URL 模式（带 API Key）：**
 
 ```json
 {
   "mcpServers": {
-    "github.com/exa-labs/exa-mcp-server": {
-      "command": "npx",
-      "args": ["exa-mcp-server", "--tools=web_search,research_paper_search,twitter_search,company_research,crawling,competitor_finder"],
-      "env": {
-        "EXA_API_KEY": "<your-api-key>"
-      },
-      "disabled": false
+    "exa": {
+      "url": "https://mcp.exa.ai/mcp?exaApiKey=<your-api-key>&tools=web_search_exa,web_search_advanced_exa,company_research_exa,crawling_exa,people_search_exa"
     }
   }
 }
 ```
 
+**远程模式可用工具：**
+
+| 工具名 | 说明 | 采集价值 |
+|--------|------|----------|
+| `web_search_exa` | 通用网页搜索 | 博客、新闻 |
+| `web_search_advanced_exa` | 高级搜索，支持 `startPublishedDate` / `endPublishedDate` 日期过滤 | ✅ 精确限制 24h 采集窗口 |
+| `company_research_exa` | 公司研究 | 企业 AI 动态 |
+| `crawling_exa` | 网页内容抓取 | 深度阅读原文 |
+| `people_search_exa` | 人物搜索 | AI 领域关键人物 |
+
+> `web_search_advanced_exa` 的日期过滤能力对日报采集至关重要 — 可以精确限制搜索窗口为过去 24 小时，避免重复采集旧资讯。
+
+**无 API Key 时的备选 — 远程免 Key 模式：**
+
+```json
+{
+  "mcpServers": {
+    "exa": {
+      "url": "https://mcp.exa.ai/mcp"
+    }
+  }
+}
+```
+
+> 免 Key 模式有调用频率限制，适合验证配置。生产采集建议使用带 API Key 的模式。
+> 获取 API Key: [https://dashboard.exa.ai/api-keys](https://dashboard.exa.ai/api-keys)
+
+**⚠️ 不推荐 — 本地 npx 模式（已过时）：**
+
+```
+# exa-mcp-server@3.1.9+ 的 npx 模式忽略 --tools 参数，
+# 仅暴露 web_search_exa 和 get_code_context_exa 两个工具，
+# 缺少 web_search_advanced_exa（日期过滤）、crawling_exa 等关键工具。
+# 请勿使用此模式。
+```
+
 验证 Exa MCP 可用：
 
 ```bash
-kiro-cli chat --no-interactive --trust-all-tools "use Exa web_search for: test query"
+kiro-cli chat --no-interactive --trust-all-tools "use web_search_exa to search for: test query"
 ```
 
 ### 3.3 Node.js（可选）
@@ -204,7 +254,8 @@ else
 If 1+ hour since last check (see `skills/tech-updates-collector/state.json` → `lastCollectorCheck`):
 - 参考 `skills/tech-updates-collector/SKILL.md` 执行采集流程
 - 通过 kiro-cli 调用 Exa MCP 工具搜索 AI 资讯
-- 按六大主题分类生成日报: `skills/tech-updates-collector/output/YYYY-MM-DD.md`
+- 优先使用 `web_search_advanced_exa` 限制搜索窗口为过去 24 小时
+- 按六大主题分类，增量追加去重写入日报: `skills/tech-updates-collector/output/YYYY-MM-DD.md`
 - 更新 `skills/tech-updates-collector/state.json` 中的 `lastCollectorCheck` 时间戳
 - 主动发送日报给 human（Feishu 消息 + markdown 文件附件）
 EOF
@@ -227,8 +278,11 @@ HEARTBEAT.md 触发
   → Agent 读取 SKILL.md
   → 检查 state.json（是否需要执行）
   → 按 6 组搜索策略调用 kiro-cli → Exa MCP
+    （优先使用 web_search_advanced_exa 限制 24h 时间窗口）
   → 搜索结果按 topics-definition.md 分类
-  → 生成 output/YYYY-MM-DD.md
+  → 增量追加去重写入 output/YYYY-MM-DD.md
+    （首次创建新文件；后续执行按 URL 去重，仅追加新条目）
+  → 更新统计和趋势章节
   → 更新 state.json
   → 发送日报给 human
 ```
@@ -240,12 +294,17 @@ HEARTBEAT.md 触发
 | 问题 | 排查方法 |
 |------|----------|
 | kiro-cli 未安装 | `kiro-cli --version`，参考安装文档 |
-| Exa 搜索无结果 | 检查 `~/.kiro/settings/mcp.json` 中 Exa 配置和 API Key |
+| Exa 搜索无结果 | 检查 `~/.kiro/settings/mcp.json` 中 Exa 配置；确认使用远程 URL 模式而非本地 npx |
+| Exa 只有 2 个工具 | 本地 npx 模式（v3.1.9+）已不支持 `--tools` 参数，切换到远程 URL 模式 |
+| 缺少日期过滤能力 | 确认远程 URL 中包含 `web_search_advanced_exa` 工具 |
 | 搜索超时 | 拆分为更小的查询批次；检查网络连接 |
 | 日报格式异常 | 参考 `output/2026-03-16.md` 样例对比 |
+| 日报条目重复 | 检查去重逻辑是否按 URL 精确匹配；确认未手动修改条目链接 |
+| 多次执行后条目序号不连续 | 正常现象 — 新条目序号接续该主题已有最大序号，不会重新编号 |
 | state.json 时间戳不更新 | 检查 Agent 是否有文件写入权限 |
 
 ---
 
-**版本**: v1.0  
-**更新时间**: 2026-03-17
+**版本**: v1.2  
+**更新时间**: 2026-03-17  
+**变更**: 日报输出策略从覆盖写入改为增量追加去重模式；Exa MCP 配置从本地 npx 模式更新为远程 URL 模式；新增 `web_search_advanced_exa` 日期过滤说明

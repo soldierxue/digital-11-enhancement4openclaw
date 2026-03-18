@@ -5,11 +5,11 @@ process with isolated context. Same project name reuses the existing
 process and session (shared context).
 """
 
-import logging, os, sys, threading
+import logging, os, sys, threading, time
 from concurrent.futures import ThreadPoolExecutor, Future
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from acp_client import ACPClient, PromptResult, PermissionRequest
+from acp_client import ACPClient, PromptResult, PermissionRequest, StreamEvent
 
 KIRO_CLI_PATH = os.environ.get("KIRO_CLI_PATH", os.path.expanduser("~/.local/bin/kiro-cli"))
 WORKING_DIR   = os.environ.get("KIRO_WORKING_DIR", os.path.expanduser("~/kiro-projects"))
@@ -59,7 +59,8 @@ class _ProjectHandle:
         log.info("[%s] Session reset: %s", self.project_name, sid[:20])
         return sid
 
-    def prompt(self, text: str, timeout: float = 300) -> PromptResult:
+    def prompt(self, text: str, timeout: float = 300,
+               on_progress=None) -> PromptResult:
         acp = self.ensure_running()
         sid = self.ensure_session()
 
@@ -70,7 +71,12 @@ class _ProjectHandle:
                         self.project_name, meta["contextUsagePercentage"])
             sid = self.reset_session()
 
-        return acp.session_prompt(sid, text, timeout=timeout)
+        # Build stream callback that translates StreamEvent → user-friendly progress
+        stream_cb = None
+        if on_progress is not None:
+            stream_cb = _make_stream_callback(on_progress)
+
+        return acp.session_prompt(sid, text, timeout=timeout, on_stream=stream_cb)
 
     def stop(self):
         with self._lock:
@@ -79,6 +85,60 @@ class _ProjectHandle:
                 self.acp = None
                 self.session_id = None
                 log.info("[%s] Stopped", self.project_name)
+
+
+_TOOL_KIND_ICONS = {
+    "fs_write": "📝",
+    "fs_read": "📖",
+    "terminal": "⚡",
+    "web": "🌐",
+}
+
+# Minimum interval between progress messages to avoid flooding the user
+_PROGRESS_THROTTLE_SECS = 2.0
+
+
+def _make_stream_callback(on_progress):
+    """Create a StreamEvent → on_progress(str) adapter with throttling.
+
+    on_progress receives user-friendly strings like:
+      "🔧 Kiro 开始执行..."
+      "📝 正在写入文件: src/main.py"
+      "✅ src/main.py 完成"
+
+    Throttling: tool_call events are rate-limited to one per
+    _PROGRESS_THROTTLE_SECS to avoid flooding the messaging channel.
+    "started" and "tool_call_done" are always sent immediately.
+    """
+    last_sent = [0.0]  # mutable container for closure
+
+    def _callback(event: StreamEvent):
+        now = time.monotonic()
+
+        if event.event_type == "started":
+            on_progress("🔧 Kiro 开始执行...")
+            last_sent[0] = now
+
+        elif event.event_type == "tool_call":
+            if now - last_sent[0] >= _PROGRESS_THROTTLE_SECS:
+                icon = _TOOL_KIND_ICONS.get(event.kind, "🔧")
+                action = {
+                    "fs_write": "正在写入文件",
+                    "fs_read": "正在读取文件",
+                    "terminal": "正在执行命令",
+                }.get(event.kind, "正在执行")
+                on_progress(f"{icon} {action}: {event.title}")
+                last_sent[0] = now
+
+        elif event.event_type == "tool_call_done":
+            status = event.metadata.get("status", "done")
+            icon = "✅" if status == "done" else "❌"
+            on_progress(f"{icon} {event.title} {'完成' if status == 'done' else '失败'}")
+            last_sent[0] = now
+
+        # metadata events are silent — no user-facing message
+
+    return _callback
 
 
 class KiroBridge:
@@ -129,7 +189,8 @@ class KiroBridge:
     # ── Core API ──────────────────────────────────────────
 
     def prompt(self, text: str, project: str | None = None,
-               cwd: str | None = None, timeout: float = 300) -> dict:
+               cwd: str | None = None, timeout: float = 300,
+               on_progress=None) -> dict:
         """
         Send a prompt to Kiro.
 
@@ -139,9 +200,12 @@ class KiroBridge:
                      starts a fresh kiro-cli process.
             cwd: Working directory override for this project.
             timeout: Max seconds to wait for response.
+            on_progress: Optional callback receiving user-friendly progress
+                         strings in real time as Kiro works. Must be
+                         non-blocking (e.g. enqueue a message send).
         """
         handle = self._get_handle(project, cwd)
-        result = handle.prompt(text, timeout=timeout)
+        result = handle.prompt(text, timeout=timeout, on_progress=on_progress)
 
         return {
             "success": True,

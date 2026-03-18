@@ -90,9 +90,9 @@ OpenClaw 使用 Claude API 处理所有任务，包括编码。编码任务的�
 ```
 ┌──────────────────────────────────────────────────────────┐
 │              用户 (Feishu / Signal / Telegram)             │
-└─────────────────────────┬────────────────────────────────┘
-                          │ message
-                          ▼
+└─────────────────────────┬──────────────▲─────────────────┘
+                          │ message      │ on_progress 实时推送
+                          ▼              │
 ┌──────────────────────────────────────────────────────────┐
 │              主 Agent (OpenClaw / Claude API)              │
 │  ┌──────────────┐  ┌──────────────┐  ┌────────────────┐  │
@@ -104,7 +104,7 @@ OpenClaw 使用 Claude API 处理所有任务，包括编码。编码任务的�
                         ┌─────────────────────▼────────────┐
                         │         acp_client.py             │
                         │  initialize / session/new         │
-                        │  session/prompt                   │
+                        │  session/prompt (on_stream 回调)  │
                         │  session/request_permission       │
                         │  _kiro.dev/metadata (用量推送)    │
                         └─────────────────────┬────────────┘
@@ -366,8 +366,15 @@ import sys, os
 sys.path.insert(0, os.path.expanduser('~/.openclaw/skills/kiro-cli/scripts'))
 from kiro_bridge import KiroBridge
 
+# on_progress 回调：实时打印 Kiro 执行进度
+def show_progress(msg):
+    print(f'  [进度] {msg}')
+
 with KiroBridge() as bridge:
-    result = bridge.prompt('Create a simple hello.py that prints Hello World')
+    result = bridge.prompt(
+        'Create a simple hello.py that prints Hello World',
+        on_progress=show_progress,
+    )
     print('Success:', result['success'])
     print('Response:', result['text'][:200])
     print('Tool calls:', len(result['tool_calls']))
@@ -462,9 +469,123 @@ openclaw gateway restart
 | 多项目上下文污染 | 不同项目的文件和依赖混在同一会话中 | 不同项目使用不同 `cwd` 创建独立会话，MCP 配置自动隔离 | `acp_client.py` `session_new(cwd)` |
 | 用量不可见 | 无法追踪 Kiro Credits 和 Claude API 的实际消耗 | `_kiro.dev/metadata` 实时推送 Credits 和上下文用量；`usage_tracker.py` 持久化双轨计费数据 | `acp_client.py` `_handle_line()` + `usage_tracker.py` `record_task()` |
 | 任务粒度过大 | 单次 prompt 包含过多工作，上下文消耗高且输出不可预测 | 建议拆分为单文件/单模块粒度的任务；SKILL.md 路由规则引导任务分解 | `SKILL.md` 路由规则 + 调用方任务拆分 |
+| 阻塞期间无进度反馈 | 用户在 Kiro 执行期间收不到任何消息 | `session_prompt()` 支持 `on_stream` 回调；`KiroBridge.prompt()` 支持 `on_progress` 回调，实时推送进度（节流 2s） | `acp_client.py` `_emit_stream_event()` + `kiro_bridge.py` `_make_stream_callback()` |
 | stderr 日志丢失 | kiro-cli 的错误输出未被捕获，排查困难 | 独立线程持续读取 stderr 并写入 Python logging | `acp_client.py` `_read_stderr()` |
 
----
+### MEMORY.md 补充：消息发送单通道原则
+
+> 以下规则应写入 OpenClaw 的 `MEMORY.md`，防止用户收到的飞书/Signal/Telegram 消息出现倒序。
+
+**问题根因**：OpenClaw 在同一轮回复中混用两个消息通道会导致消息到达顺序不可控：
+- `message` 工具 → 直调飞书 API（快通道）
+- Agent 主回复文本 → 经 OpenClaw 处理管线（慢通道）
+
+两条消息并发走不同管道，用户端收到的顺序取决于各通道延迟，无法保证。
+
+**MEMORY.md 应包含的规则**（幂等写入 — 先检查是否已存在 `单通道原则` 关键词）：
+
+```markdown
+## 消息发送 — 单通道原则（P0 强制）
+
+每轮回复只使用一个消息通道，禁止混用：
+
+| 场景 | 正确做法 | 错误做法 |
+|------|----------|----------|
+| 需要发送结构化结果（日报、报告等） | 用 `message` 工具发送，然后回复 `NO_REPLY` | 用 `message` 发完后又追加 Agent 主文本 |
+| 简单文字回复 | 直接用 Agent 主回复 | 先 `message` 发一段，再主回复补充一段 |
+| 需要发多条消息 | 按顺序依次调用 `message` 工具，每条确认前一条已返回后再发下一条，最后 `NO_REPLY` | 同时发起多个 `message` 调用 |
+
+规则：
+1. 用 `message` 工具发了内容 → 本轮必须回复 `NO_REPLY`，不追加 Agent 主文本
+2. 不用 `message` 工具 → 正常使用 Agent 主回复
+3. 多条消息 → 串行调用 `message`，等前一条返回后再发下一条
+4. 违反此规则 = 用户收到倒序消息（P0 体验问题）
+```
+
+**幂等写入脚本**：
+
+```bash
+MEMORY_FILE="$HOME/.openclaw/MEMORY.md"
+if grep -q "单通道原则" "$MEMORY_FILE" 2>/dev/null; then
+  echo "✔ 消息发送单通道原则已存在于 MEMORY.md，跳过写入"
+else
+  cat >> "$MEMORY_FILE" << 'MEMORY_EOF'
+
+## 消息发送 — 单通道原则（P0 强制）
+
+每轮回复只使用一个消息通道，禁止混用：
+
+| 场景 | 正确做法 | 错误做法 |
+|------|----------|----------|
+| 需要发送结构化结果 | 用 message 工具发送，然后回复 NO_REPLY | 用 message 发完后又追加 Agent 主文本 |
+| 简单文字回复 | 直接用 Agent 主回复 | 先 message 发一段，再主回复补充一段 |
+| 需要发多条消息 | 串行调用 message，每条确认返回后再发下一条，最后 NO_REPLY | 同时发起多个 message 调用 |
+
+规则：
+1. 用 message 工具发了内容 → 本轮必须回复 NO_REPLY
+2. 不用 message 工具 → 正常使用 Agent 主回复
+3. 多条消息 → 串行调用 message，等前一条返回后再发下一条
+4. 违反此规则 = 用户收到倒序消息（P0 体验问题）
+MEMORY_EOF
+  echo "✔ 消息发送单通道原则已写入 MEMORY.md"
+fi
+```
+
+### 流式进度推送（解决阻塞期间无反馈问题）
+
+> 生产环境发现：`session_prompt()` 阻塞等待 Kiro 完成（1-5 分钟），期间用户在飞书收不到任何消息。Kiro 的 `session/update` 事件虽被 `_read_loop` 接收，但只静默存入列表，无回调出口。任务完成后一次性发送结果 + 积压的思考过程，导致消息倒序。
+
+**已实现的两层回调机制**：
+
+**第一层：`acp_client.py` — `on_stream` 底层事件回调**
+
+`session_prompt()` 新增 `on_stream: Callable[[StreamEvent], None]` 可选参数。`_read_loop` 线程收到 `session/update` 时，除了存入列表，还通过 `_emit_stream_event()` 将原始事件翻译为 `StreamEvent` 并调用回调：
+
+| Kiro 原始事件 | StreamEvent.event_type | 触发条件 |
+|---------------|----------------------|----------|
+| 首个 `agent_message_chunk` | `started` | 仅首次，标记 Kiro 开始工作 |
+| `tool_call` | `tool_call` | 每个工具调用开始时 |
+| `tool_call_update` (status=done/error) | `tool_call_done` | 工具调用完成或失败时 |
+| `_kiro.dev/metadata` | `metadata` | Credits/上下文用量更新时 |
+
+> ⚠️ `on_stream` 在 `_read_loop` 线程中被调用，回调必须非阻塞。如果回调需要做 I/O（如发飞书消息），应使用队列或 fire-and-forget 模式。
+
+**第二层：`kiro_bridge.py` — `on_progress` 业务级进度推送**
+
+`KiroBridge.prompt()` 新增 `on_progress: Callable[[str], None]` 可选参数。内部通过 `_make_stream_callback()` 将 `StreamEvent` 翻译为用户友好的中文进度消息：
+
+| StreamEvent | 推送给用户的消息 | 节流 |
+|-------------|-----------------|------|
+| `started` | `🔧 Kiro 开始执行...` | 立即发送 |
+| `tool_call` (fs_write) | `📝 正在写入文件: src/main.py` | 2s 节流 |
+| `tool_call` (terminal) | `⚡ 正在执行命令: npm test` | 2s 节流 |
+| `tool_call_done` (done) | `✅ src/main.py 完成` | 立即发送 |
+| `tool_call_done` (error) | `❌ npm test 失败` | 立即发送 |
+| `metadata` | （静默，不推送） | — |
+
+**节流机制**：`tool_call` 事件按 2 秒间隔节流（`_PROGRESS_THROTTLE_SECS`），避免密集工具调用时刷屏。`started` 和 `tool_call_done` 始终立即发送。
+
+**调用示例**（OpenClaw 集成）：
+
+```python
+from kiro_bridge import KiroBridge
+
+def send_to_feishu(msg: str):
+    """非阻塞发送 — 实际实现中应使用队列或异步"""
+    # feishu_api.send_message(chat_id, msg)  # fire-and-forget
+    pass
+
+with KiroBridge() as bridge:
+    result = bridge.prompt(
+        "Create a REST API with FastAPI",
+        project="my-api",
+        on_progress=send_to_feishu,  # 实时进度推送
+    )
+    # result 到达时，用户已经看到了完整的执行过程
+    send_to_feishu(f"✅ 任务完成，共执行 {len(result['tool_calls'])} 个操作")
+```
+
+**向后兼容**：`on_stream` 和 `on_progress` 均为可选参数，默认 `None`。不传则保持原有的阻塞行为，现有调用方零改动。
 
 ---
 
@@ -514,6 +635,9 @@ openclaw gateway restart
 
 | 症状 | 排查命令 | 处理方式 |
 |------|----------|----------|
+| 用户收到倒序消息 | 检查 MEMORY.md 是否包含「单通道原则」 | 确认未混用 `message` 工具和 Agent 主回复；用 `message` 发完后必须 `NO_REPLY` |
+| Kiro 执行期间无进度消息 | 检查 `prompt()` 是否传入 `on_progress` 回调 | 传入非阻塞回调函数；确认回调内部不做同步 I/O |
+| 进度消息刷屏 | 检查 `_PROGRESS_THROTTLE_SECS` 值 | 增大节流间隔（默认 2s）；`tool_call` 事件受节流控制，`started`/`tool_call_done` 不受 |
 | ACP 握手失败 | `kiro-cli auth status` | 确认已登录；重新执行 `kiro-cli login` |
 | `session/new` 无响应 | `KIRO_LOG_LEVEL=debug kiro-cli acp` | 查看详细日志定位问题 |
 | 任务超时 | 检查网络连接 | 增加 timeout 参数；拆分大任务 |

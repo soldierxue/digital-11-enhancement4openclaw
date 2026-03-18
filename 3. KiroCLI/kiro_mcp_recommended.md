@@ -19,7 +19,7 @@
 在执行任何命令之前，请先完整阅读本文档所有 Step（Step 1 ~ Step 6），理解：
 - 目标：为 Kiro CLI 配置 AWS Documentation 和 Exa Search 两个 MCP Server
 - 配置文件位置：`~/.kiro/settings/mcp.json`（全局）
-- Exa 有两种模式（远程免 Key / 本地带 Key），需要用户选择
+- Exa 有两种模式（远程 URL + API Key / 远程免 Key），本地 npx 模式已过时不推荐
 - 最终验收标准：Step 5 的功能测试通过
 
 ### 第二步：检查当前环境状态
@@ -34,11 +34,27 @@ kiro-cli auth status 2>&1 || echo "KIRO_AUTH_UNKNOWN"
 # 2. uvx 是否可用（AWS Documentation Server 依赖）
 uvx --version 2>&1 || echo "UVX_NOT_FOUND"
 
-# 3. 现有 MCP 配置
-cat ~/.kiro/settings/mcp.json 2>/dev/null || echo "MCP_CONFIG_NOT_EXISTS"
-
-# 4. npx 是否可用（Exa 本地模式依赖，可选）
-npx --version 2>&1 || echo "NPX_NOT_FOUND"
+# 3. 现有 MCP 配置及 Exa 模式检测
+python3 -c "
+import json, os
+try:
+    cfg = json.load(open(os.path.expanduser('~/.kiro/settings/mcp.json')))
+    servers = cfg.get('mcpServers', {})
+    print(f'MCP_SERVERS: {list(servers.keys())}')
+    exa = servers.get('exa', {})
+    if exa:
+        if 'url' in exa:
+            url = exa['url']
+            has_key = 'exaApiKey=' in url and 'exaApiKey=<' not in url
+            has_adv = 'web_search_advanced_exa' in url
+            print(f'EXA_MODE=remote key={has_key} advanced_search={has_adv}')
+        elif 'command' in exa:
+            print('EXA_MODE=local_npx (⚠️ 已过时，建议迁移到远程 URL 模式)')
+    else:
+        print('EXA_NOT_CONFIGURED')
+except Exception as e:
+    print(f'MCP_CONFIG_READ_FAILED: {e}')
+" 2>/dev/null || echo "MCP_CONFIG_NOT_EXISTS"
 ```
 
 ### 第三步：根据状态制定分阶段计划
@@ -49,7 +65,7 @@ npx --version 2>&1 || echo "NPX_NOT_FOUND"
 |------|----------|----------|-------------------|
 | 阶段 1：环境检查 | 前置条件 | 无 | Kiro CLI 未安装/未登录时暂停；`uvx` 未安装时暂停并提供安装命令 |
 | 阶段 2：备份与配置 AWS Docs | Step 1-2 | 阶段 1 通过 | 已有 MCP 配置时先备份；若 `awslabs.aws-documentation-mcp-server` 已存在则跳过，不做任何修改 |
-| 阶段 3：配置 Exa Search | Step 3 | 阶段 2 完成 | 若 `exa` 已存在则跳过，不做任何修改；若不存在，**必须询问用户**选择远程模式（免 Key）还是本地模式（需 API Key） |
+| 阶段 3：配置 Exa Search | Step 3 | 阶段 2 完成 | 若 `exa` 已存在则跳过，不做任何修改；若不存在，**必须询问用户**是否有 API Key；若当前为 npx 本地模式，建议迁移到远程 URL 模式 |
 | 阶段 4：验证与测试 | Step 4-5 | 阶段 3 完成 | 测试失败时展示错误并等待用户决策 |
 | 阶段 5：更新路由规则 | Step 6 | 阶段 4 通过 | SKILL.md 不存在时提示先完成 ACP 集成 |
 
@@ -57,7 +73,7 @@ npx --version 2>&1 || echo "NPX_NOT_FOUND"
 
 1. **先诊断，后执行** — 不要跳过状态检查直接修改配置文件
 2. **幂等性优先** — 修改 MCP 配置前必须先检查目标 Server 是否已存在，已存在则跳过，不做任何修改
-3. **Exa 模式必须用户选择** — 不要自行决定使用远程还是本地模式，这涉及 API Key 和费用
+3. **Exa 模式必须用户选择** — 推荐远程 URL + API Key 模式（完整 5 个工具）；如果用户无 API Key，可先用免 Key 模式验证
 4. **遇到异常立即暂停** — 任何命令返回非零退出码或意外输出时，停下来向用户说明情况
 5. **每阶段汇报** — 完成一个阶段后，用简短的 ✅/❌ 汇总该阶段结果，再询问是否继续
 6. **已完成的步骤可跳过** — 如果诊断发现 MCP Server 已配置且内容一致，直接标记 ✅ 跳过
@@ -71,7 +87,7 @@ Kiro CLI 通过 MCP（Model Context Protocol）连接外部工具和数据源，
 | MCP Server | 用途 | 认证方式 |
 |------------|------|----------|
 | AWS Documentation | 搜索、阅读、推荐 AWS 官方文档 | 无需认证（公开 API） |
-| Exa Search | 实时 Web 搜索、学术论文搜索、公司调研、Twitter 搜索 | 远程模式免 Key；本地模式需 [API Key](https://dashboard.exa.ai/api-keys) |
+| Exa Search | 实时 Web 搜索、高级搜索（日期过滤）、公司调研、网页抓取、人物搜索 | 推荐远程 URL + [API Key](https://dashboard.exa.ai/api-keys)；免 Key 模式有频率限制 |
 
 ## 前置条件
 
@@ -159,18 +175,56 @@ else:
 
 ### Step 3: 配置 Exa Search MCP Server
 
+> ⚠️ **重要变更**：`exa-mcp-server` npm 本地包（v3.1.9+）已不再支持 `--tools` 参数，仅暴露 2 个默认工具。**推荐使用远程 URL 模式**。
+
 Exa 提供两种接入方式：
 
-| 方式 | 依赖 | API Key | 适用场景 |
-|------|------|---------|----------|
-| 远程 MCP（推荐） | 无 | 不需要 | 快速上手，免费额度 |
-| npm 本地包 | Node.js + npx | 需要 | 更高配额，自定义控制 |
+| 方式 | 依赖 | API Key | 可用工具数 | 适用场景 |
+|------|------|---------|-----------|----------|
+| 远程 URL + API Key（推荐） | 无 | 需要（URL 参数） | 5 个（含高级搜索） | 生产使用，完整功能 |
+| 远程 URL 免 Key | 无 | 不需要 | 默认工具集 | 快速验证 |
+| ~~npm 本地包~~ | ~~Node.js + npx~~ | ~~需要~~ | ~~仅 2 个~~ | ~~⚠️ 已过时，不推荐~~ |
 
-> 建议先用远程 MCP 快速验证，如需更高调用量或稳定性，再切换到带 API Key 的本地模式。
->
 > 获取 API Key: [https://dashboard.exa.ai/api-keys](https://dashboard.exa.ai/api-keys)
 
-**方式 A: 远程 MCP（无需 API Key）**
+**方式 A: 远程 URL + API Key（推荐，完整 5 个工具）**
+
+```bash
+python3 -c "
+import json, os
+
+mcp_path = os.path.expanduser('~/.kiro/settings/mcp.json')
+try:
+    with open(mcp_path, 'r') as f:
+        config = json.load(f)
+except (FileNotFoundError, json.JSONDecodeError):
+    config = {}
+
+if 'mcpServers' not in config:
+    config['mcpServers'] = {}
+
+if 'exa' in config['mcpServers']:
+    print('⏭ Exa MCP Server 已存在，跳过配置（不做任何修改）')
+else:
+    # 需要用户提供 API Key
+    import sys
+    api_key = sys.argv[1] if len(sys.argv) > 1 else '<your-api-key>'
+    tools = 'web_search_exa,web_search_advanced_exa,company_research_exa,crawling_exa,people_search_exa'
+    config['mcpServers']['exa'] = {
+        'url': f'https://mcp.exa.ai/mcp?exaApiKey={api_key}&tools={tools}'
+    }
+
+    with open(mcp_path, 'w') as f:
+        json.dump(config, f, indent=2)
+        f.write('\n')
+
+    print('✔ Exa Search MCP Server 已配置（远程 URL 模式，带 API Key）')
+" "\$EXA_KEY"
+```
+
+> Agent 执行时需先询问用户获取 API Key，替换 `$EXA_KEY`。
+
+**方式 B: 远程 URL 免 Key（快速验证）**
 
 ```bash
 python3 -c "
@@ -197,55 +251,20 @@ else:
         json.dump(config, f, indent=2)
         f.write('\n')
 
-    print('✔ Exa Search MCP Server 已配置（远程模式，无 API Key）')
+    print('✔ Exa Search MCP Server 已配置（远程模式，无 API Key，有调用频率限制）')
 "
 ```
 
-**方式 B: 本地 npm 包（带 API Key，推荐生产使用）**
+> 免 Key 模式有调用频率限制，适合验证配置。如需更高调用量，切换到方式 A。
 
-```bash
-# 先确认用户是否有 API Key
-read -rp "请输入 Exa API Key（留空则跳过，使用远程模式）: " EXA_KEY
+**⚠️ 不推荐 — 本地 npx 模式（已过时）**
 
-if [ -z "$EXA_KEY" ]; then
-  echo "跳过 API Key 配置，使用远程模式"
-else
-  python3 -c "
-import json, os, sys
-
-mcp_path = os.path.expanduser('~/.kiro/settings/mcp.json')
-try:
-    with open(mcp_path, 'r') as f:
-        config = json.load(f)
-except (FileNotFoundError, json.JSONDecodeError):
-    config = {}
-
-if 'mcpServers' not in config:
-    config['mcpServers'] = {}
-
-if 'exa' in config['mcpServers']:
-    print('⏭ Exa MCP Server 已存在，跳过配置（不做任何修改）')
-else:
-    config['mcpServers']['exa'] = {
-        'command': 'npx',
-        'args': ['-y', 'exa-mcp-server'],
-        'env': {
-            'EXA_API_KEY': sys.argv[1]
-        },
-        'disabled': False,
-        'autoApprove': []
-    }
-
-    with open(mcp_path, 'w') as f:
-        json.dump(config, f, indent=2)
-        f.write('\n')
-
-    print('✔ Exa Search MCP Server 已配置（本地模式，带 API Key）')
-" "$EXA_KEY"
-fi
 ```
-
-> 如果后续获取了 API Key，想从远程模式切换到本地模式，重新执行方式 B 即可，脚本会自动覆盖原有的 `exa` 配置。
+# exa-mcp-server@3.1.9+ 的 npx 模式忽略 --tools 参数，
+# 仅暴露 web_search_exa 和 get_code_context_exa 两个工具。
+# 缺少 web_search_advanced_exa（日期过滤）、crawling_exa 等关键工具。
+# 如果当前配置为 npx 模式，建议迁移到远程 URL 模式。
+```
 
 ### Step 4: 验证配置
 
@@ -258,7 +277,7 @@ echo "=== 验证 uvx 可用性（AWS Documentation Server 依赖）==="
 uvx --version 2>/dev/null && echo "✔ uvx 可用" || echo "✘ uvx 不可用，请安装: curl -LsSf https://astral.sh/uv/install.sh | sh"
 ```
 
-期望配置文件内容（远程模式）：
+期望配置文件内容（远程 URL + API Key 模式）：
 
 ```json
 {
@@ -274,13 +293,13 @@ uvx --version 2>/dev/null && echo "✔ uvx 可用" || echo "✘ uvx 不可用，
       "autoApprove": []
     },
     "exa": {
-      "url": "https://mcp.exa.ai/mcp"
+      "url": "https://mcp.exa.ai/mcp?exaApiKey=<your-api-key>&tools=web_search_exa,web_search_advanced_exa,company_research_exa,crawling_exa,people_search_exa"
     }
   }
 }
 ```
 
-或（本地模式，带 API Key）：
+或（远程免 Key 模式）：
 
 ```json
 {
@@ -289,13 +308,7 @@ uvx --version 2>/dev/null && echo "✔ uvx 可用" || echo "✘ uvx 不可用，
       "...": "同上"
     },
     "exa": {
-      "command": "npx",
-      "args": ["-y", "exa-mcp-server"],
-      "env": {
-        "EXA_API_KEY": "your_api_key_here"
-      },
-      "disabled": false,
-      "autoApprove": []
+      "url": "https://mcp.exa.ai/mcp"
     }
   }
 }
@@ -326,7 +339,7 @@ grep -q "Built-in MCP Capabilities" "$(dirname "$0")/kiro-cli-acp-agent/SKILL.md
 ```
 
 路由变更摘要：
-- **新增路由到 Kiro CLI**：Web 搜索、AWS 文档查询、论文搜索、公司调研、竞品分析
+- **新增路由到 Kiro CLI**：Web 搜索（`web_search_exa`）、高级搜索（`web_search_advanced_exa`）、AWS 文档查询、公司调研（`company_research_exa`）、网页抓取（`crawling_exa`）
 - **触发关键词新增**：搜索、查资料、搜一下、Google、查文档、AWS 文档、论文、调研、search、look up、research
 - **从 OpenClaw 直接处理中移除**："信息查询" — 现在优先走 Kiro CLI 的 MCP Server
 
@@ -350,19 +363,20 @@ grep -q "Built-in MCP Capabilities" "$(dirname "$0")/kiro-cli-acp-agent/SKILL.md
 
 ### Exa Search MCP Server
 
+> 以下为远程 URL 模式的工具列表（工具名带 `_exa` 后缀）。本地 npx 模式（v3.1.9+）已过时，仅暴露 2 个工具，不推荐使用。
+
 | 工具 | 说明 |
 |------|------|
-| `web_search` | 实时 Web 搜索 |
-| `research_paper_search` | 学术论文搜索（1 亿+ 论文） |
-| `twitter_search` | Twitter/X 内容搜索 |
-| `company_research` | 公司信息调研 |
-| `competitor_finder` | 竞品发现 |
-| `crawling` | 指定 URL 内容抓取 |
+| `web_search_exa` | 通用网页搜索 |
+| `web_search_advanced_exa` | 高级搜索，支持 `startPublishedDate` / `endPublishedDate` 日期过滤 |
+| `company_research_exa` | 公司信息调研 |
+| `crawling_exa` | 指定 URL 内容抓取 |
+| `people_search_exa` | 人物搜索 |
 
 典型用法：
-- "搜索最新的 Kubernetes 安全最佳实践"
-- "调研 Snowflake 公司的产品和定价"
-- "搜索关于 LLM 推理优化的学术论文"
+- "搜索最新的 Kubernetes 安全最佳实践"（`web_search_exa`）
+- "搜索过去 24 小时内关于 LLM 推理优化的文章"（`web_search_advanced_exa` + 日期过滤）
+- "调研 Snowflake 公司的产品和定价"（`company_research_exa`）
 
 ---
 
@@ -373,6 +387,8 @@ grep -q "Built-in MCP Capabilities" "$(dirname "$0")/kiro-cli-acp-agent/SKILL.md
 | AWS Docs Server 启动失败 | `uvx --version` | 安装 uv: `curl -LsSf https://astral.sh/uv/install.sh \| sh` |
 | AWS Docs 搜索无结果 | 检查 `AWS_DOCUMENTATION_PARTITION` | 确认值为 `aws`（全球）或 `aws-cn`（中国） |
 | Exa 连接超时 | `curl -s https://mcp.exa.ai/mcp` | 检查网络连接，确认可访问 exa.ai |
+| Exa 只有 2 个工具 | 检查配置是否为 npx 本地模式 | 本地 npx（v3.1.9+）已过时，切换到远程 URL 模式 |
+| Exa 缺少日期过滤 | 检查 URL 中是否包含 `web_search_advanced_exa` | 在 URL 的 `tools=` 参数中添加该工具 |
 | MCP 配置不生效 | `cat ~/.kiro/settings/mcp.json` | 确认 JSON 格式正确；重启 Kiro CLI 会话 |
 | 工具调用被拒绝 | 检查 `autoApprove` 配置 | 添加常用工具名到 `autoApprove` 数组，或使用 `--trust-all-tools` |
 

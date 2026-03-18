@@ -3,7 +3,7 @@ acp_client.py — JSON-RPC 2.0 over stdio client for kiro-cli.
 No external dependencies. Drop this file into your project.
 """
 
-import json, logging, os, signal, subprocess, threading
+import json, logging, os, signal, subprocess, threading, time
 from dataclasses import dataclass, field
 from typing import Callable
 
@@ -40,6 +40,23 @@ class PermissionRequest:
     options: list
 
 
+@dataclass
+class StreamEvent:
+    """A real-time event emitted during session/prompt execution.
+
+    event_type values:
+      - "started"          : Kiro began processing (first agent_message_chunk)
+      - "tool_call"        : A tool call started (file write, terminal cmd, etc.)
+      - "tool_call_done"   : A tool call completed
+      - "metadata"         : Credits / context usage update
+    """
+    event_type: str
+    title: str = ""
+    kind: str = ""
+    tool_call_id: str = ""
+    metadata: dict = field(default_factory=dict)
+
+
 class ACPClient:
     def __init__(self, cli_path: str = "kiro-cli"):
         self._cli_path = cli_path
@@ -51,6 +68,9 @@ class ACPClient:
         self._permission_handler: Callable | None = None
         self._session_metadata: dict[str, dict] = {}
         self._running = False
+        # Streaming callback: called from _read_loop thread with StreamEvent
+        self._on_stream: Callable[[StreamEvent], None] | None = None
+        self._stream_started: bool = False
 
     # ── Lifecycle ─────────────────────────────────────────
 
@@ -137,9 +157,19 @@ class ACPClient:
         text: str,
         images: list[tuple[str, str]] | None = None,
         timeout: float = 300,
+        on_stream: Callable[["StreamEvent"], None] | None = None,
     ) -> PromptResult:
-        """Send a prompt and block until Kiro completes the response."""
+        """Send a prompt and block until Kiro completes the response.
+
+        Args:
+            on_stream: Optional callback invoked from the reader thread
+                       with StreamEvent objects as Kiro works. The callback
+                       MUST be non-blocking (use a queue or fire-and-forget
+                       if you need to do I/O like sending messages).
+        """
         self._session_updates[session_id] = []
+        self._on_stream = on_stream
+        self._stream_started = False
         req_id = self._next_id()
 
         prompt_content = []
@@ -156,6 +186,7 @@ class ACPClient:
             "prompt": prompt_content,
         }, req_id, timeout=timeout)
 
+        self._on_stream = None  # detach callback after completion
         return self._build_prompt_result(session_id, result)
 
     # ── Permission Control ────────────────────────────────
@@ -260,14 +291,61 @@ class ACPClient:
             session_id = params.get("sessionId", "")
 
             if method == "session/update" and session_id:
+                update = params.get("update", {})
                 updates = self._session_updates.get(session_id)
                 if updates is not None:
-                    updates.append(params.get("update", {}))
+                    updates.append(update)
+                # ── Stream callback: emit events in real time ──
+                cb = self._on_stream
+                if cb is not None:
+                    try:
+                        self._emit_stream_event(cb, update)
+                    except Exception as e:
+                        log.debug("[ACP] on_stream callback error: %s", e)
 
             elif method == "_kiro.dev/metadata" and session_id:
                 meta = self._session_metadata.get(session_id, {})
                 meta.update(params)
                 self._session_metadata[session_id] = meta
+                cb = self._on_stream
+                if cb is not None:
+                    try:
+                        cb(StreamEvent(
+                            event_type="metadata",
+                            metadata={
+                                "contextUsagePercentage": params.get("contextUsagePercentage", 0),
+                                "credits": params.get("credits", 0),
+                            },
+                        ))
+                    except Exception as e:
+                        log.debug("[ACP] on_stream metadata callback error: %s", e)
+
+    def _emit_stream_event(self, cb: Callable, update: dict):
+        """Translate a raw session/update into a StreamEvent and invoke cb."""
+        st = update.get("sessionUpdate", "")
+
+        if st == "agent_message_chunk" and not self._stream_started:
+            self._stream_started = True
+            cb(StreamEvent(event_type="started"))
+
+        elif st == "tool_call":
+            cb(StreamEvent(
+                event_type="tool_call",
+                tool_call_id=update.get("toolCallId", ""),
+                title=update.get("title", ""),
+                kind=update.get("kind", ""),
+            ))
+
+        elif st == "tool_call_update":
+            status = update.get("status", "")
+            if status in ("done", "error"):
+                cb(StreamEvent(
+                    event_type="tool_call_done",
+                    tool_call_id=update.get("toolCallId", ""),
+                    title=update.get("title", ""),
+                    kind=update.get("kind", ""),
+                    metadata={"status": status},
+                ))
 
     def _send_permission_response(self, msg_id, session_id, option_id):
         response = {

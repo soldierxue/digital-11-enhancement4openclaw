@@ -4,6 +4,74 @@
 >
 > 参考: [AWS 官方文档](https://docs.aws.amazon.com/dcv/latest/adminguide/setting-up-installing-linux-server.html)
 
+## ⚙️ Agent 执行指引（OpenClaw 请先读此段）
+
+> **本段是给你（执行 Agent）的操作规范，不是给人类用户看的文档。请严格遵循。**
+
+### 第一步：通读全文，理解全貌
+
+在执行任何命令之前，请先完整阅读本文档所有章节（Step 1 ~ Step 6），理解：
+- 目标：在 Ubuntu 24.04 上安装 Amazon DCV Server，实现通过 SSM Port Forwarding 的远程桌面访问
+- 核心脚本：`install-dcv-ubuntu24.sh`（一键安装，位于本文档同目录下）
+- 安装后必须重启服务器，Agent 会断连 1-2 分钟
+- Step 4-6 涉及用户本地操作（获取 Instance ID、SSM 端口转发、浏览器访问），Agent 需输出指引信息
+- 最终验收标准：DCV 服务 `active (running)` + 端口 8443 监听 + DCV 会话存在
+
+### 第二步：检查当前环境状态
+
+通读完成后，先执行以下诊断命令，收集当前状态：
+
+```bash
+# 1. 操作系统版本
+lsb_release -d 2>/dev/null || cat /etc/os-release | grep PRETTY_NAME
+
+# 2. CPU 架构
+ARCH=$(uname -m)
+echo "架构: $ARCH"
+
+# 3. DCV Server 是否已安装
+dpkg -l nice-dcv-server 2>/dev/null | grep -q "^ii" && echo "DCV_INSTALLED" || echo "DCV_NOT_INSTALLED"
+
+# 4. DCV 服务状态
+systemctl is-active dcvserver 2>/dev/null || echo "DCV_SERVICE_NOT_RUNNING"
+
+# 5. 端口 8443 是否在监听
+ss -tlnp | grep 8443 >/dev/null 2>&1 && echo "PORT_8443_LISTENING" || echo "PORT_8443_NOT_LISTENING"
+
+# 6. DCV 会话是否存在
+dcv list-sessions 2>/dev/null || echo "DCV_SESSIONS_UNKNOWN"
+
+# 7. 桌面环境是否已安装
+dpkg -l ubuntu-desktop 2>/dev/null | grep -q "^ii" && echo "DESKTOP_INSTALLED" || echo "DESKTOP_NOT_INSTALLED"
+
+# 8. sudo 权限
+sudo -n true 2>/dev/null && echo "SUDO_OK" || echo "SUDO_REQUIRES_PASSWORD"
+```
+
+### 第三步：根据状态制定分阶段计划
+
+根据诊断结果，将执行拆分为以下阶段。**每个阶段完成后向用户汇报结果，再进入下一阶段：**
+
+| 阶段 | 对应文档 | 前置条件 | 需要用户确认的情况 |
+|------|----------|----------|-------------------|
+| 阶段 1：环境检查 | 前置条件 | 无 | 非 Ubuntu 24.04 时暂停；无 `sudo` 权限时暂停 |
+| 阶段 2：执行安装脚本 | Step 1 | 阶段 1 通过 | DCV 已安装且服务正常时跳过安装，仅验证；**必须询问用户设置密码**；GPU 实例需加 `--gpu` 参数 |
+| 阶段 3：重启服务器 | Step 2 | 阶段 2 完成 | DCV 已安装且服务正常时跳过重启；**提前告知用户 Agent 会断连 1-2 分钟** |
+| 阶段 4：验证安装 | Step 3 | 重启后重新连接 | DCV 服务未运行时尝试启动；会话不存在时创建 |
+| 阶段 5：输出连接信息 | Step 4-6 | 阶段 4 通过 | 获取 Instance ID 并输出完整连接指引给用户 |
+
+### 执行原则
+
+1. **先诊断，后执行** — 不要跳过环境检查直接运行安装脚本
+2. **幂等性优先** — DCV 已安装且服务正常时不重复安装，仅验证状态
+3. **密码必须用户提供** — 如果用户未指定密码，主动询问，不要跳过或使用默认值
+4. **重启前必须告知** — 重启会导致 Agent 断连，必须提前告知用户
+5. **遇到异常立即暂停** — 安装脚本报错、服务启动失败等情况，停下来向用户说明
+6. **每阶段汇报** — 完成一个阶段后，用简短的 ✅/❌ 汇总该阶段结果，再询问是否继续
+7. **始终使用 `--no-reboot`** — 安装脚本加 `--no-reboot` 参数，验证完成后再手动重启
+
+---
+
 ## 前置条件（需用户提前完成）
 
 以下操作需要用户提前完成，Agent 无法代为执行：

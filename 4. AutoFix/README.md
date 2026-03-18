@@ -5,6 +5,78 @@
 > 基于 [auto-fix-setup-guide.md](https://github.com/kingdoooo/openclaw-setup-guides/blob/main/auto-fix-setup-guide.md) 改编，将 Claude Code 替换为 Kiro CLI 作为自动修复引擎。
 >
 > 参考: [Kiro CLI 安装与配置](../3.%20KiroCLI/kiro_install_config.md) | [Kiro CLI ACP 集成](../3.%20KiroCLI/kiro_acp_integrate.md)
+>
+> 幂等性原则：所有操作执行前先检查当前状态，已存在的配置只验证不重复写入，重复执行不会产生副作用。
+
+---
+
+## ⚙️ Agent 执行指引（OpenClaw 请先读此段）
+
+> **本段是给你（执行 Agent）的操作规范，不是给人类用户看的文档。请严格遵循。**
+
+### 第一步：通读全文，理解全貌
+
+在执行任何命令之前，请先完整阅读本文档所有章节（步骤 1 ~ 步骤 6），理解：
+- 目标：配置 systemd 自愈机制 — Gateway 反复崩溃时自动调用 Kiro CLI 修复
+- 核心组件：`openclaw-gateway.service`（主服务）+ `openclaw-fix.service`（修复服务）+ `openclaw-fix.sh`（修复脚本）
+- 前置依赖：OpenClaw Gateway 以 systemd user service 方式运行 + Kiro CLI 已安装并登录
+- 触发条件：60 秒内崩溃 5 次 → OnFailure 触发修复
+- 最终验收标准：Gateway 服务运行正常、OnFailure 配置就位、修复脚本可执行、Kiro CLI 认证通过
+
+### 第二步：检查当前环境状态
+
+通读完成后，先执行以下诊断命令，收集当前状态：
+
+```bash
+# 1. OpenClaw Gateway 是否以 systemd 方式运行
+systemctl --user status openclaw-gateway.service 2>/dev/null || echo "GATEWAY_SERVICE_NOT_FOUND"
+
+# 2. OnFailure 配置是否已存在
+cat ~/.config/systemd/user/openclaw-gateway.service.d/auto-fix.conf 2>/dev/null || echo "ONFAILURE_CONF_NOT_FOUND"
+
+# 3. 修复服务是否已配置
+cat ~/.config/systemd/user/openclaw-fix.service 2>/dev/null || echo "FIX_SERVICE_NOT_FOUND"
+
+# 4. 修复脚本是否已存在且可执行
+ls -la ~/scripts/openclaw-fix.sh 2>/dev/null || echo "FIX_SCRIPT_NOT_FOUND"
+
+# 5. Kiro CLI 是否已安装并认证
+kiro-cli version 2>/dev/null || echo "KIRO_CLI_NOT_FOUND"
+kiro-cli auth status 2>/dev/null || echo "KIRO_AUTH_UNKNOWN"
+
+# 6. loginctl linger 是否已启用
+loginctl show-user "$USER" --property=Linger 2>/dev/null || echo "LINGER_UNKNOWN"
+
+# 7. Python3 是否可用（JSON 验证依赖）
+python3 --version 2>/dev/null || echo "PYTHON3_NOT_FOUND"
+
+# 8. 通知渠道是否已配置
+openclaw notification list 2>/dev/null | head -1 || echo "NOTIFICATION_NOT_CONFIGURED"
+```
+
+### 第三步：根据状态制定分阶段计划
+
+根据诊断结果，将执行拆分为以下阶段。**每个阶段完成后向用户汇报结果，再进入下一阶段：**
+
+| 阶段 | 对应文档 | 前置条件 | 需要用户确认的情况 |
+|------|----------|----------|-------------------|
+| 阶段 1：环境检查 | 前置条件 | 无 | Kiro CLI 未安装/未登录时暂停；Gateway 未以 systemd 方式运行时暂停 |
+| 阶段 2：配置 Gateway 服务 | 步骤 1 | 阶段 1 通过 | `openclaw-gateway.service` 已存在时跳过，仅验证内容 |
+| 阶段 3：配置 OnFailure 触发 | 步骤 2 | 阶段 2 完成 | `auto-fix.conf` 已存在时跳过，仅验证 |
+| 阶段 4：创建修复服务和脚本 | 步骤 3-4 | 阶段 3 完成 | `openclaw-fix.service` 和 `openclaw-fix.sh` 已存在时跳过，仅验证 |
+| 阶段 5：启用服务 | 步骤 6 | 阶段 4 完成 | linger 已启用且服务已 enable 时跳过 |
+| 阶段 6：验证 | 测试 | 阶段 5 完成 | 验证失败时展示错误并等待用户决策 |
+
+### 执行原则
+
+1. **先诊断，后执行** — 不要跳过状态检查直接创建 systemd 文件
+2. **幂等性优先** — 每个文件写入前先检查是否已存在且内容一致，已存在则跳过
+3. **遇到异常立即暂停** — systemd daemon-reload 失败、服务启动失败等情况，停下来向用户说明
+4. **每阶段汇报** — 完成一个阶段后，用简短的 ✅/❌ 汇总该阶段结果，再询问是否继续
+5. **已完成的步骤可跳过** — 如果诊断发现所有组件已就位且运行正常，直接标记 ✅ 跳过
+6. **修改 systemd 文件后必须 daemon-reload** — 每次修改 `.service` 或 `.conf` 文件后执行 `systemctl --user daemon-reload`
+
+---
 
 ## 为什么用 Kiro CLI 替代 Claude Code？
 
