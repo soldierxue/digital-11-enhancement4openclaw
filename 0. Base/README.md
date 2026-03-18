@@ -15,10 +15,10 @@
 ### 第一步：通读全文，理解全貌
 
 在执行任何命令之前，请先完整阅读本文档所有章节（第 1 ~ 3 节），理解：
-- 第 1 节：配置安全防护 — 在 MEMORY.md 和 HEARTBEAT.md 中写入约束规则
+- 第 1 节：配置安全防护 — 在 MEMORY.md 和 HEARTBEAT.md 中写入约束规则；通过 `skill-registry.json` 注册 Skill 来源并定期检查更新
 - 第 2 节：Skill 安全审查 — skill-vetter 的审查维度和流程（本节为知识参考，无需执行命令）
 - 第 3 节：Memory Search — 通过 LiteLLM 代理接入 Bedrock Embeddings
-- 最终验收标准：第 1 节的规则已写入记忆、第 3 节的 `memory_search` API 可正常返回结果
+- 最终验收标准：第 1 节的规则已写入记忆、`skill-registry.json` 已创建、HEARTBEAT 更新检查已配置（注册表模式）、第 3 节的 `memory_search` API 可正常返回结果
 
 ### 第二步：检查当前环境状态
 
@@ -31,8 +31,20 @@ grep -c "配置安全约束" ~/.openclaw/MEMORY.md 2>/dev/null || echo "MEMORY_R
 # 2. MEMORY.md 中是否已有 Skill 安装安全约束
 grep -c "Skill 安装安全约束" ~/.openclaw/MEMORY.md 2>/dev/null || echo "SKILL_VETTER_RULE_NOT_FOUND"
 
-# 3. HEARTBEAT.md 中是否已有 Skill 更新检查任务
-grep -c "Skill 更新检查" ~/.openclaw/HEARTBEAT.md 2>/dev/null || echo "HEARTBEAT_RULE_NOT_FOUND"
+# 3. HEARTBEAT.md 中是否已有 Skill 更新检查任务（注册表模式）
+grep -c "Skill 更新检查（注册表模式）" ~/.openclaw/HEARTBEAT.md 2>/dev/null || echo "HEARTBEAT_RULE_NOT_FOUND"
+# 检查是否存在旧版（引用不存在的 skill-update-checker）
+grep -c "skill-update-checker" ~/.openclaw/HEARTBEAT.md 2>/dev/null && echo "⚠️ HEARTBEAT_HAS_OLD_SKILL_UPDATE_CHECKER_REF" || true
+
+# 3b. skill-registry.json 是否存在
+python3 -c "
+import json, os
+p = os.path.expanduser('~/.openclaw/skill-registry.json')
+d = json.load(open(p))
+skills = d.get('skills', {})
+git_skills = [k for k,v in skills.items() if v.get('gitRemote')]
+print(f'REGISTRY_OK skills={len(skills)} git_trackable={len(git_skills)} lastCheck={d.get(\"_meta\",{}).get(\"lastFullCheck\",0)}')
+" 2>/dev/null || echo "SKILL_REGISTRY_NOT_FOUND"
 
 # 4. openclaw.json 中 memorySearch 是否已配置
 python3 -c "
@@ -60,6 +72,7 @@ aws sts get-caller-identity --query Account --output text 2>/dev/null || echo "A
 |------|----------|----------|-------------------|
 | 阶段 1：写入配置安全规则 | 第 1 节 | 无 | MEMORY.md / HEARTBEAT.md 已有对应规则时跳过，仅验证内容 |
 | 阶段 2：Skill 审查知识 | 第 2 节 | 无 | 本节为知识参考，将审查规则写入 MEMORY.md 即可，无需执行其他命令 |
+| 阶段 2b：Skill 注册表初始化 | 第 1 节 §3a-3c | 无 | `skill-registry.json` 已存在时跳过创建，仅验证；旧版 HEARTBEAT 引用 `skill-update-checker` 时自动替换 |
 | 阶段 3：安装 LiteLLM | 第 3 节 Step 1-2 | AWS Credentials 可用 | AWS Credentials 不可用时暂停；LiteLLM 已安装且运行中时跳过 |
 | 阶段 4：配置 memorySearch | 第 3 节 Step 3-5 | 阶段 3 完成 | `memorySearch` 已配置且 `enabled=true` 时跳过，仅验证 |
 | 阶段 5：验证 | 第 3 节验证 | 阶段 4 完成 | 验证失败时展示错误并等待用户决策 |
@@ -137,26 +150,194 @@ else
 fi
 ```
 
-#### 3. 设置定时检查 Skill 更新
+#### 3. Skill 来源注册与定时更新检查
 
-在 HEARTBEAT.md 中添加定时任务（幂等），每天自动检查 GitHub 上的 Skill 是否有更新。先检查是否已存在该段落：
+> ⚠️ **设计变更 (v1.1)**：原方案引用了不存在的 `skill-update-checker` Skill。新方案改为 Agent 原生逻辑 — 通过 `skill-registry.json` 记录每个 Skill 的安装来源，HEARTBEAT 心跳时直接执行 `git fetch` 比对，无需额外 Skill。
+
+##### 3a. 初始化 Skill 注册表
+
+`skill-registry.json` 是所有已安装 Skill 的来源登记簿，记录安装方式、git 远程地址、安装时的 commit hash。
+
+先检查注册表是否已存在，不存在时创建初始版本：
+
+```bash
+REGISTRY_FILE="$HOME/.openclaw/skill-registry.json"
+if [ -f "$REGISTRY_FILE" ]; then
+  echo "✔ skill-registry.json 已存在，跳过创建"
+  python3 -m json.tool "$REGISTRY_FILE" > /dev/null && echo "  JSON 格式合法" || echo "  ⚠️ JSON 格式异常，请检查"
+else
+  cat > "$REGISTRY_FILE" << 'REGISTRY_EOF'
+{
+  "_meta": {
+    "description": "OpenClaw Skill 来源注册表 — 记录每个 Skill 的安装方式和 git 来源，供心跳更新检查使用",
+    "version": "1.0",
+    "lastFullCheck": 0
+  },
+  "skills": {
+    "openclaw-guide": {
+      "installMethod": "git-clone",
+      "gitRemote": "https://github.com/win4r/OpenClaw-Skill.git",
+      "installedCommit": "",
+      "installedAt": "",
+      "note": "OpenClaw 官方 Skill 手册，git clone 安装"
+    },
+    "skill-vetter": {
+      "installMethod": "manual-copy",
+      "gitRemote": "",
+      "installedCommit": "",
+      "installedAt": "",
+      "note": "手动复制安装，无远程来源"
+    },
+    "tech-updates-collector": {
+      "installMethod": "manual-copy",
+      "gitRemote": "https://github.com/soldierxue/digital-11-enhancement4openclaw.git",
+      "gitSubPath": "5. F1-TechUpdate/tech-updates-collector",
+      "installedCommit": "",
+      "installedAt": "",
+      "note": "手动复制安装，来源为 digital-11 仓库子目录，可添加 git remote 实现更新检查"
+    },
+    "tech-updates-writer": {
+      "installMethod": "manual-copy",
+      "gitRemote": "https://github.com/soldierxue/digital-11-enhancement4openclaw.git",
+      "gitSubPath": "6. F2-TechWriter/tech-updates-writer",
+      "installedCommit": "",
+      "installedAt": "",
+      "note": "手动复制安装，来源为 digital-11 仓库子目录"
+    },
+    "web-article-saver": {
+      "installMethod": "local-built",
+      "gitRemote": "",
+      "installedCommit": "",
+      "installedAt": "",
+      "note": "本地自建 Skill，无远程来源"
+    },
+    "kiro-cli": {
+      "installMethod": "local-built",
+      "gitRemote": "",
+      "installedCommit": "",
+      "installedAt": "",
+      "note": "本地自建 Skill（ACP 集成），无远程来源"
+    }
+  }
+}
+REGISTRY_EOF
+  echo "✔ skill-registry.json 已创建: $REGISTRY_FILE"
+fi
+```
+
+**注册表字段说明**：
+
+| 字段 | 说明 | 示例 |
+|------|------|------|
+| `installMethod` | 安装方式 | `git-clone`（可自动更新）/ `manual-copy`（需手动加 remote）/ `local-built`（跳过检查） |
+| `gitRemote` | Git 远程仓库 URL | `https://github.com/win4r/OpenClaw-Skill.git` |
+| `gitSubPath` | 仓库内子目录路径（仅 monorepo 场景） | `5. F1-TechUpdate/tech-updates-collector` |
+| `installedCommit` | 安装时的 commit hash | `a1b2c3d`（首次注册时为空，首次检查后自动填充） |
+| `installedAt` | 安装时间 | ISO 8601 格式 |
+| `note` | 备注 | 人类可读的安装说明 |
+
+##### 3b. 新 Skill 安装时注册来源
+
+安装任何新 Skill 时，必须同步更新注册表。以下是注册脚本模板（幂等）：
+
+```bash
+REGISTRY_FILE="$HOME/.openclaw/skill-registry.json"
+SKILL_NAME="<skill-name>"          # 替换为实际 Skill 名
+INSTALL_METHOD="<method>"          # git-clone / manual-copy / local-built
+GIT_REMOTE="<url-or-empty>"        # Git 远程 URL，无则留空
+
+python3 -c "
+import json, os, datetime
+registry_path = os.path.expanduser('$REGISTRY_FILE')
+with open(registry_path) as f:
+    reg = json.load(f)
+
+skill_name = '$SKILL_NAME'
+if skill_name in reg['skills']:
+    print(f'✔ {skill_name} 已在注册表中，跳过注册')
+else:
+    reg['skills'][skill_name] = {
+        'installMethod': '$INSTALL_METHOD',
+        'gitRemote': '$GIT_REMOTE',
+        'installedCommit': '',
+        'installedAt': datetime.datetime.utcnow().isoformat() + 'Z',
+        'note': ''
+    }
+    with open(registry_path, 'w') as f:
+        json.dump(reg, f, indent=2, ensure_ascii=False)
+    print(f'✔ {skill_name} 已注册到 skill-registry.json')
+"
+```
+
+##### 3c. HEARTBEAT.md 写入更新检查任务
+
+替换原来引用 `skill-update-checker/state.json` 的段落，改为基于注册表的 Agent 原生检查逻辑：
 
 ```bash
 HEARTBEAT_FILE="$HOME/.openclaw/HEARTBEAT.md"
-if ! grep -q "Skill 更新检查" "$HEARTBEAT_FILE" 2>/dev/null; then
+
+# 先清理旧版本（如果存在引用 skill-update-checker 的段落）
+if grep -q "skill-update-checker/state.json" "$HEARTBEAT_FILE" 2>/dev/null; then
+  echo "⚠️ 发现旧版 Skill 更新检查段落（引用不存在的 skill-update-checker），正在替换..."
+  # 使用 python3 精确删除旧段落
+  python3 -c "
+import re, os
+hb_path = os.path.expanduser('$HEARTBEAT_FILE')
+with open(hb_path) as f:
+    content = f.read()
+# 删除从 '## Skill 更新检查' 到下一个 '##' 或文件末尾的段落
+content = re.sub(r'\n## Skill 更新检查[^\n]*\n(?:(?!## ).+\n)*', '\n', content)
+with open(hb_path, 'w') as f:
+    f.write(content)
+print('✔ 旧版段落已清理')
+"
+fi
+
+# 写入新版本（幂等）
+if grep -q "Skill 更新检查（注册表模式）" "$HEARTBEAT_FILE" 2>/dev/null; then
+  echo "✔ Skill 更新检查（注册表模式）任务已存在，跳过写入"
+else
   cat >> "$HEARTBEAT_FILE" << 'EOF'
 
-## Skill 更新检查 🔄 (daily)
-If 24+ hours since last check (see `skills/skill-update-checker/state.json` → `lastCheck`):
-- 检查已安装的 Skills 在 GitHub 上是否有新版本
-- 如果有更新，通知用户并列出变更摘要
-- 不要自动更新，等待用户确认
+## Skill 更新检查（注册表模式）🔄 (daily)
+If 24+ hours since last check (see `skill-registry.json` → `_meta.lastFullCheck`):
+1. 读取 `~/.openclaw/skill-registry.json`
+2. 遍历 `skills` 中 `installMethod` 为 `git-clone` 的条目：
+   - 进入 Skill 目录，执行 `git fetch origin`
+   - 比较 `HEAD` 与 `origin/main`（或 `origin/master`）
+   - 如有新 commit，记录变更摘要（`git log HEAD..origin/main --oneline`）
+3. 遍历 `installMethod` 为 `manual-copy` 且 `gitRemote` 非空的条目：
+   - 使用 `git ls-remote <gitRemote> HEAD` 获取远程最新 commit
+   - 与 `installedCommit` 比较，不同则标记为"有更新可用"
+4. `installMethod` 为 `local-built` 或 `gitRemote` 为空的条目 → 跳过
+5. 更新 `_meta.lastFullCheck` 为当前 Unix 时间戳
+6. 如果发现任何更新，通知用户并列出变更摘要
+7. **不要自动更新，等待用户确认**
 EOF
-  echo "✔ Skill 更新检查任务已写入 $HEARTBEAT_FILE"
-else
-  echo "✔ Skill 更新检查任务已存在，跳过写入"
+  echo "✔ Skill 更新检查（注册表模式）任务已写入 $HEARTBEAT_FILE"
 fi
 ```
+
+##### 3d. 为已有 Skill 补充 git remote（可选）
+
+对于 `installMethod` 为 `manual-copy` 但有 `gitRemote` 的 Skill（如 `tech-updates-collector`），可以在 Skill 目录中初始化 git 追踪，使其支持 `git fetch` 比对：
+
+```bash
+# 示例：为 tech-updates-collector 添加 git 追踪
+SKILL_DIR="$HOME/.openclaw/skills/tech-updates-collector"
+if [ -d "$SKILL_DIR/.git" ]; then
+  echo "✔ $SKILL_DIR 已有 git 仓库，跳过初始化"
+else
+  echo "为 tech-updates-collector 初始化 git 追踪..."
+  # 注意：这里不做 git clone 覆盖，只是添加 remote 以便 fetch 比对
+  # 实际文件保持不变，仅用于版本比较
+  echo "⚠️ manual-copy 的 Skill 无法直接 git fetch（不是 git clone 的目录）"
+  echo "  → 更新检查将使用 git ls-remote 比对远程 HEAD commit"
+  echo "  → 如需完整 git 追踪，建议重新以 git clone 方式安装"
+fi
+```
+
+> 对于 monorepo 来源的 Skill（如 `tech-updates-collector` 来自 `digital-11-enhancement4openclaw` 仓库的子目录），`git ls-remote` 只能检测仓库级别的更新，无法精确到子目录。这是可接受的 — 仓库有更新时提示用户检查即可。
 
 ### 效果
 
@@ -169,6 +350,19 @@ Agent 需要改配置
   → 修改后验证 JSON 合法性
   → 验证通过 → 告知用户并重启 Gateway
   → 验证失败 → 回滚，不重启
+
+安装新 Skill 时
+  → skill-vetter 审查通过
+  → 复制 Skill 文件到 skills/ 目录
+  → 在 skill-registry.json 中注册来源信息
+  → HEARTBEAT 心跳时自动检查更新
+
+HEARTBEAT 心跳更新检查
+  → 读取 skill-registry.json
+  → git-clone 的 Skill → git fetch + 比对
+  → manual-copy 有 gitRemote 的 → git ls-remote 比对
+  → local-built 的 → 跳过
+  → 有更新 → 通知用户，不自动更新
 ```
 
 后续增加其它功能时，Agent 会更智能地提出有哪些可行的配置方式，而不是盲目修改。
@@ -579,5 +773,6 @@ systemctl --user disable --now litellm-proxy.service
 
 ---
 
-**版本**: v1.0
-**更新时间**: 2026-03-17
+**版本**: v1.1
+**更新时间**: 2026-03-18
+**变更**: 移除对不存在的 `skill-update-checker` Skill 的引用；新增 `skill-registry.json` 注册表机制，支持安装时记录 git 来源、HEARTBEAT 心跳时基于注册表检查更新
