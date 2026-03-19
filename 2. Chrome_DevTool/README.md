@@ -587,6 +587,8 @@ bash setup-devtools-mcp.sh --headed
 }
 ```
 
+> `user` profile 需要浏览器启动时带有 `--remote-debugging-port=9222 --remote-allow-origins=*` 参数。推荐通过持久化配置注入（Snap Chromium 用 `~/.chromium-browser.init`，Chrome 用 `~/.config/chrome-flags.conf`，见 Part 3 Step 13），避免每次手动指定。
+
 **方案 C — ARM64 Snap Chromium（attachOnly）：**
 
 ```json
@@ -682,6 +684,64 @@ curl -s http://127.0.0.1:18800/json/version | python3 -m json.tool
 
 此步骤让 Agent 能连接到用户正在使用的 Chrome 浏览器。
 
+> **核心要求**：Chrome/Chromium 必须同时启用 `--remote-debugging-port=9222` 和 `--remote-allow-origins=*` 两个参数。缺少后者会导致 WebSocket 握手被拒绝（端口在监听但 CDP 连接失败）。
+
+#### 方法 A：持久化配置（推荐，重启浏览器自动生效）
+
+将 CDP 参数写入 Chromium/Chrome 的启动配置文件，以后每次启动浏览器都会自动带上这些参数。
+
+**Snap Chromium（Ubuntu 24.04 ARM64 等）：**
+
+> ⚠ Snap Chromium **不读取** `chromium-flags.conf`。正确方式是通过 `~/.chromium-browser.init` 设置 `CHROMIUM_FLAGS` 环境变量——Snap launcher 启动时会 `source` 该文件。
+
+```bash
+INIT_FILE="$HOME/.chromium-browser.init"
+REQUIRED_FLAGS="--remote-debugging-port=9222 --remote-allow-origins=*"
+
+# 幂等写入：检查 CHROMIUM_FLAGS 是否已包含所需参数
+if [ -f "$INIT_FILE" ] && grep -q "CHROMIUM_FLAGS" "$INIT_FILE"; then
+  # 已有 CHROMIUM_FLAGS 行，检查是否缺少参数
+  NEEDS_UPDATE=false
+  grep -q "remote-debugging-port" "$INIT_FILE" || NEEDS_UPDATE=true
+  grep -q "remote-allow-origins" "$INIT_FILE" || NEEDS_UPDATE=true
+  if [ "$NEEDS_UPDATE" = "true" ]; then
+    # 追加缺少的参数到现有 CHROMIUM_FLAGS 行
+    sed -i '/^export CHROMIUM_FLAGS/s/"$/ '"${REQUIRED_FLAGS}"'"/' "$INIT_FILE"
+    echo "✔ 已更新 $INIT_FILE 中的 CHROMIUM_FLAGS"
+  else
+    echo "✔ $INIT_FILE 已包含所需参数，无需修改"
+  fi
+else
+  # 新增 CHROMIUM_FLAGS
+  echo "export CHROMIUM_FLAGS=\"\$CHROMIUM_FLAGS ${REQUIRED_FLAGS}\"" >> "$INIT_FILE"
+  echo "✔ 已写入 $INIT_FILE"
+fi
+
+cat "$INIT_FILE"
+echo ""
+echo "⚠ 需要关闭并重新打开 Chromium 浏览器才能生效"
+```
+
+**Google Chrome（amd64 .deb 安装）：**
+
+```bash
+FLAGS_FILE="$HOME/.config/chrome-flags.conf"
+
+grep -q "remote-debugging-port" "$FLAGS_FILE" 2>/dev/null || \
+  echo "--remote-debugging-port=9222" >> "$FLAGS_FILE"
+grep -q "remote-allow-origins" "$FLAGS_FILE" 2>/dev/null || \
+  echo "--remote-allow-origins=*" >> "$FLAGS_FILE"
+
+echo "✔ 已写入 $FLAGS_FILE："
+cat "$FLAGS_FILE"
+echo ""
+echo "⚠ 需要关闭并重新打开 Chrome 浏览器才能生效"
+```
+
+> 写入配置后，**必须完全关闭浏览器再重新打开**（不是刷新页面）。如果是 DCV 远程桌面环境，请提示用户在桌面上关闭浏览器窗口后重新打开。
+
+#### 方法 B：通过 chrome://inspect 启用（临时，浏览器关闭后失效）
+
 **在用户的 Chrome 浏览器中操作：**
 
 1. 地址栏输入 `chrome://inspect/#remote-debugging` 并回车
@@ -689,15 +749,31 @@ curl -s http://127.0.0.1:18800/json/version | python3 -m json.tool
 3. 勾选该复选框
 4. 确认页面显示 `Server running at: 127.0.0.1:9222`
 
-> 注意：`chrome://` 页面无法通过外部链接打开，必须在地址栏手动输入。
+> 注意：`chrome://` 页面无法通过外部链接打开，必须在地址栏手动输入。此方法每次重启浏览器后需要重新启用。
+
+#### 方法 C：命令行启动（一次性）
+
+```bash
+# Snap Chromium
+chromium-browser --remote-debugging-port=9222 --remote-allow-origins=* &
+
+# Google Chrome
+google-chrome-stable --remote-debugging-port=9222 --remote-allow-origins=* &
+```
+
+> 此方法会启动一个新的浏览器实例。如果已有浏览器在运行，新实例可能无法绑定端口。
 
 **验证 User Profile 的 Remote Debugging：**
 
 ```bash
+# 验证端口监听
+ss -tlnp | grep 9222
+
+# 验证 CDP 连接（必须返回 JSON，而非连接被拒绝）
 curl -s http://127.0.0.1:9222/json/version | python3 -m json.tool
 ```
 
-期望输出包含 Chrome 版本信息和 `webSocketDebuggerUrl`。
+期望输出包含 Chrome 版本信息和 `webSocketDebuggerUrl`。如果 `curl` 返回空或报错，说明 `--remote-allow-origins=*` 未生效，需要重启浏览器。
 
 > ⚠ 安全提示：启用 Remote Debugging 后，本机上的任何应用都可以通过该端口完全控制浏览器（包括读取 Cookie、浏览数据等）。仅在开发/测试环境中使用。
 
@@ -762,7 +838,8 @@ bash setup-devtools-mcp.sh --headed     # DCV / 远程桌面 / 本地开发机
 | Gateway 重启失败 | `openclaw gateway status` | 检查端口占用：`ss -tlnp \| grep 18789` |
 | Browser 能力未生效 | `openclaw config set browser.enabled true && openclaw gateway restart` | 确认重启后配置已加载 |
 | headless 模式下截图空白 | 添加 `--disable-gpu` 参数 | 在 `openclaw.json` 的 `browser.extraArgs` 中添加 `["--disable-gpu"]` |
-| Remote Debugging 未启用 | `curl -s http://127.0.0.1:9222/json/version` | 在 Chrome 中访问 `chrome://inspect/#remote-debugging` 并勾选启用 |
+| Remote Debugging 未启用 | `curl -s http://127.0.0.1:9222/json/version` | 在 Chrome 中访问 `chrome://inspect/#remote-debugging` 并勾选启用，或使用持久化配置（见 Step 13） |
+| CDP 端口在监听但连接被拒绝 | `ss -tlnp \| grep 9222` 显示端口在监听，但 `curl` 返回空 | 缺少 `--remote-allow-origins=*` 参数。Snap Chromium 写入 `~/.chromium-browser.init`（设置 `CHROMIUM_FLAGS`），Chrome 写入 `~/.config/chrome-flags.conf`，然后**关闭并重新打开浏览器**（见 Step 13 方法 A） |
 | Snap Chromium 启动失败 | `systemctl --user status chromium-headless` | AppArmor 沙箱限制，使用 systemd 服务方式运行（setup 脚本自动处理） |
 | Snap Chromium CDP 端口无响应 | `curl -s http://127.0.0.1:18800/json/version` | `systemctl --user restart chromium-headless` |
 | 配置中存在 `mcpServers` | `python3 -c "..."` 检查 | 运行 `setup-devtools-mcp.sh` 自动清理，或手动删除该字段 |
@@ -784,22 +861,60 @@ bash setup-devtools-mcp.sh --headed     # DCV / 远程桌面 / 本地开发机
 
 ## 扩展 Skill: web-article-saver（网页文章保存）
 
-> 本目录附带 `web-article-saver` Skill，可让 OpenClaw 从用户浏览器中抓取文章（含图片），保存为 Markdown 和 PDF。特别支持微信公众号等有防盗链的网站。
+> 本目录附带 `web-article-saver` Skill，可让 OpenClaw 抓取网页文章（含图片），保存为 Markdown 和 PDF。
+>
+> **双引擎架构**：优先使用 [Scrapling](https://github.com/D4Vinci/Scrapling)（轻量 HTTP 抓取，无需浏览器），对防盗链网站（如微信公众号）自动回退到 CDP 浏览器上下文模式。
 
 ### 功能特点
 
-- 通过 CDP 在浏览器上下文中 fetch 图片，绕过微信公众号等防盗链限制
+- 双引擎：Scrapling（HTTP 直抓）→ CDP（浏览器上下文）自动切换
+- Scrapling 引擎：无需运行浏览器，支持 TLS 指纹伪装、反检测、自适应选择器
+- CDP 引擎：在浏览器上下文中 fetch 图片，绕过微信公众号等防盗链限制
 - 自动识别微信公众号、知乎专栏、通用网页
 - 输出 Markdown（含本地图片引用）+ PDF（图片内嵌）
-- 自动滚动触发懒加载图片
+- 自动滚动触发懒加载图片（CDP 模式）
+
+### 引擎选择逻辑
+
+```
+用户请求保存文章
+    │
+    ▼
+检测目标 URL 域名
+    │
+    ├── mp.weixin.qq.com（防盗链）──→ CDP 引擎（需浏览器已打开该页面）
+    │
+    └── 其他网站 ──→ Scrapling 引擎（HTTP 直抓）
+                        │
+                        ├── 成功 → 输出 Markdown/PDF
+                        │
+                        └── 失败（反爬/JS 渲染）──→ 回退 CDP 引擎
+```
+
+| 场景 | 引擎 | 原因 |
+|------|------|------|
+| 微信公众号 | CDP | 图片有 Referer 防盗链，必须在浏览器上下文中 fetch |
+| 知乎专栏 | Scrapling | 无防盗链，HTTP 直抓更快 |
+| 通用网页 | Scrapling | 轻量高效，无需浏览器 |
+| Scrapling 被反爬拦截 | CDP 回退 | 利用用户浏览器的真实会话绕过 |
 
 ### 安装步骤
 
 **Step 1: 安装 Python 依赖**
 
 ```bash
+# Scrapling（主引擎）
+pip3 install --break-system-packages scrapling
+
+# 如需 Scrapling 的浏览器自动化能力（StealthyFetcher/DynamicFetcher），还需安装浏览器依赖：
+# pip3 install --break-system-packages "scrapling[fetchers]"
+# scrapling install
+
+# CDP 引擎依赖（回退用）
 pip3 install --break-system-packages websocket-client
 ```
+
+> Scrapling 基础安装（`pip install scrapling`）仅包含解析引擎和 `Fetcher`（HTTP 请求），体积小、无浏览器依赖。对于大多数文章抓取场景已足够。
 
 **Step 2: 将 Skill 安装到 OpenClaw**
 
@@ -821,18 +936,31 @@ echo "✔ Skill 已安装到 $SKILL_DIR"
 > ~/.openclaw/skills/web-article-saver/
 > ├── SKILL.md              # Skill 描述文件（OpenClaw 自动识别）
 > └── scripts/
->     └── save_article.py   # 文章抓取脚本
+>     └── save_article.py   # 文章抓取脚本（含双引擎）
 > ```
 
-**Step 3: 确认浏览器 CDP 端口可用**
-
-Skill 需要连接到用户浏览器的 CDP 端口。根据你的环境：
-
-- ARM64 Snap Chromium（已配置 systemd 服务）：CDP 端口 `18800`
-- 标准 Chrome/Chromium：需启动时加 `--remote-debugging-port=9222 --remote-allow-origins=*`
+**Step 3: 验证 Scrapling 安装**
 
 ```bash
-# 验证 CDP 端口
+# 验证 Scrapling 可用
+python3 -c "from scrapling.fetchers import Fetcher; print('✔ Scrapling OK')"
+
+# 可选：用 CLI 快速测试抓取
+scrapling extract get 'https://quotes.toscrape.com/' /tmp/test-scrapling.md
+cat /tmp/test-scrapling.md | head -20
+```
+
+**Step 4: 确认浏览器 CDP 端口可用（CDP 回退引擎需要）**
+
+仅当需要抓取防盗链网站（如微信公众号）或 Scrapling 失败回退时才需要。根据你的环境：
+
+- ARM64 Snap Chromium（已配置 systemd 服务）：CDP 端口 `18800`
+- 标准 Chrome/Chromium（headed 模式 user profile）：CDP 端口 `9222`，需确保浏览器启动时带有 `--remote-debugging-port=9222 --remote-allow-origins=*`（Snap Chromium 通过 `~/.chromium-browser.init` 注入，Chrome 通过 `~/.config/chrome-flags.conf`）
+
+> 如果端口在监听但 `curl` 返回空或连接被拒绝，说明缺少 `--remote-allow-origins=*` 参数。参见 Part 3 Step 13 的持久化配置方法。
+
+```bash
+# 验证 CDP 端口（应返回 JSON 版本信息）
 curl -s http://127.0.0.1:9222/json/version || curl -s http://127.0.0.1:18800/json/version
 ```
 
@@ -848,26 +976,65 @@ curl -s http://127.0.0.1:9222/json/version || curl -s http://127.0.0.1:18800/jso
 把浏览器里打开的文章存下来，保存到 ~/Artical/Weixin
 ```
 
+```
+抓取 https://example.com/blog/post-1 保存为 Markdown
+```
+
 也可以手动运行脚本：
 
 ```bash
+# Scrapling 引擎（默认，无需浏览器）
 python3 ~/.openclaw/skills/web-article-saver/scripts/save_article.py \
+  --url "https://zhuanlan.zhihu.com/p/123456789" \
+  --output-dir ~/Artical \
+  --format md
+
+# 强制 CDP 引擎（需浏览器已打开目标页面）
+python3 ~/.openclaw/skills/web-article-saver/scripts/save_article.py \
+  --engine cdp \
   --cdp-url http://127.0.0.1:9222 \
   --tab-url "mp.weixin.qq.com" \
   --output-dir ~/Artical/Weixin \
   --format both
+
+# Scrapling CLI 快速抓取（不经过脚本，直接输出 Markdown）
+scrapling extract get 'https://example.com/article' article.md
 ```
 
 ### 脚本参数
 
 | 参数 | 默认值 | 说明 |
 |------|--------|------|
-| `--cdp-url` | `http://127.0.0.1:9222` | 浏览器 CDP 地址 |
-| `--tab-url` | 自动选择 | 匹配标签页 URL 的关键词 |
+| `--engine` | `auto` | 引擎选择: `auto`（自动）、`scrapling`（强制 Scrapling）、`cdp`（强制 CDP） |
+| `--url` | — | 目标文章 URL（Scrapling 引擎使用） |
+| `--cdp-url` | `http://127.0.0.1:9222` | 浏览器 CDP 地址（CDP 引擎使用） |
+| `--tab-url` | 自动选择 | 匹配标签页 URL 的关键词（CDP 引擎使用） |
 | `--output-dir` | `~/Artical/Weixin` | 保存目录 |
 | `--format` | `both` | `md`、`pdf` 或 `both` |
 | `--no-images` | — | 不下载图片 |
-| `--no-scroll` | — | 不滚动触发懒加载 |
+| `--no-scroll` | — | 不滚动触发懒加载（CDP 引擎） |
+| `--stealthy` | — | 使用 StealthyFetcher（需安装 `scrapling[fetchers]`） |
+
+### Scrapling 引擎说明
+
+[Scrapling](https://github.com/D4Vinci/Scrapling)（v0.4+）是一个自适应 Web 抓取框架，核心优势：
+
+- **轻量 HTTP 抓取**：`Fetcher` 类通过 HTTP 直接请求页面，无需启动浏览器，速度快、资源占用低
+- **TLS 指纹伪装**：可模拟 Chrome/Firefox 的 TLS 指纹，降低被反爬检测的概率
+- **自适应选择器**：网站结构变化后，能通过相似度算法自动重新定位元素
+- **CSS/XPath 选择器**：与 BeautifulSoup/Scrapy 类似的 API，上手成本低
+- **CLI 工具**：`scrapling extract get URL output.md` 一行命令直接输出 Markdown
+
+```python
+# Scrapling 基本用法示例
+from scrapling.fetchers import Fetcher
+
+page = Fetcher.get('https://example.com/article', stealthy_headers=True)
+title = page.css('h1::text').get()
+content = page.css('article').get()       # HTML 内容
+paragraphs = page.css('p::text').getall() # 所有段落文本
+images = page.css('img::attr(src)').getall()
+```
 
 ## 参考链接
 
@@ -876,4 +1043,6 @@ python3 ~/.openclaw/skills/web-article-saver/scripts/save_article.py \
 - [Ubuntu update-alternatives 文档](https://manpages.ubuntu.com/manpages/noble/man1/update-alternatives.1.html)
 - [Chrome DevTools MCP GitHub](https://github.com/nicolo-ribaudo/chrome-devtools-mcp)
 - [Chrome Remote Debugging 文档](https://developer.chrome.com/docs/devtools/remote-debugging/)
+- [Scrapling — 自适应 Web 抓取框架](https://github.com/D4Vinci/Scrapling)
+- [Scrapling 文档](https://scrapling.readthedocs.io/)
 - [OpenClaw 文档](https://docs.openclaw.ai)

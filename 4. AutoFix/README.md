@@ -46,7 +46,8 @@ ls -la ~/scripts/openclaw-deps-check.sh 2>/dev/null || echo "DEPS_CHECK_SCRIPT_N
 
 # 6. Kiro CLI 是否已安装并认证
 kiro-cli version 2>/dev/null || echo "KIRO_CLI_NOT_FOUND"
-kiro-cli auth status 2>/dev/null || echo "KIRO_AUTH_UNKNOWN"
+# 注意：kiro-cli v1.27.2 无 auth status 子命令，用最小对话测试认证
+timeout 15 kiro-cli chat --no-interactive --trust-all-tools -p "echo ok" >/dev/null 2>&1 && echo "KIRO_AUTH_OK" || echo "KIRO_AUTH_FAILED"
 
 # 7. loginctl linger 是否已启用
 loginctl show-user "$USER" --property=Linger 2>/dev/null || echo "LINGER_UNKNOWN"
@@ -57,25 +58,37 @@ python3 --version 2>/dev/null || echo "PYTHON3_NOT_FOUND"
 # 9. 通知渠道是否已配置
 openclaw notification list 2>/dev/null | head -1 || echo "NOTIFICATION_NOT_CONFIGURED"
 
-# 10. 依赖服务发现 — 从 openclaw.json 解析依赖
+# 10. 依赖服务发现 — 从 openclaw.json 解析依赖（Chromium 服务名动态检测）
 python3 -c "
-import json, os
+import json, os, subprocess
 cfg_path = os.path.expanduser('~/.openclaw/openclaw.json')
 try:
     cfg = json.load(open(cfg_path))
     deps = []
-    # memorySearch → LiteLLM
+    # memorySearch → LiteLLM（服务名: litellm-proxy.service）
     ms = cfg.get('memorySearch', {})
     if ms.get('enabled') and ms.get('remote', {}).get('baseUrl'):
         url = ms['remote']['baseUrl']
         port = url.split(':')[-1].rstrip('/')
         deps.append(f'litellm-proxy.service (port {port})')
-    # browser → Chromium headless
+    # browser → Chromium（动态检测实际 systemd 服务名）
     browser = cfg.get('browser', {})
     for pname, profile in browser.get('profiles', {}).items():
         cdp = profile.get('cdpUrl', '')
         if '18800' in cdp:
-            deps.append(f'chromium-headless.service (port 18800, profile={pname})')
+            chromium_svc = 'openclaw-browser.service'  # 默认值
+            try:
+                units = subprocess.check_output(
+                    ['systemctl', '--user', 'list-unit-files', '--type=service', '--no-legend'],
+                    text=True, timeout=5
+                )
+                for candidate in ['openclaw-browser.service', 'chromium-headless.service']:
+                    if candidate in units:
+                        chromium_svc = candidate
+                        break
+            except Exception:
+                pass
+            deps.append(f'{chromium_svc} (port 18800, profile={pname})')
     if deps:
         print('DEPS_DISCOVERED: ' + ', '.join(deps))
     else:
@@ -87,7 +100,8 @@ except Exception as e:
 # 11. 依赖服务运行状态
 systemctl --user is-active litellm-proxy.service 2>/dev/null || echo "LITELLM_SERVICE_NOT_FOUND"
 curl -s --max-time 3 http://localhost:4000/health >/dev/null 2>&1 && echo "LITELLM_HEALTH_OK" || echo "LITELLM_HEALTH_FAIL"
-systemctl --user is-active chromium-headless.service 2>/dev/null || echo "CHROMIUM_SERVICE_NOT_FOUND"
+# Chromium 服务名可能是 openclaw-browser.service 或 chromium-headless.service，动态查找
+systemctl --user list-unit-files --type=service 2>/dev/null | grep -E 'chromium|openclaw-browser' || echo "CHROMIUM_SERVICE_NOT_FOUND"
 curl -s --max-time 3 http://localhost:18800/json/version >/dev/null 2>&1 && echo "CHROMIUM_CDP_OK" || echo "CHROMIUM_CDP_FAIL"
 
 # 12. HEARTBEAT.md 中是否已有依赖服务健康检查任务
@@ -154,7 +168,7 @@ Gateway 正常运行
                       ├── ★ 检查依赖服务健康状态（调用 openclaw-deps-check.sh）
                       │     ├── 解析 openclaw.json 发现依赖
                       │     ├── litellm-proxy.service → HTTP /health
-                      │     └── chromium-headless.service → CDP /json/version
+                      │     └── Chromium（动态检测服务名）→ CDP /json/version
                       ├── 依赖异常 → 先修复依赖，再重启 Gateway
                       ├── 依赖正常 → 调用 Kiro CLI 分析 + 修复（最多2轮）
                       ├── 修复后验证 JSON + 重启 Gateway
@@ -177,7 +191,7 @@ HEARTBEAT 定时健康检查（每 30 分钟）
 | 组件 | 要求 |
 |---|---|
 | OpenClaw Gateway | systemd user service 方式运行 |
-| Kiro CLI | 已安装并登录（`kiro-cli auth status` 确认已认证） |
+| Kiro CLI | 已安装并登录（`kiro-cli version` 确认版本 + `kiro-cli chat` 最小请求验证认证） |
 | Kiro CLI 版本 | ≥ 1.20.0（`kiro-cli version`） |
 | 通知渠道 | 自动检测已配置的渠道（Telegram/Discord/Feishu 等，通过 `openclaw notification list`） |
 | loginctl linger | 已启用（`loginctl enable-linger $USER`） |
@@ -421,8 +435,8 @@ if [[ -z "$KIRO_CLI" ]]; then
   exit 1
 fi
 
-# Verify Kiro CLI auth
-if ! "$KIRO_CLI" auth status 2>&1 | grep -qi "authenticated\|logged in\|active"; then
+# Verify Kiro CLI auth (v1.27.2 无 auth status 子命令，用最小对话测试认证)
+if ! timeout 15 "$KIRO_CLI" chat --no-interactive --trust-all-tools -p "echo ok" >/dev/null 2>&1; then
   notify "🔴 $SERVICE_NAME failed. Kiro CLI not authenticated; run 'kiro-cli login' first."
   exit 1
 fi
@@ -484,7 +498,7 @@ chmod +x ~/scripts/openclaw-fix.sh
 | 部分 | Claude Code 版 | Kiro CLI 版 |
 |------|---------------|-------------|
 | 查找命令 | `find_claude()` → `claude` | `find_kiro_cli()` → `kiro-cli` |
-| 认证检查 | 无 | 新增 `kiro-cli auth status` 检查 |
+| 认证检查 | 无 | 新增 `timeout 15 kiro-cli chat` 最小请求验证 |
 | 调用方式 | `claude -p "$PROMPT" --allowedTools "Read,Write,Edit,Bash" --max-turns 10` | `kiro-cli chat --no-interactive --trust-all-tools --model claude-opus-4-6 -p "$PROMPT"` |
 | 超时变量 | `OPENCLAW_FIX_CLAUDE_TIMEOUT_SECS` | `OPENCLAW_FIX_KIRO_TIMEOUT_SECS` |
 | 计费 | Claude API Token | Kiro Credits（独立） |
@@ -602,9 +616,9 @@ Gateway 崩溃的根因可能不是 Gateway 本身，而是它依赖的服务挂
 | 配置路径 | 依赖服务 | systemd 服务名 | 健康检查方式 | 端口 |
 |----------|----------|----------------|-------------|------|
 | `memorySearch.remote.baseUrl` | LiteLLM Proxy | `litellm-proxy.service` | HTTP GET `/health` | 4000 |
-| `browser.profiles.*.cdpUrl` (含 18800) | Chromium Headless | `chromium-headless.service` | HTTP GET `/json/version` | 18800 |
+| `browser.profiles.*.cdpUrl` (含 18800) | Chromium Headless | 动态检测（优先 `openclaw-browser.service`，回退 `chromium-headless.service`） | HTTP GET `/json/version` | 18800 |
 
-> 服务发现是动态的 — 如果 `openclaw.json` 中未启用 `memorySearch` 或未配置 CDP profile，对应的服务检查会自动跳过。未来新增依赖只需在脚本的 `discover_deps()` 函数中添加解析规则。
+> 服务发现是动态的 — 如果 `openclaw.json` 中未启用 `memorySearch` 或未配置 CDP profile，对应的服务检查会自动跳过。Chromium 服务名通过 `systemctl --user list-unit-files` 动态查找，兼容不同环境的命名差异。未来新增依赖只需在脚本的 `discover_deps()` 函数中添加解析规则。
 
 ### 创建依赖服务健康检查脚本
 
@@ -642,26 +656,40 @@ notify() {
 # ---- Service Discovery from openclaw.json ----
 discover_deps() {
   # Output: one line per dependency in format "SERVICE_NAME|HEALTH_URL|DESCRIPTION"
+  # Chromium 服务名动态检测：不同环境可能是 openclaw-browser.service 或 chromium-headless.service
   python3 -c "
-import json, os, sys
+import json, os, subprocess, sys
 cfg_path = os.path.expanduser('$OPENCLAW_CONFIG_PATH')
 if not os.path.isfile(cfg_path):
     sys.exit(0)
 cfg = json.load(open(cfg_path))
 
-# memorySearch → LiteLLM
+# memorySearch → LiteLLM（服务名: litellm-proxy.service）
 ms = cfg.get('memorySearch', {})
 if ms.get('enabled') and ms.get('remote', {}).get('baseUrl'):
     base = ms['remote']['baseUrl'].rstrip('/')
     print(f'litellm-proxy.service|{base}/health|LiteLLM Proxy (memorySearch)')
 
-# browser profiles → Chromium headless (port 18800)
+# browser profiles → Chromium (port 18800)，动态检测实际 systemd 服务名
 browser = cfg.get('browser', {})
 for pname, profile in browser.get('profiles', {}).items():
     cdp = profile.get('cdpUrl', '')
     if '18800' in cdp:
         host = cdp.rstrip('/')
-        print(f'chromium-headless.service|{host}/json/version|Chromium Headless (browser CDP, profile={pname})')
+        # 从 systemd 中动态查找 Chromium 相关服务
+        chromium_svc = 'openclaw-browser.service'  # 默认值
+        try:
+            units = subprocess.check_output(
+                ['systemctl', '--user', 'list-unit-files', '--type=service', '--no-legend'],
+                text=True, timeout=5
+            )
+            for candidate in ['openclaw-browser.service', 'chromium-headless.service']:
+                if candidate in units:
+                    chromium_svc = candidate
+                    break
+        except Exception:
+            pass
+        print(f'{chromium_svc}|{host}/json/version|Chromium Headless (browser CDP, profile={pname})')
         break  # only need one entry for chromium
 " 2>/dev/null || true
 }
@@ -836,7 +864,7 @@ openclaw-fix.sh 启动
 ## 关键设计
 
 - **Kiro CLI `--no-interactive --trust-all-tools`**：非交互模式 + 信任所有工具，适合无人值守的自动修复场景
-- **认证前置检查**：修复前验证 `kiro-cli auth status`，避免因未登录导致修复失败
+- **认证前置检查**：修复前用最小对话测试 Kiro CLI 认证（v1.27.2 无 `auth status` 子命令，改用 `timeout 15 kiro-cli chat` 验证），避免因未登录导致修复失败。代价是多消耗少量 Credits，但可靠
 - **Kiro Credits 独立计费**：自愈修复不消耗 Claude API Token，运维成本可控
 - **MCP 扩展能力**：如果配置了 AWS Documentation MCP，Kiro CLI 修复时可自动查阅 AWS 文档获取正确配置
 - **最小变更原则**：提示词明确要求 "prefer minimal changes"，避免大改
@@ -891,7 +919,6 @@ bash ~/scripts/openclaw-deps-check.sh
 bash ~/scripts/safe-gateway-restart.sh "测试重启"
 
 # 验证 Kiro CLI 可用性
-kiro-cli auth status
 kiro-cli version
 
 # 验证依赖服务发现
@@ -914,7 +941,7 @@ for pname, p in browser.get('profiles', {}).items():
 | 症状 | 排查命令 | 处理方式 |
 |------|----------|----------|
 | `kiro-cli` 命令不存在 | `ls ~/.local/bin/kiro-cli` | 参考 [kiro_install_config.md](../3.%20KiroCLI/kiro_install_config.md) 安装 |
-| Kiro CLI 未认证 | `kiro-cli auth status` | 执行 `kiro-cli login --license free --use-device-flow` |
+| Kiro CLI 未认证 | `timeout 15 kiro-cli chat --no-interactive --trust-all-tools -p "echo ok"` | 执行 `kiro-cli login --license free --use-device-flow` |
 | 修复超时 | 检查网络连接 | 增加 `OPENCLAW_FIX_KIRO_TIMEOUT_SECS`；拆分修复任务 |
 | 修复后 JSON 无效 | `python3 -m json.tool ~/.openclaw/openclaw.json` | 手动检查并修复 JSON 语法 |
 | systemd 服务未触发 | `systemctl --user status openclaw-fix.service` | 确认 `auto-fix.conf` 已正确放置并执行 `daemon-reload` |
@@ -922,11 +949,11 @@ for pname, p in browser.get('profiles', {}).items():
 | Kiro Credits 不足 | Kiro CLI 返回错误 | 检查 Kiro 订阅状态；升级到 Pro |
 | 修复质量不佳 | 检查 Kiro CLI 模型配置 | 在 `~/.kiro/settings/settings.json` 中设置 `defaultModel` 为 `claude-opus-4-6` |
 | LiteLLM 健康检查失败 | `curl -s http://localhost:4000/health` | `systemctl --user restart litellm-proxy.service`；检查 AWS Credentials |
-| Chromium CDP 无响应 | `curl -s http://localhost:18800/json/version` | `systemctl --user restart chromium-headless.service`；检查 Snap AppArmor |
+| Chromium CDP 无响应 | `curl -s http://localhost:18800/json/version` | `systemctl --user restart openclaw-browser.service`（或实际服务名）；检查 Snap AppArmor |
 | 依赖服务发现为空 | `python3 -c "import json; ..."` 检查 openclaw.json | 确认 `memorySearch.enabled=true` 或 `browser.profiles` 中有 CDP 配置 |
 | Gateway 崩溃但依赖检查正常 | `bash ~/scripts/openclaw-deps-check.sh` | 依赖正常说明问题在 Gateway 本身，Kiro CLI 修复流程会接管 |
 | 依赖修复后 Gateway 仍崩溃 | 检查 `openclaw-fix.sh` 日志 | 依赖已修复但 Gateway 有独立问题，Kiro CLI 会继续分析 |
-| `openclaw-deps-check.sh` 找不到 systemd 服务 | `systemctl --user list-units \| grep -E 'litellm\|chromium'` | 确认依赖服务已按对应文档配置为 systemd user service |
+| `openclaw-deps-check.sh` 找不到 systemd 服务 | `systemctl --user list-unit-files \| grep -E 'litellm\|chromium\|openclaw-browser'` | Chromium 服务名因环境而异（`openclaw-browser.service` 或 `chromium-headless.service`），脚本会自动检测 |
 
 ## 参考
 
@@ -941,6 +968,6 @@ for pname, p in browser.get('profiles', {}).items():
 
 ---
 
-**版本**: v1.1
-**更新时间**: 2026-03-18
-**变更**: 从仅修复 Gateway 扩展为覆盖所有 OpenClaw 依赖服务；新增 `openclaw-deps-check.sh` 依赖服务健康检查脚本；`openclaw-fix.sh` 增加依赖检查前置步骤；新增 HEARTBEAT 定时健康巡检任务；服务发现基于 `openclaw.json` 动态解析
+**版本**: v1.2
+**更新时间**: 2026-03-19
+**变更**: 基于生产环境反馈适配 — ① Chromium 服务名从硬编码改为动态检测（`systemctl --user list-unit-files` 查找，优先 `openclaw-browser.service` 回退 `chromium-headless.service`）；② 移除不存在的 `kiro-cli auth status` 命令（v1.27.2），改用 `timeout 15 kiro-cli chat` 最小请求验证认证；③ LiteLLM 确认为 `litellm-proxy.service`（systemd user service），无需适配

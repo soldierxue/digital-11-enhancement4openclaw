@@ -112,7 +112,7 @@ After=graphical-session.target
 
 [Service]
 Type=simple
-ExecStart=/snap/bin/chromium --headless --no-sandbox --disable-gpu --remote-debugging-port=${CDP_PORT} --remote-debugging-address=127.0.0.1 --user-data-dir=%h/.cache/openclaw-chromium-profile --no-first-run --no-default-browser-check
+ExecStart=/snap/bin/chromium --headless --no-sandbox --disable-gpu --remote-debugging-port=${CDP_PORT} --remote-debugging-address=127.0.0.1 --remote-allow-origins=* --user-data-dir=%h/.cache/openclaw-chromium-profile --no-first-run --no-default-browser-check
 Restart=on-failure
 RestartSec=5
 
@@ -303,6 +303,42 @@ with open(config_path, 'w') as f:
 
 print('  ✔ 配置已写入 (headed 模式，含双 Profile)')
 "
+
+  # --- 为 user profile 写入浏览器 CDP 启动参数 ---
+  echo ""
+  echo "  📋 写入浏览器 CDP 参数（user profile 需要）..."
+  REQUIRED_FLAGS="--remote-debugging-port=9222 --remote-allow-origins=*"
+
+  if snap list chromium &>/dev/null 2>&1; then
+    # Snap Chromium: 写入 ~/.chromium-browser.init（Snap launcher 会 source 此文件）
+    # 注意：Snap Chromium 不读取 chromium-flags.conf
+    INIT_FILE="${HOME}/.chromium-browser.init"
+    NEEDS_WRITE=false
+    if [ -f "$INIT_FILE" ] && grep -q "CHROMIUM_FLAGS" "$INIT_FILE"; then
+      grep -q "remote-debugging-port" "$INIT_FILE" || NEEDS_WRITE=true
+      grep -q "remote-allow-origins" "$INIT_FILE" || NEEDS_WRITE=true
+      if [ "$NEEDS_WRITE" = "true" ]; then
+        sed -i '/^export CHROMIUM_FLAGS/s/"$/ '"${REQUIRED_FLAGS}"'"/' "$INIT_FILE"
+        echo "  ✔ 已更新 $INIT_FILE 中的 CHROMIUM_FLAGS"
+      else
+        echo "  ✔ $INIT_FILE 已包含所需参数，无需修改"
+      fi
+    else
+      echo "export CHROMIUM_FLAGS=\"\$CHROMIUM_FLAGS ${REQUIRED_FLAGS}\"" >> "$INIT_FILE"
+      echo "  ✔ 已写入 $INIT_FILE"
+    fi
+  elif command -v google-chrome-stable &>/dev/null; then
+    # Google Chrome (.deb): 写入 ~/.config/chrome-flags.conf
+    FLAGS_FILE="${HOME}/.config/chrome-flags.conf"
+    grep -q "remote-debugging-port" "$FLAGS_FILE" 2>/dev/null || \
+      echo "--remote-debugging-port=9222" >> "$FLAGS_FILE"
+    grep -q "remote-allow-origins" "$FLAGS_FILE" 2>/dev/null || \
+      echo "--remote-allow-origins=*" >> "$FLAGS_FILE"
+    echo "  ✔ 已写入 $FLAGS_FILE"
+  else
+    echo "  ⚠ 未检测到 Snap Chromium 或 Google Chrome，请手动配置 CDP 参数"
+  fi
+  echo "  ⚠ 如果浏览器正在运行，需要关闭并重新打开才能生效"
 
 fi
 
