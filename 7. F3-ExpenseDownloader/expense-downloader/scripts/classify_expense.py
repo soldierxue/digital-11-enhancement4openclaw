@@ -3,16 +3,19 @@
 classify_expense.py — 将下载的 Expense 材料按费用类型分类归档。
 
 根据邮件元数据（发件人、主题）和文件名模式，将发票/水单/收据
-分类到对应目录，并生成汇总报告。
+分类到对应目录。对每个发票文件，尝试从邮件元数据提取日期、类型、
+金额、地点等信息组合成新文件名；如果信息不足，调用 Kiro CLI
+进行发票内容识别（OCR/AI）。
 
 用法:
     python3 classify_expense.py [选项]
 
 选项:
-    --input-dir DIR       待分类文件目录 (默认: ~/Expenses/downloads)
+    --input-dir DIR       待分类文件目录（RAW 文件夹路径）
     --output-dir DIR      归档根目录 (默认: ~/Expenses)
     --scan-result PATH    scan_inbox.py 输出的 JSON（辅助分类）
-    --download-result PATH  download_expense.py 输出的 JSON（文件-邮件映射）
+    --download-result PATH  download_expense.py 输出的 JSON
+    --no-ocr              禁用 Kiro CLI 发票识别
 """
 
 import json
@@ -21,6 +24,7 @@ import sys
 import re
 import shutil
 import argparse
+import subprocess
 from datetime import datetime, date
 
 
@@ -167,7 +171,58 @@ def classify_file(filename, sender="", subject=""):
 
 
 # ============================================================
-# 文件命名
+# Kiro CLI 发票内容识别（OCR/AI）
+# ============================================================
+
+def kiro_cli_recognize_invoice(file_path):
+    """
+    调用 Kiro CLI 对发票文件进行内容识别，提取结构化信息。
+    返回 dict: {date, amount, vendor, location, type, raw_response}
+    失败返回 None。
+    """
+    if not os.path.exists(file_path):
+        return None
+
+    prompt = (
+        f"请识别这个发票/收据文件的内容，提取以下信息并以 JSON 格式返回"
+        f"（只返回 JSON，不要其他文字）：\n"
+        f'{{"date":"YYYY-MM-DD","amount":"金额数字","vendor":"供应商/商户名",'
+        f'"location":"消费地点/城市","type":"发票类型(如:增值税电子普通发票/水单/行程单/收据)"}}\n'
+        f"文件路径: {file_path}"
+    )
+
+    try:
+        result = subprocess.run(
+            ["kiro-cli", "chat", "--no-interactive", "--trust-all-tools",
+             "-p", prompt],
+            capture_output=True, text=True, timeout=60
+        )
+        output = result.stdout.strip()
+        if not output:
+            return None
+
+        # 尝试从输出中提取 JSON
+        json_match = re.search(r'\{[^{}]*"date"[^{}]*\}', output, re.DOTALL)
+        if json_match:
+            data = json.loads(json_match.group())
+            data["raw_response"] = output[:500]
+            return data
+
+        # 兜底：尝试直接解析整个输出
+        data = json.loads(output)
+        data["raw_response"] = output[:500]
+        return data
+
+    except (subprocess.TimeoutExpired, FileNotFoundError, json.JSONDecodeError) as e:
+        print(f"    ⚠️ Kiro CLI 识别失败: {e}")
+        return None
+    except Exception as e:
+        print(f"    ⚠️ Kiro CLI 异常: {e}")
+        return None
+
+
+# ============================================================
+# 文件命名（增强版：日期_类型_金额_地点_供应商）
 # ============================================================
 
 def extract_date_from_email(email_info):
@@ -176,13 +231,10 @@ def extract_date_from_email(email_info):
     if not date_str:
         return None
 
-    # 尝试多种日期格式
     patterns = [
-        r"(\d{4})[/-](\d{1,2})[/-](\d{1,2})",  # 2026-01-15 or 2026/01/15
-        r"(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{4})",
+        r"(\d{4})[/-](\d{1,2})[/-](\d{1,2})",
         r"(\d{4})年(\d{1,2})月(\d{1,2})日",
     ]
-
     month_map = {
         "Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4, "May": 5, "Jun": 6,
         "Jul": 7, "Aug": 8, "Sep": 9, "Oct": 10, "Nov": 11, "Dec": 12,
@@ -192,62 +244,113 @@ def extract_date_from_email(email_info):
         m = re.search(pat, date_str)
         if m:
             groups = m.groups()
-            if len(groups) == 3:
-                if groups[1] in month_map:
-                    # "15 Jan 2026" format
-                    return f"{groups[2]}{month_map[groups[1]]:02d}{int(groups[0]):02d}"
-                else:
-                    # "2026-01-15" or "2026年1月15日" format
-                    return f"{groups[0]}{int(groups[1]):02d}{int(groups[2]):02d}"
+            return f"{groups[0]}{int(groups[1]):02d}{int(groups[2]):02d}"
+
+    m = re.search(
+        r"(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{4})",
+        date_str)
+    if m:
+        return f"{m.group(3)}{month_map[m.group(2)]:02d}{int(m.group(1)):02d}"
+
+    m = re.search(
+        r"(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{1,2}),?\s+(\d{4})",
+        date_str)
+    if m:
+        return f"{m.group(3)}{month_map[m.group(1)]:02d}{int(m.group(2)):02d}"
 
     return None
 
 
-def generate_filename(original_name, email_info, category):
-    """生成规范化文件名: YYYYMMDD_供应商_类型.pdf"""
-    # 提取日期
-    date_prefix = extract_date_from_email(email_info) or datetime.now().strftime("%Y%m%d")
+def sanitize(s, max_len=20):
+    """清理字符串用于文件名"""
+    if not s:
+        return ""
+    s = re.sub(r'[<>:"/\\|?*\n\r\t]', '', s).strip()
+    s = re.sub(r'\s+', ' ', s)
+    return s[:max_len]
 
-    # 提取供应商（从发件人或主题）
-    sender_name = email_info.get("senderName", "")
-    subject = email_info.get("subject", "")
 
-    vendor = ""
-    if "滴滴" in sender_name or "didi" in sender_name.lower():
-        vendor = "滴滴出行"
-    elif "marriott" in sender_name.lower():
-        vendor = "Marriott"
-    elif "hilton" in sender_name.lower():
-        vendor = "Hilton"
-    elif "10086" in sender_name or "移动" in sender_name:
-        vendor = "中国移动"
-    elif sender_name:
-        # 取发件人名称的前 10 个字符
-        vendor = re.sub(r'[<>:"/\\|?*\n\r]', '', sender_name)[:10].strip()
-
-    # 提取类型描述
-    type_desc = ""
-    if "发票" in subject or "invoice" in subject.lower():
-        type_desc = "发票"
-    elif "水单" in subject or "folio" in subject.lower():
-        type_desc = "水单"
-    elif "收据" in subject or "receipt" in subject.lower():
-        type_desc = "收据"
-    elif "行程单" in subject:
-        type_desc = "行程单"
-    elif "账单" in subject or "bill" in subject.lower():
-        type_desc = "账单"
-    else:
-        type_desc = "发票"
-
-    # 保留原始扩展名
+def generate_filename(original_name, email_info, category, ocr_info=None):
+    """
+    生成增强版文件名。
+    格式: YYYYMMDD_类型_金额_地点_供应商.ext
+    各字段缺失时省略，保证文件名可读且信息丰富。
+    """
     _, ext = os.path.splitext(original_name)
     ext = ext or ".pdf"
 
+    # 收集各字段（优先 OCR 结果，其次邮件元数据）
+    date_prefix = None
+    inv_type = ""
+    amount = ""
+    location = ""
+    vendor = ""
+
+    # --- 从 OCR 结果提取 ---
+    if ocr_info:
+        ocr_date = ocr_info.get("date", "")
+        if ocr_date:
+            m = re.search(r"(\d{4})-?(\d{2})-?(\d{2})", ocr_date)
+            if m:
+                date_prefix = f"{m.group(1)}{m.group(2)}{m.group(3)}"
+
+        raw_amount = ocr_info.get("amount", "")
+        if raw_amount:
+            # 提取数字部分
+            amt_match = re.search(r"[\d,.]+", str(raw_amount))
+            if amt_match:
+                amount = amt_match.group().rstrip(".")
+
+        vendor = sanitize(ocr_info.get("vendor", ""), 15)
+        location = sanitize(ocr_info.get("location", ""), 10)
+        inv_type = sanitize(ocr_info.get("type", ""), 15)
+
+    # --- 从邮件元数据补充缺失字段 ---
+    if not date_prefix:
+        date_prefix = extract_date_from_email(email_info) or datetime.now().strftime("%Y%m%d")
+
+    sender_name = email_info.get("senderName", "")
+    subject = email_info.get("subject", "")
+
+    if not vendor:
+        if "滴滴" in sender_name or "didi" in sender_name.lower():
+            vendor = "滴滴出行"
+        elif "marriott" in sender_name.lower():
+            vendor = "Marriott"
+        elif "hilton" in sender_name.lower():
+            vendor = "Hilton"
+        elif "10086" in sender_name or "移动" in sender_name:
+            vendor = "中国移动"
+        elif "联通" in sender_name:
+            vendor = "中国联通"
+        elif "电信" in sender_name:
+            vendor = "中国电信"
+        elif sender_name:
+            vendor = sanitize(sender_name, 12)
+
+    if not inv_type:
+        for kw, label in [
+            ("发票", "发票"), ("invoice", "发票"),
+            ("水单", "水单"), ("folio", "水单"),
+            ("收据", "收据"), ("receipt", "收据"),
+            ("行程单", "行程单"), ("账单", "账单"), ("bill", "账单"),
+        ]:
+            if kw in subject.lower():
+                inv_type = label
+                break
+        if not inv_type:
+            inv_type = "发票"
+
+    # --- 组合文件名 ---
     parts = [date_prefix]
+    if inv_type:
+        parts.append(inv_type)
+    if amount:
+        parts.append(amount + "元")
+    if location:
+        parts.append(location)
     if vendor:
         parts.append(vendor)
-    parts.append(type_desc)
 
     return "_".join(parts) + ext
 
@@ -332,9 +435,8 @@ def generate_summary_json(classified_files, failed_items):
 def main():
     parser = argparse.ArgumentParser(description="分类归档 Expense 材料")
     parser.add_argument("--input-dir",
-                        default=os.path.expanduser(
-                            os.environ.get("EXPENSE_OUTPUT_DIR", "~/Expenses") + "/downloads"),
-                        help="待分类文件目录")
+                        default=None,
+                        help="待分类文件目录（RAW 文件夹路径）")
     parser.add_argument("--output-dir",
                         default=os.path.expanduser(
                             os.environ.get("EXPENSE_OUTPUT_DIR", "~/Expenses")),
@@ -343,10 +445,31 @@ def main():
                         help="scan_inbox.py 输出的 JSON（辅助分类）")
     parser.add_argument("--download-result", default=None,
                         help="download_expense.py 输出的 JSON")
+    parser.add_argument("--no-ocr", action="store_true",
+                        help="禁用 Kiro CLI 发票内容识别")
     args = parser.parse_args()
 
-    if not os.path.isdir(args.input_dir):
+    # 如果未指定 input-dir，尝试从 download-result 中获取 rawDir
+    if not args.input_dir:
+        if args.download_result and os.path.exists(args.download_result):
+            with open(args.download_result, "r", encoding="utf-8") as f:
+                dl_data = json.load(f)
+            args.input_dir = dl_data.get("rawDir", "")
+        if not args.input_dir:
+            # 兜底：查找 ~/Expenses 下最新的 RAW 文件夹
+            expenses_dir = os.path.expanduser("~/Expenses")
+            if os.path.isdir(expenses_dir):
+                raw_dirs = [d for d in os.listdir(expenses_dir)
+                            if os.path.isdir(os.path.join(expenses_dir, d))
+                            and d.startswith("[")]
+                if raw_dirs:
+                    raw_dirs.sort(key=lambda d: os.path.getmtime(
+                        os.path.join(expenses_dir, d)), reverse=True)
+                    args.input_dir = os.path.join(expenses_dir, raw_dirs[0])
+
+    if not args.input_dir or not os.path.isdir(args.input_dir):
         print(f"✘ 输入目录不存在: {args.input_dir}")
+        print("  请指定 --input-dir（RAW 文件夹路径）或 --download-result")
         sys.exit(1)
 
     # 加载邮件元数据（如果有）
@@ -396,7 +519,6 @@ def main():
         # 简单匹配：用文件名在 email_metadata 中查找
         for idx, meta in email_metadata.items():
             meta_subject = meta.get("subject", "")
-            # 如果文件名包含主题的一部分，认为匹配
             if meta_subject and (meta_subject[:10] in fname or fname[:10] in meta_subject):
                 sender = meta.get("sender", "")
                 subject = meta_subject
@@ -407,8 +529,26 @@ def main():
         category, classified_by = classify_file(fname, sender, subject)
         label = CATEGORY_LABELS.get(category, category)
 
-        # 生成新文件名
-        new_fname = generate_filename(fname, email_info, category)
+        # ============================================================
+        # 发票内容识别（Kiro CLI OCR/AI）
+        # 当邮件元数据不足以提取金额、地点等信息时，调用 Kiro CLI
+        # ============================================================
+        ocr_info = None
+        need_ocr = (not args.no_ocr
+                    and fname.lower().endswith((".pdf", ".jpg", ".jpeg", ".png"))
+                    and not email_info.get("amount"))
+
+        if need_ocr:
+            print(f"  🔍 Kiro CLI 识别: {fname}...")
+            ocr_info = kiro_cli_recognize_invoice(fpath)
+            if ocr_info:
+                print(f"    → 日期={ocr_info.get('date','?')} "
+                      f"金额={ocr_info.get('amount','?')} "
+                      f"供应商={ocr_info.get('vendor','?')} "
+                      f"地点={ocr_info.get('location','?')}")
+
+        # 生成新文件名（增强版：日期_类型_金额_地点_供应商）
+        new_fname = generate_filename(fname, email_info, category, ocr_info)
 
         # 目标目录
         cat_dir = CATEGORY_DIRS.get(category, "other")
@@ -438,6 +578,7 @@ def main():
             "sender": sender,
             "subject": subject,
             "date": email_info.get("date", ""),
+            "ocrInfo": ocr_info,
         })
 
     # 生成汇总报告

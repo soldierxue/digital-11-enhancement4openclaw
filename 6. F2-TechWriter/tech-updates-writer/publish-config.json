@@ -1,0 +1,19 @@
+{
+  "github": {
+    "repo": "jason.xue",
+    "branch": "main",
+    "postsDir": "_posts",
+    "localCloneDir": "/tmp/jason.xue",
+    "remoteUrl": "git@github.com:<username>/jason.xue.git"
+  },
+  "auth": {
+    "method": "ssh",
+    "sshKeyPath": "~/.ssh/id_ed25519",
+    "_comment_pat": "如使用 Personal Access Token，将 method 改为 'pat'，并设置环境变量 GITHUB_TOKEN"
+  },
+  "jekyll": {
+    "layout": "post",
+    "defaultCategories": ["AI", "Tech"],
+    "filenamePattern": "YYYY-MM-DD-NN-slug.md"
+  }
+}

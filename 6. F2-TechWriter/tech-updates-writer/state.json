@@ -1,0 +1,14 @@
+{
+  "lastWritingSystemCheck": 0,
+  "currentRun": {
+    "date": "",
+    "status": "idle",
+    "orchestratorStartTime": null,
+    "endTime": null,
+    "currentPhase": null,
+    "totalRetries": 0,
+    "monitorPid": null,
+    "checkpoints": {},
+    "qualityGates": {}
+  }
+}

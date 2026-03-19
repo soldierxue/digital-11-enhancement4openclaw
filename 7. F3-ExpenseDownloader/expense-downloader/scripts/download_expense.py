@@ -29,6 +29,7 @@ import hashlib
 import argparse
 import shutil
 import glob
+from datetime import date, datetime
 
 try:
     import websocket
@@ -601,6 +602,50 @@ def download_email(cdp, provider, idx, email_info, output_dir, timeout, before_f
 
 
 # ============================================================
+# 日期解析
+# ============================================================
+
+MONTH_MAP = {
+    "Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4, "May": 5, "Jun": 6,
+    "Jul": 7, "Aug": 8, "Sep": 9, "Oct": 10, "Nov": 11, "Dec": 12,
+}
+
+def parse_email_date(date_str):
+    """从邮件日期字符串解析出 date 对象，失败返回 None"""
+    if not date_str:
+        return None
+    # 2026-01-15, 2026/01/15
+    m = re.search(r"(\d{4})[/-](\d{1,2})[/-](\d{1,2})", date_str)
+    if m:
+        try:
+            return date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+        except ValueError:
+            pass
+    # 2026年1月15日
+    m = re.search(r"(\d{4})年(\d{1,2})月(\d{1,2})日", date_str)
+    if m:
+        try:
+            return date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+        except ValueError:
+            pass
+    # 15 Jan 2026
+    m = re.search(r"(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{4})", date_str)
+    if m:
+        try:
+            return date(int(m.group(3)), MONTH_MAP[m.group(2)], int(m.group(1)))
+        except (ValueError, KeyError):
+            pass
+    # Jan 15, 2026
+    m = re.search(r"(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{1,2}),?\s+(\d{4})", date_str)
+    if m:
+        try:
+            return date(int(m.group(3)), MONTH_MAP[m.group(1)], int(m.group(2)))
+        except (ValueError, KeyError):
+            pass
+    return None
+
+
+# ============================================================
 # 主流程
 # ============================================================
 
@@ -611,8 +656,8 @@ def main():
     parser.add_argument("--email-indices", required=True,
                         help="要下载的邮件索引，逗号分隔")
     parser.add_argument("--output-dir",
-                        default=os.path.expanduser(os.environ.get("EXPENSE_OUTPUT_DIR", "~/Expenses/downloads")),
-                        help="下载目录")
+                        default=os.path.expanduser(os.environ.get("EXPENSE_OUTPUT_DIR", "~/Expenses")),
+                        help="下载根目录（RAW 子目录将自动创建）")
     parser.add_argument("--scan-result", required=True,
                         help="scan_inbox.py 输出的 JSON")
     parser.add_argument("--timeout", type=int, default=30,
@@ -634,8 +679,9 @@ def main():
     print(f"▶ 邮箱类型: {scan_data.get('providerName', provider)}")
     print(f"  待下载: {len(indices)} 封邮件")
 
-    # 准备下载目录
-    os.makedirs(args.output_dir, exist_ok=True)
+    # 准备临时下载目录（先下载到临时目录，完成后根据日期范围重命名）
+    tmp_download_dir = os.path.join(args.output_dir, f"_tmp_raw_{provider}_{int(time.time())}")
+    os.makedirs(tmp_download_dir, exist_ok=True)
 
     # 查找邮箱标签页
     tab = find_tab(args.cdp_url)
@@ -645,10 +691,10 @@ def main():
 
     cdp = CDPClient(tab["webSocketDebuggerUrl"])
 
-    # 设置下载行为
+    # 设置下载行为 — 下载到临时目录
     cdp.send("Browser.setDownloadBehavior", {
         "behavior": "allowAndName",
-        "downloadPath": args.output_dir,
+        "downloadPath": tmp_download_dir,
         "eventsEnabled": True,
     })
 
@@ -668,9 +714,9 @@ def main():
                 all_failed.append({"index": idx, "reason": "not found in scan result"})
                 continue
 
-            before_files = set(glob.glob(os.path.join(args.output_dir, "*")))
+            before_files = set(glob.glob(os.path.join(tmp_download_dir, "*")))
             dl_files, failure = download_email(
-                cdp, provider, idx, email_info, args.output_dir, args.timeout, before_files
+                cdp, provider, idx, email_info, tmp_download_dir, args.timeout, before_files
             )
             all_downloaded.extend(dl_files)
             if failure:
@@ -679,12 +725,54 @@ def main():
     finally:
         cdp.close()
 
+    # ============================================================
+    # 根据下载的发票日期范围，重命名 RAW 文件夹
+    # 格式: [provider]_[earliest_date]_to_[latest_date]
+    # 例如: [163]_[2026.02.01]_to_[2026.03.31]
+    # ============================================================
+    date_values = []
+    for idx in indices:
+        for e in emails:
+            if e.get("index") == idx:
+                d = parse_email_date(e.get("date", ""))
+                if d:
+                    date_values.append(d)
+                break
+
+    if date_values:
+        earliest = min(date_values)
+        latest = max(date_values)
+        earliest_str = earliest.strftime("%Y.%m.%d")
+        latest_str = latest.strftime("%Y.%m.%d")
+    else:
+        # 兜底：使用当前日期
+        today = date.today()
+        earliest_str = today.strftime("%Y.%m.%d")
+        latest_str = today.strftime("%Y.%m.%d")
+
+    raw_folder_name = f"[{provider}]_[{earliest_str}]_to_[{latest_str}]"
+    raw_dir = os.path.join(args.output_dir, raw_folder_name)
+
+    # 如果目标目录已存在，加序号
+    if os.path.exists(raw_dir):
+        n = 2
+        while os.path.exists(f"{raw_dir}_{n}"):
+            n += 1
+        raw_dir = f"{raw_dir}_{n}"
+
+    os.rename(tmp_download_dir, raw_dir)
+    print(f"\n📁 RAW 文件夹: {raw_dir}")
+
+    # 更新文件路径（临时目录 → 最终 RAW 目录）
+    all_downloaded = [p.replace(tmp_download_dir, raw_dir) for p in all_downloaded]
+
     # 输出汇总
     print(f"\n{'='*60}")
     print(f"✅ 下载完成: {len(all_downloaded)} 个文件")
     for f_path in all_downloaded:
-        size = os.path.getsize(f_path)
-        print(f"   📄 {os.path.basename(f_path)} ({size/1024:.1f}KB)")
+        if os.path.exists(f_path):
+            size = os.path.getsize(f_path)
+            print(f"   📄 {os.path.basename(f_path)} ({size/1024:.1f}KB)")
 
     if all_failed:
         print(f"\n⚠️ 失败: {len(all_failed)} 封邮件")
@@ -695,18 +783,23 @@ def main():
     # 输出 JSON 结果
     result = {
         "downloaded": [{"path": p, "filename": os.path.basename(p),
-                        "size": os.path.getsize(p)} for p in all_downloaded],
+                        "size": os.path.getsize(p) if os.path.exists(p) else 0}
+                       for p in all_downloaded],
         "failed": all_failed,
+        "rawDir": raw_dir,
+        "rawFolderName": raw_folder_name,
         "outputDir": args.output_dir,
+        "provider": provider,
+        "dateRange": {"earliest": earliest_str, "latest": latest_str},
         "totalDownloaded": len(all_downloaded),
         "totalFailed": len(all_failed),
     }
 
-    result_path = os.path.join(args.output_dir, "download-result.json")
+    result_path = os.path.join(raw_dir, "download-result.json")
     with open(result_path, "w", encoding="utf-8") as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
 
-    print(f"\nRESULT_JSON:{json.dumps({'downloaded': len(all_downloaded), 'failed': len(all_failed), 'resultFile': result_path}, ensure_ascii=False)}")
+    print(f"\nRESULT_JSON:{json.dumps({'downloaded': len(all_downloaded), 'failed': len(all_failed), 'rawDir': raw_dir, 'resultFile': result_path}, ensure_ascii=False)}")
 
 
 if __name__ == "__main__":

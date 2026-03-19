@@ -88,7 +88,7 @@ python3 SKILL_DIR/scripts/scan_inbox.py \
 python3 SKILL_DIR/scripts/download_expense.py \
   --cdp-url http://127.0.0.1:9222 \
   --email-indices "0,2,5,8" \
-  --output-dir ~/Expenses/downloads \
+  --output-dir ~/Expenses \
   --scan-result /tmp/expense-scan-result.json
 ```
 
@@ -108,13 +108,24 @@ python3 SKILL_DIR/scripts/download_expense.py \
 4. 监控下载完成
 5. 返回邮件列表，处理下一封
 
+**RAW 文件夹命名:** 下载完成后，根据邮件中发票的最早和最晚日期，
+自动将临时下载目录重命名为:
+```
+~/Expenses/[provider]_[earliest_date]_to_[latest_date]/
+```
+示例:
+```
+~/Expenses/[163]_[2026.02.01]_to_[2026.03.31]/
+~/Expenses/[gmail]_[2026.01.15]_to_[2026.03.10]/
+```
+
 **中国发票平台处理:** 参考 `references/platforms.md`
 
 ### Phase 4: 分类归档
 
 ```bash
 python3 SKILL_DIR/scripts/classify_expense.py \
-  --input-dir ~/Expenses/downloads \
+  --input-dir "~/Expenses/[163]_[2026.02.01]_to_[2026.03.31]" \
   --output-dir ~/Expenses \
   --scan-result /tmp/expense-scan-result.json
 ```
@@ -127,10 +138,35 @@ python3 SKILL_DIR/scripts/classify_expense.py \
 - 💻 办公 (office/) — 办公用品
 - 📋 其他 (other/) — 未分类
 
+**发票文件智能重命名:**
+
+每个发票文件根据其内容信息重命名，格式:
+```
+YYYYMMDD_类型_金额_地点_供应商.pdf
+```
+
+示例:
+- `20260115_发票_58.50元_北京_滴滴出行.pdf`
+- `20260118_水单_1280.00元_上海_Marriott.pdf`
+- `20260201_发票_89.00元_广州_中国移动.pdf`
+- `20260210_行程单_1560.00元_北京-上海_东方航空.pdf`
+
+信息提取优先级:
+1. **Kiro CLI 发票识别（OCR/AI）** — 对 PDF/图片文件调用 Kiro CLI 提取日期、金额、供应商、地点等
+2. **邮件元数据** — 从发件人、主题、日期等字段提取
+3. **文件名模式** — 从原始文件名中提取
+4. **兜底** — 使用下载日期 + 默认类型
+
+> 可通过 `--no-ocr` 参数禁用 Kiro CLI 识别（仅依赖邮件元数据）
+
 输出目录结构:
 ```
 ~/Expenses/
-├── YYYY-MM/
+├── [163]_[2026.02.01]_to_[2026.03.31]/   ← RAW 原始下载
+│   ├── 原始文件1.pdf
+│   ├── 原始文件2.pdf
+│   └── download-result.json
+├── YYYY-MM/                                ← 分类归档
 │   ├── transport/didi/
 │   ├── transport/flight/
 │   ├── accommodation/
@@ -168,7 +204,7 @@ python3 SKILL_DIR/scripts/classify_expense.py \
 |------|--------|------|
 | `--cdp-url` | `http://127.0.0.1:9222` | CDP 地址 |
 | `--email-indices` | (必填) | 要下载的邮件索引，逗号分隔 |
-| `--output-dir` | `~/Expenses/downloads` | 下载目录 |
+| `--output-dir` | `~/Expenses` | 下载根目录（RAW 子目录自动创建） |
 | `--scan-result` | (必填) | Phase 1 输出的 JSON |
 | `--timeout` | `30` | 单个下载超时秒数 |
 
@@ -176,9 +212,11 @@ python3 SKILL_DIR/scripts/classify_expense.py \
 
 | 参数 | 默认值 | 说明 |
 |------|--------|------|
-| `--input-dir` | `~/Expenses/downloads` | 待分类文件目录 |
+| `--input-dir` | (自动检测) | RAW 文件夹路径（如 `~/Expenses/[163]_[...]`） |
 | `--output-dir` | `~/Expenses` | 归档根目录 |
 | `--scan-result` | (可选) | 邮件元数据，辅助分类 |
+| `--download-result` | (可选) | download_expense.py 输出的 JSON |
+| `--no-ocr` | `false` | 禁用 Kiro CLI 发票内容识别 |
 
 ## State
 
@@ -223,3 +261,5 @@ python3 SKILL_DIR/scripts/classify_expense.py \
 | ZIP 解压失败 | 文件可能损坏，标记为需人工处理 |
 | 分类错误 | 调整 `references/expense-categories.md` 中的规则 |
 | websocket-client 未安装 | `pip3 install --break-system-packages websocket-client` |
+| Kiro CLI 识别失败 | 检查 `kiro-cli` 是否已安装并可用；可用 `--no-ocr` 跳过识别 |
+| RAW 文件夹名称异常 | 邮件日期解析失败时使用当前日期；检查邮件日期格式 |
