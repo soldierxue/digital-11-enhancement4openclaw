@@ -30,6 +30,7 @@ https://github.com/aws-samples/sample-OpenClaw-on-AWS-with-Bedrock/blob/main/cla
 | 5 | [F1-TechUpdate](#5-f1-techupdate--ai-资讯采集) | tech-updates-collector Skill — 每日 AI 资讯自动采集，6 大主题，增量去重 | 信息输入 |
 | 6 | [F2-TechWriter](#6-f2-techwriter--多-agent-协作写作) | tech-updates-writer Skill — Orchestrator Agent 协调的 Phase 0-10 写作流水线 | 内容产出 |
 | 7 | [F3-ExpenseDownloader](#7-f3-expensedownloader--发票自动下载) | 浏览器自动化邮箱发票/水单下载，AI 识别分类归档 | 报销自动化 |
+| 8 | [F4-WeixinPublisher](#8-f4-weixinpublisher--微信公众号发布) | 博客文章自动发布微信公众号，AI 封面生成，两阶段发布 | 内容分发 |
 
 ---
 
@@ -110,6 +111,17 @@ expense-downloader Skill，基于浏览器自动化的邮箱发票/水单下载�
 - 自动分类：交通、住宿、餐饮、通讯、办公等，智能重命名 `YYYYMMDD_类型_金额_地点_供应商.pdf`
 - 当前状态：设计方案完成，脚本框架已搭建
 
+### 8. F4-WeixinPublisher — 微信公众号发布
+
+weixin-publisher Skill，从博客 URL 或本地 Markdown 自动发布微信公众号图文消息。
+
+- **两阶段发布**：Phase 1 快速出草稿（~10 秒）→ Phase 2 AI 封面生成 + 更新草稿（~2 分钟）
+- **AI 封面生成**：Kiro CLI 生成文生图 prompt → Bedrock SD3.5 Large 出图，5 种风格（赛博朋克/科幻/像素/漫画/浮世绘）
+- **AI 引言**：Kiro CLI 生成 100 字以内吸引读者的摘要
+- **扩展阅读推荐**：从公众号已发布文章中语义匹配 5+ 篇相关历史文章
+- **资源去重**：封面/文中图片/草稿均通过 registry 跳过重复上传
+- SubAgent 委托执行，不阻塞主 Agent
+
 ---
 
 ## 模块依赖关系
@@ -141,7 +153,14 @@ expense-downloader Skill，基于浏览器自动化的邮箱发票/水单下载�
   │ 7. F3-Expense │              │ 6. F2-Tech    │
   │  Downloader   │              │    Writer     │
   │  (发票下载)    │              │  (协作写作)    │
-  └───────────────┘              └───────────────┘
+  └───────────────┘              └───────┬───────┘
+                                         │
+                                         ▼
+                                 ┌───────────────┐
+                                 │ 8. F4-Weixin  │
+                                 │  Publisher    │
+                                 │ (公众号发布)   │
+                                 └───────────────┘
 ```
 
 **关键依赖链**：
@@ -153,6 +172,7 @@ expense-downloader Skill，基于浏览器自动化的邮箱发票/水单下载�
 | 3 → 5 | F1 采集通过 Kiro CLI 调用 Exa MCP 搜索 |
 | 5 → 6 | F2 写作系统的素材来源完全依赖 F1 采集的日报 |
 | 1 + 2 → 7 | F3 发票下载需要 DCV 桌面 + Chrome CDP 能力 |
+| 3 + 6 → 8 | F4 微信发布依赖 Kiro CLI（AI 引言/封面）+ F2 产出的文章，Bedrock SD3.5 生成封面图 |
 
 > 模块 2 的 headless 模式不依赖模块 1，可在无桌面服务器上独立运行。
 
@@ -172,6 +192,7 @@ expense-downloader Skill，基于浏览器自动化的邮箱发票/水单下载�
 | 5. F1-TechUpdate | ✅ 完全可用 | 仅依赖 Kiro CLI + Exa MCP，与云平台无关 |
 | 6. F2-TechWriter | ✅ 完全可用 | 纯 Agent 协作流水线，不依赖任何 AWS 服务 |
 | 7. F3-ExpenseDownloader | ⚠️ 需要桌面 | 需要任意图形桌面 + Chrome CDP，不限于 DCV；Mac/Linux 本地桌面即可 |
+| 8. F4-WeixinPublisher | ⚠️ 部分可用 | Kiro CLI + 微信 API 不依赖 AWS；AI 封面生成依赖 Bedrock SD3.5（可替换为其他文生图 API） |
 
 **快速上手建议（非 AWS 环境）**：
 1. 从模块 3（KiroCLI）开始，获得 ACP 编码加速能力
@@ -192,7 +213,8 @@ digital-11-enhancement4openclaw/
 ├── 4. AutoFix/                        # systemd 自愈 + 依赖健康检查
 ├── 5. F1-TechUpdate/                  # AI 资讯采集 Skill
 ├── 6. F2-TechWriter/                  # 多 Agent 协作写作 Skill
-└── 7. F3-ExpenseDownloader/           # 发票自动下载 Skill
+├── 7. F3-ExpenseDownloader/           # 发票自动下载 Skill
+└── 8. F4-WeixinPublisher/             # 微信公众号自动发布 Skill
 ```
 
 每个模块目录下的 `README.md` 均为 Agent 可执行文档（供 OpenClaw 读取并自动执行），包含完整的环境检测、分阶段安装、幂等性保证和故障排查。
@@ -209,5 +231,5 @@ digital-11-enhancement4openclaw/
 
 ---
 
-**版本**: v1.0
-**更新时间**: 2026-03-19
+**版本**: v1.1
+**更新时间**: 2026-03-22
