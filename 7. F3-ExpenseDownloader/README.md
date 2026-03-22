@@ -4,6 +4,66 @@
 
 ---
 
+## ⚙️ Agent 执行指引（OpenClaw 请先读此段）
+
+> **本段是给你（执行 Agent）的操作规范，不是给人类用户看的文档。请严格遵循。**
+
+### 执行方式：SubAgent 委托
+
+本 Skill 执行时间较长（扫描邮件 + 逐封下载附件 + 分类归档，视邮件数量可能 5~15 分钟），**必须通过 SubAgent 委托执行**，避免阻塞主 Agent。
+
+```
+OpenClaw 主 Agent
+  └── 用户触发 → sessions_spawn 启动 SubAgent
+                    └── SubAgent 读取 SKILL.md → 独立执行完整流程
+                          ├── Phase 0: 环境检查（CDP 端口 + 邮箱标签页）
+                          ├── Phase 1: 扫描邮件列表（scan_inbox.py）
+                          ├── Phase 2: AI 识别 Expense 邮件（Agent 语义判断）
+                          ├── Phase 3: 下载附件/链接（download_expense.py）
+                          ├── Phase 4: 分类归档（classify_expense.py）
+                          ├── Phase 5: 生成汇总报告
+                          └── 完成后向用户汇报结果
+```
+
+启动 SubAgent 的 prompt：
+
+```
+sessions_spawn:
+  prompt: |
+    你是邮箱发票/水单自动下载 Agent。
+    请读取 skills/expense-downloader/SKILL.md 了解你的职责和执行流程。
+    用户要求下载最近 3 个月的报销材料。
+    输出目录: ~/Expenses
+    开始执行。
+```
+
+### 主 Agent 职责
+
+1. 确认用户意图（下载哪个邮箱、时间范围、输出目录）
+2. 启动 SubAgent（sessions_spawn）
+3. 等待 SubAgent 完成，向用户汇报结果（下载数量、分类统计、需人工处理的项目）
+
+**不要**在主 Agent 中直接逐步执行各 Phase，那会长时间阻塞。
+
+### 前置检查（启动前快速验证）
+
+```bash
+# CDP 端口是否可用
+curl -s http://127.0.0.1:9222/json/list | head -5 && echo "✓ CDP" || echo "✗ CDP 端口不可用"
+
+# 是否有邮箱标签页
+curl -s http://127.0.0.1:9222/json/list | grep -E "mail\.(google|163|126)\.com" \
+  && echo "✓ 邮箱标签页" || echo "✗ 未找到邮箱标签页，请先打开并登录邮箱"
+
+# Python + websocket-client
+python3 -c "import websocket; print('✓ websocket-client')" 2>/dev/null \
+  || echo "✗ pip3 install websocket-client"
+```
+
+如有缺失，提示用户补齐后再启动 SubAgent。
+
+---
+
 ## 一、Gmail Invoice Downloader 参考分析
 
 ### 1.1 原方案架构

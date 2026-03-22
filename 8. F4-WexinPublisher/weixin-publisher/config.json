@@ -1,0 +1,10 @@
+{
+  "default_author": "薛以致用",
+  "default_cover": "assets/default_cover.jpg",
+  "cover_styles": ["cyberpunk", "scifi", "pixel", "comic", "ukiyoe"],
+  "bedrock_region": "us-west-2",
+  "need_open_comment": 1,
+  "only_fans_can_comment": 0,
+  "publish_mode": "draft",
+  "related_reading_count": 5
+}

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>微信公众号文章模板</title>
+  <!--
+    ============================================================
+    微信公众号 Markdown → HTML 通用模板
+    ============================================================
+    使用说明：
+    1. 将 Markdown 内容转换为 HTML 后，替换 {{CONTENT}} 占位符
+    2. 微信编辑器只读取 <section id="weixin-content"> 内的内容
+    3. 复制该 section 内的 HTML 粘贴到微信公众号编辑器即可
+    4. 所有样式均为 inline，兼容微信渲染引擎
+    5. 不使用 CSS 变量、class 选择器、外部样式表
+    ============================================================
+  -->
+</head>
+<body style="margin: 0; padding: 0; background-color: #f6f6f6;">
+
+<!-- ====== 微信公众号正文区域 - 复制此 section 内容粘贴到微信编辑器 ====== -->
+<section id="weixin-content" style="
+  box-sizing: border-box;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 20px 16px;
+  background-color: #ffffff;
+  color: #1F2328;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+  font-size: 16px;
+  line-height: 1.75;
+  word-wrap: break-word;
+  letter-spacing: 0.5px;
+">
+
+<!-- ==================== 标题 ==================== -->
+<!-- 使用时替换为实际文章标题，或删除此块（微信编辑器有独立标题输入） -->
+<!--
+<h1 style="
+  margin: 0 0 24px 0;
+  padding: 0 0 12px 0;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: #1F2328;
+  border-bottom: 1px solid #d0d7de;
+">{{TITLE}}</h1>
+-->
+
+<!-- ==================== 正文内容开始 ==================== -->
+<!-- 将 Markdown 转换后的 HTML 替换到此处，使用下方各元素的 inline style -->
+
+<!-- === 段落 <p> === -->
+<p style="
+  margin: 0 0 16px 0;
+  padding: 0;
+  font-size: 16px;
+  line-height: 1.75;
+  color: #1F2328;
+  letter-spacing: 0.5px;
+">这是一个段落示例。段落之间保持 16px 的间距，行高 1.75 确保中文阅读舒适度。</p>
+
+<!-- === 二级标题 <h2> === -->
+<h2 style="
+  margin: 32px 0 16px 0;
+  padding: 0 0 8px 0;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: #1F2328;
+  border-bottom: 1px solid #d0d7de;
+">二级标题示例</h2>
+
+<p style="
+  margin: 0 0 16px 0;
+  padding: 0;
+  font-size: 16px;
+  line-height: 1.75;
+  color: #1F2328;
+  letter-spacing: 0.5px;
+">二级标题下方的段落内容。</p>
+
+<!-- === 三级标题 <h3> === -->
+<h3 style="
+  margin: 28px 0 14px 0;
+  padding: 0;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: #1F2328;
+">三级标题示例</h3>
+
+<p style="
+  margin: 0 0 16px 0;
+  padding: 0;
+  font-size: 16px;
+  line-height: 1.75;
+  color: #1F2328;
+  letter-spacing: 0.5px;
+">三级标题下方的段落内容。</p>
+
+<!-- === 四级标题 <h4> === -->
+<h4 style="
+  margin: 24px 0 12px 0;
+  padding: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: #1F2328;
+">四级标题示例</h4>
+
+<!-- === 加粗 <strong> === -->
+<p style="
+  margin: 0 0 16px 0;
+  padding: 0;
+  font-size: 16px;
+  line-height: 1.75;
+  color: #1F2328;
+  letter-spacing: 0.5px;
+">这是普通文本，<strong style="font-weight: 600; color: #1F2328;">这是加粗文本</strong>，继续普通文本。</p>
+
+<!-- === 斜体 <em> === -->
+<p style="
+  margin: 0 0 16px 0;
+  padding: 0;
+  font-size: 16px;
+  line-height: 1.75;
+  color: #1F2328;
+  letter-spacing: 0.5px;
+">这是普通文本，<em style="font-style: italic;">这是斜体文本</em>，继续普通文本。</p>
+
+<!-- === 链接 <a> === -->
+<p style="
+  margin: 0 0 16px 0;
+  padding: 0;
+  font-size: 16px;
+  line-height: 1.75;
+  color: #1F2328;
+  letter-spacing: 0.5px;
+">这是一个<a style="color: #0969da; text-decoration: none;" href="https://example.com">链接示例</a>（注意：微信会自动处理外链）。</p>
+
+<!-- === 行内代码 <code> === -->
+<p style="
+  margin: 0 0 16px 0;
+  padding: 0;
+  font-size: 16px;
+  line-height: 1.75;
+  color: #1F2328;
+  letter-spacing: 0.5px;
+">行内代码示例：<code style="
+  padding: 2px 6px;
+  margin: 0 2px;
+  font-size: 14px;
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+  background-color: rgba(175, 184, 193, 0.2);
+  border-radius: 4px;
+  color: #1F2328;
+  white-space: break-spaces;
+">console.log()</code> 就是这样用的。</p>
+
+<!-- === 代码块 <pre><code> === -->
+<pre style="
+  margin: 0 0 16px 0;
+  padding: 16px;
+  font-size: 14px;
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+  line-height: 1.45;
+  color: #1F2328;
+  background-color: #f6f8fa;
+  border-radius: 6px;
+  overflow-x: auto;
+  white-space: pre;
+  word-wrap: normal;
+"><code style="
+  padding: 0;
+  margin: 0;
+  font-size: 14px;
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+  background: transparent;
+  border: 0;
+  white-space: pre;
+">// 代码块示例
+function hello() {
+  return "Hello, WeChat!";
+}</code></pre>
+
+<!-- === 引用块 <blockquote> === -->
+<blockquote style="
+  margin: 0 0 16px 0;
+  padding: 8px 16px;
+  color: #656d76;
+  border-left: 4px solid #d0d7de;
+  background-color: #f6f8fa;
+">
+  <p style="
+    margin: 0;
+    padding: 0;
+    font-size: 15px;
+    line-height: 1.75;
+    color: #656d76;
+    letter-spacing: 0.5px;
+  ">这是一段引用文本。引用块使用左侧边框和浅灰背景来区分正文。</p>
+</blockquote>
+
+<!-- === 无序列表 <ul> === -->
+<ul style="
+  margin: 0 0 16px 0;
+  padding-left: 2em;
+  font-size: 16px;
+  line-height: 1.75;
+  color: #1F2328;
+">
+  <li style="margin: 4px 0; letter-spacing: 0.5px;">无序列表项一</li>
+  <li style="margin: 4px 0; letter-spacing: 0.5px;">无序列表项二</li>
+  <li style="margin: 4px 0; letter-spacing: 0.5px;">无序列表项三</li>
+</ul>
+
+<!-- === 有序列表 <ol> === -->
+<ol style="
+  margin: 0 0 16px 0;
+  padding-left: 2em;
+  font-size: 16px;
+  line-height: 1.75;
+  color: #1F2328;
+">
+  <li style="margin: 4px 0; letter-spacing: 0.5px;">有序列表项一</li>
+  <li style="margin: 4px 0; letter-spacing: 0.5px;">有序列表项二</li>
+  <li style="margin: 4px 0; letter-spacing: 0.5px;">有序列表项三</li>
+</ol>
+
+<!-- === 分割线 <hr> === -->
+<hr style="
+  margin: 24px 0;
+  padding: 0;
+  height: 1px;
+  background-color: #d0d7de;
+  border: 0;
+  overflow: hidden;
+">
+
+<!-- === 图片 <img> === -->
+<p style="margin: 0 0 16px 0; padding: 0; text-align: center;">
+  <img style="
+    max-width: 100%;
+    border-radius: 4px;
+    box-sizing: border-box;
+  " src="{{IMAGE_URL}}" alt="图片描述">
+</p>
+
+<!-- === 表格 <table> === -->
+<table style="
+  margin: 0 0 16px 0;
+  border-spacing: 0;
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 15px;
+  line-height: 1.6;
+  overflow: auto;
+">
+  <thead>
+    <tr style="background-color: #f6f8fa; border-top: 1px solid #d0d7de;">
+      <th style="padding: 8px 13px; border: 1px solid #d0d7de; font-weight: 600; text-align: left;">表头一</th>
+      <th style="padding: 8px 13px; border: 1px solid #d0d7de; font-weight: 600; text-align: left;">表头二</th>
+      <th style="padding: 8px 13px; border: 1px solid #d0d7de; font-weight: 600; text-align: left;">表头三</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="background-color: #ffffff; border-top: 1px solid #d0d7de;">
+      <td style="padding: 8px 13px; border: 1px solid #d0d7de;">内容 1-1</td>
+      <td style="padding: 8px 13px; border: 1px solid #d0d7de;">内容 1-2</td>
+      <td style="padding: 8px 13px; border: 1px solid #d0d7de;">内容 1-3</td>
+    </tr>
+    <tr style="background-color: #f6f8fa; border-top: 1px solid #d0d7de;">
+      <td style="padding: 8px 13px; border: 1px solid #d0d7de;">内容 2-1</td>
+      <td style="padding: 8px 13px; border: 1px solid #d0d7de;">内容 2-2</td>
+      <td style="padding: 8px 13px; border: 1px solid #d0d7de;">内容 2-3</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- === 删除线 <del> === -->
+<p style="
+  margin: 0 0 16px 0;
+  padding: 0;
+  font-size: 16px;
+  line-height: 1.75;
+  color: #1F2328;
+  letter-spacing: 0.5px;
+">这是<del style="text-decoration: line-through; color: #656d76;">删除线文本</del>示例。</p>
+
+<!-- === 高亮/标记 <mark> === -->
+<p style="
+  margin: 0 0 16px 0;
+  padding: 0;
+  font-size: 16px;
+  line-height: 1.75;
+  color: #1F2328;
+  letter-spacing: 0.5px;
+">这是<mark style="background-color: #fff8c5; color: #1F2328; padding: 2px 4px; border-radius: 2px;">高亮标记文本</mark>示例。</p>
+
+<!-- === 脚注/来源说明 === -->
+<p style="
+  margin: 24px 0 0 0;
+  padding: 12px 0 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #656d76;
+  border-top: 1px solid #d0d7de;
+  letter-spacing: 0.3px;
+">(来源: 来源说明文字)</p>
+
+<!-- ==================== 正文内容结束 ==================== -->
+
+</section>
+<!-- ====== 微信公众号正文区域结束 ====== -->
+
+</body>
+</html>
