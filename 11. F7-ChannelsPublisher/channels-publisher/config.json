@@ -1,0 +1,9 @@
+{
+  "cdp_url": "http://127.0.0.1:9222",
+  "channels_url": "https://channels.weixin.qq.com/platform/post/create",
+  "upload_timeout_seconds": 300,
+  "poll_interval_seconds": 3,
+  "title_max_chars": 30,
+  "desc_max_chars": 1000,
+  "default_tags_count": 5
+}
