@@ -159,10 +159,12 @@ Step 10 draft/update 更新草稿封面
 
 ## 三、架构与模块
 
+> `main.py` 是唯一入口，包含完整的两阶段发布流程（`publish_article()` 函数）。无需任何额外脚本。
+
 ```
 weixin-publisher/
 ├── SKILL.md                 # Agent 执行指南（SubAgent 委托执行）
-├── main.py                  # 入口（两阶段流程编排）
+├── main.py                  # 唯一入口（两阶段流程编排，python main.py <文章路径>）
 ├── input_handler.py         # 统一输入层（URL / .md → Markdown + 元数据）
 ├── cover_generator.py       # AI 封面生成（Kiro CLI + Bedrock SD3.5 Large）
 ├── md2weixin.py             # Markdown → 微信 HTML（inline style）
@@ -324,6 +326,8 @@ aws bedrock list-foundation-models --region us-west-2 | grep sd3
 
 ### 4.2 运行
 
+`main.py` 是唯一入口，包含完整的两阶段发布流程。无需创建任何额外脚本。
+
 ```bash
 # 从 URL 抓取并创建草稿
 python main.py https://example.com/article
@@ -334,6 +338,20 @@ python main.py /path/to/article.md
 # 创建草稿并发布
 python main.py https://example.com/article --mode publish
 ```
+
+**pyenv 环境兼容写法**（Agent 执行时推荐）：
+
+```bash
+env -i HOME="$HOME" \
+  PATH="/usr/bin:/usr/local/bin:/opt/homebrew/bin:/bin:$HOME/.local/bin" \
+  WEIXIN_APPID="your_appid" WEIXIN_SECRET="your_secret" \
+  AWS_SHARED_CREDENTIALS_FILE="$HOME/.aws/credentials" \
+  AWS_CONFIG_FILE="$HOME/.aws/config" \
+  python3 "digital-11-enhancement4openclaw/8. F4-WexinPublisher/weixin-publisher/main.py" \
+  "/path/to/article.md"
+```
+
+> `main.py` 的 `publish_article()` 函数会自动完成全部流程：加载文章 → 生成引言 → 上传图片 → 扩展阅读 → 生成 HTML → 创建草稿 → AI 封面生成 → 用户选择封面 → 更新草稿。
 
 ### 4.3 配置文件 config.json
 
