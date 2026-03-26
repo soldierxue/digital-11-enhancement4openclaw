@@ -1,0 +1,23 @@
+{
+  "default_host_voice": "zh-CN-XiaoxiaoNeural",
+  "default_guest_voice": "zh-CN-YunyangNeural",
+  "default_turns": 38,
+  "default_tts_backend": "edge-tts",
+  "tts_rate": "-5%",
+  "tts_pitch": "+0Hz",
+  "gap_ms": 400,
+  "normalize_lufs": -16,
+  "host_name": "十一",
+  "guest_name": "薛以致用",
+  "podcast_name": "军见数科·科技播客",
+  "opening_line": "大家好，欢迎收听军见数科科技播客，我是主持人十一。今天请到的嘉宾是我们的老朋友薛以致用。",
+  "closing_line": "好的，感谢大家收听本期节目，我们下期再见。",
+  "ai_model": "anthropic/claude-sonnet-4-20250514",
+  "output_dir": "~/.openclaw/workspace/output",
+  "bgm_volume": 0.08,
+  "minimax_model": "speech-2.6-hd",
+  "minimax_api_base": "https://api.minimax.io/v1",
+  "audio_format": "mp3",
+  "audio_bitrate": "192k",
+  "audio_sample_rate": 44100
+}
