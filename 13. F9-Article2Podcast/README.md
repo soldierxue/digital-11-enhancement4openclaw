@@ -6,6 +6,70 @@
 
 ---
 
+## ⚙️ Agent 执行指引（OpenClaw 请先读此段）
+
+> **本段是给你（执行 Agent）的操作规范，不是给人类用户看的文档。请严格遵循。**
+
+### 执行方式：SubAgent 委托
+
+本 Skill 执行时间约 8 分钟（Phase 1 LLM 生成 ~60s + Phase 2 TTS 38 段 ~5min + Phase 3 拼接 ~30s + Phase 4 元数据 ~10s），**必须通过 SubAgent 委托执行**，避免阻塞主 Agent。
+
+```
+OpenClaw 主 Agent
+  └── 用户触发 → sessions_spawn 启动 SubAgent
+                    └── SubAgent 读取 SKILL.md → 独立执行完整流程
+                          ├── Phase 1: 文章 → 对话脚本（~60 秒，可能多次 LLM 调用）
+                          ├── Phase 2: 多角色 TTS 合成（~5 分钟，38 段）
+                          ├── Phase 3: 音频拼接 + 响度标准化（~30 秒）
+                          ├── Phase 4: 元数据生成（~10 秒）
+                          └── 完成后向用户汇报结果
+```
+
+启动 SubAgent 的 prompt：
+
+```
+sessions_spawn:
+  prompt: |
+    你是 Article2Podcast 播客生成 Agent。
+    请读取 skills/article2podcast/SKILL.md 了解你的职责和执行流程。
+    用户要求将以下文章转为播客: <URL 或 .md 路径>
+    选项: --host-voice zh-CN-XiaoxiaoNeural --guest-voice zh-CN-YunyangNeural --turns 38
+    开始执行。
+```
+
+### 主 Agent 职责
+
+1. 确认用户意图（哪篇文章、对话轮数、是否需要背景音乐）
+2. 启动 SubAgent（sessions_spawn）
+3. 等待 SubAgent 完成，向用户汇报结果
+
+**不要**在主 Agent 中直接运行 `main.py`，那会阻塞 8+ 分钟。
+
+### 进度汇报规范
+
+SubAgent 在执行过程中**必须定期向用户汇报进度**，不能静默执行到结束。
+
+阶段性汇报节点：
+
+| 节点 | 汇报内容 |
+|------|----------|
+| Phase 1 完成 | 📝 对话脚本已生成：N 轮对话（host:X, guest:Y），总字数约 M 字 |
+| Phase 2 完成 | 🔊 多角色语音合成完成：总时长 X 分 Y 秒 |
+| Phase 3 完成 | 🎙️ 播客音频拼接完成：最终时长 X 分 Y 秒，文件大小 N MB |
+| Phase 4 完成 | 📋 元数据已生成（标题、描述、章节标记） |
+
+### 前置检查（启动前快速验证）
+
+```bash
+# FFmpeg
+ffmpeg -version 2>/dev/null && echo "✓ FFmpeg" || echo "✗ FFmpeg 未安装"
+
+# Python 依赖
+python3 -c "import edge_tts; import litellm" 2>/dev/null && echo "✓ Python deps" || echo "✗ pip install edge-tts litellm"
+```
+
+---
+
 ## 设计思路
 
 ### 1. 为什么做 Article2Podcast？
