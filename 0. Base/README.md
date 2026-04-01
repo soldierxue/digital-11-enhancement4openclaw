@@ -14,11 +14,12 @@
 
 ### 第一步：通读全文，理解全貌
 
-在执行任何命令之前，请先完整阅读本文档所有章节（第 1 ~ 3 节），理解：
+在执行任何命令之前，请先完整阅读本文档所有章节（第 1 ~ 4 节），理解：
 - 第 1 节：配置安全防护 — 在 MEMORY.md 和 HEARTBEAT.md 中写入约束规则；通过 `skill-registry.json` 注册 Skill 来源并定期检查更新
 - 第 2 节：Skill 安全审查 — skill-vetter 的审查维度和流程（本节为知识参考，无需执行命令）
 - 第 3 节：Memory Search — 通过 LiteLLM 代理接入 Bedrock Embeddings
-- 最终验收标准：第 1 节的规则已写入记忆、`skill-registry.json` 已创建、HEARTBEAT 更新检查已配置（注册表模式）、第 3 节的 `memory_search` API 可正常返回结果
+- 第 4 节：常用 Skill 安装 — 从 Anthropic 官方仓库安装 xlsx/pptx/pdf/docx/frontend-design 等常用 Skill
+- 最终验收标准：第 1 节的规则已写入记忆、`skill-registry.json` 已创建、HEARTBEAT 更新检查已配置（注册表模式）、第 3 节的 `memory_search` API 可正常返回结果、第 4 节的常用 Skill 已安装并注册
 
 ### 第二步：检查当前环境状态
 
@@ -76,6 +77,7 @@ aws sts get-caller-identity --query Account --output text 2>/dev/null || echo "A
 | 阶段 3：安装 LiteLLM | 第 3 节 Step 1-2 | AWS Credentials 可用 | AWS Credentials 不可用时暂停；LiteLLM 已安装且运行中时跳过 |
 | 阶段 4：配置 memorySearch | 第 3 节 Step 3-5 | 阶段 3 完成 | `memorySearch` 已配置且 `enabled=true` 时跳过，仅验证 |
 | 阶段 5：验证 | 第 3 节验证 | 阶段 4 完成 | 验证失败时展示错误并等待用户决策 |
+| 阶段 6：安装常用 Skill | 第 4 节 | 无 | Skill 已存在时跳过；安装后注册到 `skill-registry.json` |
 
 ### 执行原则
 
@@ -773,6 +775,150 @@ systemctl --user disable --now litellm-proxy.service
 
 ---
 
-**版本**: v1.1
-**更新时间**: 2026-03-18
-**变更**: 移除对不存在的 `skill-update-checker` Skill 的引用；新增 `skill-registry.json` 注册表机制，支持安装时记录 git 来源、HEARTBEAT 心跳时基于注册表检查更新
+## 4. 常用 Skill 安装：Anthropic 官方 Skills
+
+以下是来自 [Anthropic Skills 仓库](https://github.com/anthropics/skills) 的常用 Skill，建议在初始化环境时一并安装，提升 Agent 处理文档、表格、演示文稿和前端设计的能力。
+
+### Skill 列表
+
+| Skill | 用途 | 来源 |
+|-------|------|------|
+| **xlsx** | 电子表格处理 — 创建、读取、编辑 `.xlsx/.xlsm/.csv/.tsv` 文件，支持公式、格式化、图表、数据清洗 | [skills/xlsx](https://github.com/anthropics/skills/tree/main/skills/xlsx) |
+| **pptx** | 演示文稿处理 — 创建、读取、编辑 `.pptx` 文件，支持模板编辑、从零创建幻灯片、提取内容 | [skills/pptx](https://github.com/anthropics/skills/tree/main/skills/pptx) |
+| **pdf** | PDF 处理 — 读取/提取文本和表格、合并/拆分、旋转、水印、表单填写、OCR、加密解密 | [skills/pdf](https://github.com/anthropics/skills/tree/main/skills/pdf) |
+| **docx** | Word 文档处理 — 创建、读取、编辑 `.docx` 文件，支持目录、页眉页脚、表格、图片、批注、修订 | [skills/docx](https://github.com/anthropics/skills/tree/main/skills/docx) |
+| **frontend-design** | 前端界面设计 — 生成高质量、有设计感的前端代码（HTML/CSS/JS、React、Vue 等），避免千篇一律的 AI 风格 | [skills/frontend-design](https://github.com/anthropics/skills/tree/main/skills/frontend-design) |
+
+### 安装方式
+
+#### 方式一：Git Clone 整个仓库后复制（推荐）
+
+```bash
+SKILLS_DIR="$HOME/.openclaw/skills"
+TEMP_DIR="/tmp/anthropic-skills-$(date +%s)"
+
+# 1. Clone 仓库
+git clone --depth 1 https://github.com/anthropics/skills.git "$TEMP_DIR"
+
+# 2. 复制目标 Skill（幂等：已存在则跳过）
+for SKILL in xlsx pptx pdf docx frontend-design; do
+  if [ -d "$SKILLS_DIR/$SKILL" ]; then
+    echo "✔ $SKILL 已存在，跳过"
+  else
+    cp -r "$TEMP_DIR/skills/$SKILL" "$SKILLS_DIR/$SKILL"
+    echo "✔ $SKILL 已安装到 $SKILLS_DIR/$SKILL"
+  fi
+done
+
+# 3. 清理临时目录
+rm -rf "$TEMP_DIR"
+```
+
+#### 方式二：逐个下载 SKILL.md（轻量）
+
+如果只需要核心指令文件，不需要附带的脚本：
+
+```bash
+SKILLS_DIR="$HOME/.openclaw/skills"
+BASE_URL="https://raw.githubusercontent.com/anthropics/skills/main/skills"
+
+for SKILL in xlsx pptx pdf docx frontend-design; do
+  mkdir -p "$SKILLS_DIR/$SKILL"
+  if [ -f "$SKILLS_DIR/$SKILL/SKILL.md" ]; then
+    echo "✔ $SKILL/SKILL.md 已存在，跳过"
+  else
+    curl -sL "$BASE_URL/$SKILL/SKILL.md" -o "$SKILLS_DIR/$SKILL/SKILL.md"
+    echo "✔ $SKILL/SKILL.md 已下载"
+  fi
+done
+```
+
+> ⚠️ 方式二只下载 `SKILL.md`，部分 Skill（如 pptx、pdf、docx）包含额外的参考文档和脚本，完整功能建议用方式一。
+
+### 安装后注册到 skill-registry.json
+
+安装完成后，将这些 Skill 注册到来源注册表（参见第 1 节 §3b）：
+
+```bash
+REGISTRY_FILE="$HOME/.openclaw/skill-registry.json"
+
+python3 -c "
+import json, os, datetime
+registry_path = os.path.expanduser('$REGISTRY_FILE')
+with open(registry_path) as f:
+    reg = json.load(f)
+
+skills_to_register = {
+    'xlsx':             'Anthropic 官方 Skill — 电子表格处理',
+    'pptx':             'Anthropic 官方 Skill — 演示文稿处理',
+    'pdf':              'Anthropic 官方 Skill — PDF 处理',
+    'docx':             'Anthropic 官方 Skill — Word 文档处理',
+    'frontend-design':  'Anthropic 官方 Skill — 前端界面设计',
+}
+
+now = datetime.datetime.utcnow().isoformat() + 'Z'
+added = []
+for name, note in skills_to_register.items():
+    if name not in reg['skills']:
+        reg['skills'][name] = {
+            'installMethod': 'git-clone',
+            'gitRemote': 'https://github.com/anthropics/skills.git',
+            'gitSubPath': f'skills/{name}',
+            'installedCommit': '',
+            'installedAt': now,
+            'note': note
+        }
+        added.append(name)
+
+if added:
+    with open(registry_path, 'w') as f:
+        json.dump(reg, f, indent=2, ensure_ascii=False)
+    print('已注册: ' + ', '.join(added))
+else:
+    print('所有 Skill 已在注册表中，跳过')
+"
+```
+
+### 依赖说明
+
+各 Skill 可能需要额外的系统依赖，按需安装：
+
+| Skill | 主要依赖 | 安装命令 |
+|-------|----------|----------|
+| xlsx | openpyxl, pandas | `pip install openpyxl pandas` |
+| pptx | pptxgenjs, markitdown, sharp | `npm install -g pptxgenjs` / `pip install "markitdown[pptx]"` |
+| pdf | pypdf, pdfplumber, reportlab | `pip install pypdf pdfplumber reportlab` |
+| docx | docx (npm), pandoc | `npm install -g docx` / `brew install pandoc` |
+| frontend-design | 无额外依赖 | — |
+
+> 💡 LibreOffice 是 pptx/docx/xlsx 多个 Skill 共用的可选依赖（用于 PDF 转换、公式重算等），建议提前安装：`brew install --cask libreoffice`
+
+### 验证安装
+
+```bash
+# 检查所有 Skill 是否已就位
+for SKILL in xlsx pptx pdf docx frontend-design; do
+  if [ -f "$HOME/.openclaw/skills/$SKILL/SKILL.md" ]; then
+    echo "✅ $SKILL"
+  else
+    echo "❌ $SKILL — 未找到 SKILL.md"
+  fi
+done
+```
+
+---
+
+## 参考
+
+- [OpenClaw 文档](https://docs.openclaw.ai)
+- [Anthropic Skills 仓库](https://github.com/anthropics/skills)
+- [Amazon Nova Embeddings 定价](https://aws.amazon.com/bedrock/pricing/)
+- [LiteLLM Proxy 文档](https://docs.litellm.ai/docs/simple_proxy)
+- [Bedrock Access Gateway](https://github.com/aws-samples/bedrock-access-gateway)
+- [Kiro CLI 安装与配置](../3.%20KiroCLI/kiro_install_config.md)
+
+---
+
+**版本**: v1.2
+**更新时间**: 2026-03-30
+**变更**: 新增第 4 节 — Anthropic 官方常用 Skill（xlsx/pptx/pdf/docx/frontend-design）安装指引
