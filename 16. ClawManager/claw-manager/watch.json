@@ -1,0 +1,113 @@
+{
+  "_schema": "watch.json v0.4",
+  "tasks": [
+    {
+      "taskId": "tech-writer-orchestrator-0404",
+      "label": "tech-writer-orchestrator-0404",
+      "assignedTo": "Quill",
+      "project": "daily-content-pipeline",
+      "date": "2026-04-04",
+      "goal": "完成4/4日期虾群写作流水线，发布>=5篇，均分>=82",
+      "status": "done",
+      "startedAt": 1775287573,
+      "endTime": 1775303015,
+      "estimatedMinutes": 240,
+      "batchProgress": {
+        "total": 21,
+        "completed": 7,
+        "failed": 0
+      },
+      "cost": {
+        "tokens_in": 0,
+        "tokens_out": 0,
+        "usd": 0.0,
+        "budget_usd": 5.0
+      },
+      "result": "21篇选题，7篇发布，均分86.3，Phase 0-10全部完成",
+      "stateFile": "~/.openclaw/skills/tech-updates-writer/state.json",
+      "dependsOn": [
+        "collector-0404"
+      ]
+    },
+    {
+      "taskId": "collector-0404",
+      "label": "collector-0404",
+      "assignedTo": "Scout",
+      "project": "daily-content-pipeline",
+      "date": "2026-04-04",
+      "goal": "采集当日AI资讯，覆盖A-G七维度，输出>=15条候选题",
+      "status": "done",
+      "startedAt": 1775287200,
+      "endTime": 1775287573,
+      "estimatedMinutes": 30,
+      "batchProgress": {
+        "total": 7,
+        "completed": 7,
+        "failed": 0
+      },
+      "cost": {
+        "tokens_in": 0,
+        "tokens_out": 0,
+        "usd": 0.0,
+        "budget_usd": 1.0
+      },
+      "result": "20条候选题目，6主题覆盖",
+      "stateFile": null,
+      "dependsOn": []
+    },
+    {
+      "taskId": "video-render-0403",
+      "label": "video-render-0403",
+      "assignedTo": "Frame",
+      "project": "video-pipeline",
+      "date": "2026-04-04",
+      "goal": "渲染4/3批次7篇文章视频（横版+竖版）",
+      "status": "done",
+      "startedAt": 1775258460,
+      "endTime": 1775277360,
+      "estimatedMinutes": 360,
+      "batchProgress": {
+        "total": 7,
+        "completed": 7,
+        "failed": 0
+      },
+      "cost": {
+        "tokens_in": 0,
+        "tokens_out": 0,
+        "usd": 0.0,
+        "budget_usd": 2.0
+      },
+      "result": "7/7 横版+竖版视频全部完成",
+      "stateFile": "~/.openclaw/skills/article2video/batch-state.json",
+      "dependsOn": []
+    },
+    {
+      "taskId": "channels-upload-0403",
+      "label": "channels-upload-0403",
+      "assignedTo": "Echo",
+      "project": "video-pipeline",
+      "date": "2026-04-04",
+      "goal": "上传4/3批次7个横版视频到微信视频号草稿箱",
+      "status": "failed",
+      "startedAt": 1775278140,
+      "endTime": 1775282040,
+      "estimatedMinutes": 120,
+      "batchProgress": {
+        "total": 7,
+        "completed": 0,
+        "failed": 7
+      },
+      "cost": {
+        "tokens_in": 0,
+        "tokens_out": 0,
+        "usd": 0.0,
+        "budget_usd": 0.5
+      },
+      "result": "DNS NXDOMAIN: vupload.video.qq.com 解析失败，AWS服务器到腾讯CDN网络不通",
+      "stateFile": null,
+      "dependsOn": [
+        "video-render-0403"
+      ]
+    }
+  ]
+}

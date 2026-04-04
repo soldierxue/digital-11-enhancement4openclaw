@@ -1,0 +1,82 @@
+{
+  "profiles": {
+    "article2video": {
+      "peak_memory_mb": 2400,
+      "avg_duration_min": 38,
+      "concurrent_limit": 2,
+      "auto_restart": true,
+      "max_restarts": 3,
+      "pre_checks": ["mem_available > 3000", "remotion_instances < 3"],
+      "pre_actions": ["drop_caches"],
+      "notes": "Remotion 渲染，限制实例≤2"
+    },
+    "weixin-publisher": {
+      "peak_memory_mb": 600,
+      "avg_duration_min": 8,
+      "concurrent_limit": 1,
+      "auto_restart": false,
+      "max_restarts": 0,
+      "pre_checks": ["weixin_api_accessible"],
+      "pre_actions": ["verify_access_token"],
+      "notes": "需人工确认重启，可能产生重复草稿"
+    },
+    "channels-publisher": {
+      "peak_memory_mb": 600,
+      "avg_duration_min": 15,
+      "concurrent_limit": 1,
+      "auto_restart": false,
+      "max_restarts": 0,
+      "pre_checks": ["chromium_available"],
+      "pre_actions": [],
+      "notes": "需人工确认重启，可能重复上传"
+    },
+    "tech-updates-writer": {
+      "peak_memory_mb": 400,
+      "avg_duration_min": 220,
+      "concurrent_limit": 1,
+      "auto_restart": true,
+      "max_restarts": 2,
+      "pre_checks": ["litellm_healthy"],
+      "pre_actions": [],
+      "notes": "长任务，有 checkpoint 断点恢复"
+    },
+    "tech-updates-collector": {
+      "peak_memory_mb": 200,
+      "avg_duration_min": 15,
+      "concurrent_limit": 1,
+      "auto_restart": true,
+      "max_restarts": 2,
+      "pre_checks": [],
+      "pre_actions": [],
+      "notes": "幂等操作，重复采集无害"
+    }
+  },
+  "model_pricing": {
+    "claude-sonnet-4-6": {
+      "input_per_million": 3.0,
+      "output_per_million": 15.0,
+      "currency": "USD"
+    },
+    "claude-opus-4-6": {
+      "input_per_million": 15.0,
+      "output_per_million": 75.0,
+      "currency": "USD"
+    },
+    "claude-haiku-3-5": {
+      "input_per_million": 0.8,
+      "output_per_million": 4.0,
+      "currency": "USD"
+    },
+    "claude-sonnet-4-20250514": {
+      "input_per_million": 3.0,
+      "output_per_million": 15.0,
+      "currency": "USD"
+    },
+    "gpt-4o": {
+      "input_per_million": 5.0,
+      "output_per_million": 15.0,
+      "currency": "USD"
+    }
+  },
+  "usd_to_cny": 7.25
+}

@@ -1,0 +1,15 @@
+[Unit]
+Description=Claw Manager Daemon
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /home/ubuntu/.openclaw/claw-manager/daemon.py
+WorkingDirectory=/home/ubuntu/.openclaw/claw-manager
+Restart=always
+RestartSec=10
+MemoryMax=64M
+CPUWeight=50
+
+[Install]
+WantedBy=default.target
