@@ -31,6 +31,12 @@ https://github.com/aws-samples/sample-OpenClaw-on-AWS-with-Bedrock/blob/main/cla
 | 6 | [F2-TechWriter](#6-f2-techwriter--多-agent-协作写作) | tech-updates-writer Skill — Orchestrator Agent 协调的 Phase 0-10 写作流水线 | 内容产出 |
 | 7 | [F3-ExpenseDownloader](#7-f3-expensedownloader--发票自动下载) | 浏览器自动化邮箱发票/水单下载，AI 识别分类归档 | 报销自动化 |
 | 8 | [F4-WeixinPublisher](#8-f4-weixinpublisher--微信公众号发布) | 博客文章自动发布微信公众号，AI 封面生成，两阶段发布 | 内容分发 |
+| 9 | [F5-WexinArchiver](#9-f5-wexinarchiver--微信公众号归档) | 微信公众号文章索引与内容备份，CDP 自动提取 Session | 内容归档 |
+| 10 | [F6-Article2Video](#10-f6-article2video--文章转短视频) | 博客文章自动转 3-5 分钟短视频，横竖屏双模板，虚拟人物出镜 | 视频生产 |
+| 11 | [F7-ChannelsPublisher](#11-f7-channelspublisher--视频号发布) | CDP 浏览器自动化发布视频到微信视频号创作者中心 | 视频分发 |
+| 12 | [F8-BiliPublisher](#12-f8-bilipublisher--b站投稿) | B站 API 自动投稿，AI 生成标题/标签/简介 | 视频分发 |
+| 13 | [F9-Article2Podcast](#13-f9-article2podcast--文章转播客) | 博客文章自动转多人对话播客音频，支持 RSS Feed 发布 | 音频生产 |
+| 15 | [F11-ViMax-A2V](#15-f11-vimax-a2v--多平台视频流水线) | 一条命令文章转三平台差异化视频，多智能体架构，断点恢复 | 视频流水线 |
 
 ---
 
@@ -122,6 +128,64 @@ weixin-publisher Skill，从博客 URL 或本地 Markdown 自动发布微信公�
 - **资源去重**：封面/文中图片/草稿均通过 registry 跳过重复上传
 - SubAgent 委托执行，不阻塞主 Agent
 
+### 9. F5-WexinArchiver — 微信公众号归档
+
+weixin-indexer Skill，微信公众号文章索引与内容备份。
+
+- 从微信公众号拉取全量已发布文章索引（API + 管理后台双通道）
+- 文章正文下载备份为本地 Markdown 文件（readability + html2text）
+- CDP 自动提取微信后台 Session（cookie + token），免手动复制
+- 文章分类索引、摘要与金句提取
+- 为 F4（扩展阅读推荐）和 F6/F11（视频选题）提供数据源
+
+### 10. F6-Article2Video — 文章转短视频
+
+article2video Skill，从博客文章自动生成 3-5 分钟短视频。
+
+- 全流程自动化：文章 → AI 演讲稿 → TTS 语音合成 → 视觉幻灯片渲染 → FFmpeg 合成
+- 横屏（1920×1080）和竖屏（720×1280）双模板
+- 虚拟人物形象出镜 + Ken Burns 动效 + 5 种结构化数据布局（stats/list/comparison/quote/grid）
+- Remotion 渲染引擎 + 原生 JSX 字幕
+- SubAgent 委托执行（约 40 分钟），不阻塞主 Agent
+
+### 11. F7-ChannelsPublisher — 视频号发布
+
+channels-publisher Skill，通过 CDP 浏览器自动化发布视频到微信视频号。
+
+- 利用用户已登录的微信视频号创作者中心浏览器会话
+- CDP 自动化完成：上传视频 → 填写标题/描述/标签 → AI 生成封面 → 发布
+- AI 元数据生成：Kiro CLI 生成标题、描述、标签
+- 依赖 DCV 远程桌面 + Chrome headed 模式
+
+### 12. F8-BiliPublisher — B站投稿
+
+bili-publisher Skill，通过 B站 API 自动投稿视频。
+
+- B站 API 投稿：分片上传 → 创建稿件 → AI 生成标题/标签/简介
+- AI 元数据生成：Kiro CLI 生成符合 B站风格的标题、标签、简介
+- AI 封面生成：Bedrock SD3.5 Large 生成竖版封面
+- 支持自定义分区、标签、转载声明
+
+### 13. F9-Article2Podcast — 文章转播客
+
+article2podcast Skill，从博客文章自动生成多人对话播客音频。
+
+- 全流程：文章 → AI 生成多人对话脚本 → TTS 多角色语音合成 → 音频拼接 → 元数据生成
+- 支持多角色对话（主持人 + 嘉宾），edge-tts 多声线
+- AI 生成播客封面（Bedrock SD3.5 Large）
+- RSS Feed 生成，支持 Apple Podcasts / Spotify 等平台分发
+- 断点恢复：checkpoint 机制，失败后可从中断处继续
+
+### 15. F11-ViMax-A2V — 多平台视频流水线
+
+vimax-a2v Skill，一条命令将文章转化为微信视频号、B站、小红书三平台差异化视频。
+
+- 整合 F10 十一个版本迭代的最佳实践，重构为多智能体自动化流水线
+- ScriptWriter + IllustrationWriter 真正实现的 Agent 层（非 NotImplementedError）
+- 多视频风格：Style A（横屏）+ Style B（竖屏）+ Style C（Claude 信息图竖屏）+ B站版
+- 断点恢复：`checkpoint.json` + `--resume`，Nova Reel 滑动窗口并发控制
+- `run.sh` 环境隔离，一条命令完成全流程
+
 ---
 
 ## 模块依赖关系
@@ -138,29 +202,46 @@ weixin-publisher Skill，从博客 URL 或本地 Markdown 自动发布微信公�
   │ 1. DCV_on_    │ │ 3. KiroCLI │ │ 2. Chrome_    │
   │    Ubuntu     │ │            │ │    DevTool    │
   │  (远程桌面)    │ │ (Kiro CLI) │ │  (浏览器)     │
-  └───────┬───────┘ └──┬─────┬──┘ └───────────────┘
-          │            │     │
-          │            │     │
-          ▼            ▼     ▼
+  └───────┬───────┘ └──┬─────┬──┘ └───────┬───────┘
+          │            │     │             │
+          ▼            ▼     ▼             ▼
   ┌───────────────┐ ┌──────────┐ ┌───────────────┐
-  │ 2. Chrome     │ │ 4. Auto  │ │ 5. F1-Tech    │
-  │ (headed 模式)  │ │    Fix   │ │    Update     │
-  └───────┬───────┘ └──────────┘ │  (资讯采集)    │
+  │ 2. Chrome     │ │ 4. Auto  │ │ 9. F5-Weixin  │
+  │ (headed 模式)  │ │    Fix   │ │   Archiver    │
+  └───────┬───────┘ └──────────┘ │  (公众号归档)  │
           │                      └───────┬───────┘
+          │                              │
+          ▼                              │
+  ┌───────────────┐              ┌───────┴───────┐
+  │ 7. F3-Expense │              │ 5. F1-Tech    │
+  │  Downloader   │              │    Update     │
+  │  (发票下载)    │              │  (资讯采集)    │
+  └───────────────┘              └───────┬───────┘
+                                         │
+          ┌──────────────────────────────┤
           │                              │
           ▼                              ▼
   ┌───────────────┐              ┌───────────────┐
-  │ 7. F3-Expense │              │ 6. F2-Tech    │
-  │  Downloader   │              │    Writer     │
-  │  (发票下载)    │              │  (协作写作)    │
+  │ 8. F4-Weixin  │              │ 6. F2-Tech    │
+  │  Publisher    │              │    Writer     │
+  │ (公众号发布)   │              │  (协作写作)    │
   └───────────────┘              └───────┬───────┘
                                          │
-                                         ▼
-                                 ┌───────────────┐
-                                 │ 8. F4-Weixin  │
-                                 │  Publisher    │
-                                 │ (公众号发布)   │
-                                 └───────────────┘
+                    ┌────────────────────┤
+                    │                    │
+                    ▼                    ▼
+          ┌───────────────┐    ┌─────────────────┐
+          │ 10. F6-A2V    │    │ 13. F9-A2P      │
+          │ (文章转视频)   │    │ (文章转播客)     │
+          └───────┬───────┘    └─────────────────┘
+                  │
+          ┌───────┼───────┐
+          │       │       │
+          ▼       ▼       ▼
+  ┌────────┐ ┌────────┐ ┌─────────────────┐
+  │11. F7  │ │12. F8  │ │ 15. F11-ViMax   │
+  │视频号   │ │ B站    │ │  (多平台流水线)  │
+  └────────┘ └────────┘ └─────────────────┘
 ```
 
 **关键依赖链**：
@@ -170,9 +251,17 @@ weixin-publisher Skill，从博客 URL 或本地 Markdown 自动发布微信公�
 | 1 → 2 (headed) | DCV 远程桌面为 Chrome headed 模式提供图形环境 |
 | 3 → 4 | AutoFix 使用 Kiro CLI 作为自动修复引擎 |
 | 3 → 5 | F1 采集通过 Kiro CLI 调用 Exa MCP 搜索 |
+| 2 → 9 | F5 归档通过 CDP 自动提取微信后台 Session |
+| 9 → 8 | F4 微信发布的扩展阅读功能读取 F5 的文章索引 |
 | 5 → 6 | F2 写作系统的素材来源完全依赖 F1 采集的日报 |
+| 3 + 6 → 8 | F4 微信发布依赖 Kiro CLI（AI 引言/封面）+ F2 产出的文章 |
+| 6 → 10 | F6 视频生产消费 F2 写作产出的博客文章 |
+| 6 → 13 | F9 播客生产消费 F2 写作产出的博客文章 |
+| 10 → 11 | F7 视频号发布消费 F6 生成的视频 |
+| 10 → 12 | F8 B站投稿消费 F6 生成的视频 |
+| 10 → 15 | F11 ViMax 整合 F6 能力，一条命令输出三平台视频 |
 | 1 + 2 → 7 | F3 发票下载需要 DCV 桌面 + Chrome CDP 能力 |
-| 3 + 6 → 8 | F4 微信发布依赖 Kiro CLI（AI 引言/封面）+ F2 产出的文章，Bedrock SD3.5 生成封面图 |
+| 1 + 2 → 11 | F7 视频号发布需要 DCV 桌面 + Chrome CDP 能力 |
 
 > 模块 2 的 headless 模式不依赖模块 1，可在无桌面服务器上独立运行。
 
@@ -193,11 +282,19 @@ weixin-publisher Skill，从博客 URL 或本地 Markdown 自动发布微信公�
 | 6. F2-TechWriter | ✅ 完全可用 | 纯 Agent 协作流水线，不依赖任何 AWS 服务 |
 | 7. F3-ExpenseDownloader | ⚠️ 需要桌面 | 需要任意图形桌面 + Chrome CDP，不限于 DCV；Mac/Linux 本地桌面即可 |
 | 8. F4-WeixinPublisher | ⚠️ 部分可用 | Kiro CLI + 微信 API 不依赖 AWS；AI 封面生成依赖 Bedrock SD3.5（可替换为其他文生图 API） |
+| 9. F5-WexinArchiver | ✅ 完全可用 | 微信 API + CDP Session 提取，不依赖 AWS |
+| 10. F6-Article2Video | ⚠️ 部分可用 | Remotion + FFmpeg + TTS 不依赖 AWS；AI 演讲稿生成可用 LiteLLM 切换后端；AI 生图依赖 Bedrock（可替换） |
+| 11. F7-ChannelsPublisher | ⚠️ 需要桌面 | 需要图形桌面 + Chrome CDP；Mac/Linux 本地桌面即可 |
+| 12. F8-BiliPublisher | ✅ 完全可用 | B站 API + Kiro CLI，不依赖 AWS；封面生成依赖 Bedrock（可替换） |
+| 13. F9-Article2Podcast | ✅ 完全可用 | edge-tts + FFmpeg，不依赖 AWS；封面生成依赖 Bedrock（可替换） |
+| 15. F11-ViMax-A2V | ⚠️ 部分可用 | 核心流程不依赖 AWS；Nova Reel 视频片段和 AI 生图依赖 Bedrock |
 
 **快速上手建议（非 AWS 环境）**：
 1. 从模块 3（KiroCLI）开始，获得 ACP 编码加速能力
 2. 安装模块 2（Chrome_DevTool）的 headless 模式，获得浏览器自动化
 3. 安装模块 5 + 6（F1 + F2），搭建 AI 资讯采集 → 写作的完整流水线
+4. 安装模块 8 + 9（F4 + F5），实现博客文章 → 微信公众号的自动发布
+5. 安装模块 10 + 13（F6 + F9），将文章转化为短视频和播客音频
 
 ---
 
@@ -214,7 +311,13 @@ digital-11-enhancement4openclaw/
 ├── 5. F1-TechUpdate/                  # AI 资讯采集 Skill
 ├── 6. F2-TechWriter/                  # 多 Agent 协作写作 Skill
 ├── 7. F3-ExpenseDownloader/           # 发票自动下载 Skill
-└── 8. F4-WeixinPublisher/             # 微信公众号自动发布 Skill
+├── 8. F4-WeixinPublisher/             # 微信公众号自动发布 Skill
+├── 9. F5-WexinArchiver/              # 微信公众号文章索引与备份 Skill
+├── 10. F6-Article2Video/              # 博客文章转短视频 Skill
+├── 11. F7-ChannelsPublisher/          # 微信视频号自动发布 Skill
+├── 12. F8-BiliPublisher/              # B站视频自动投稿 Skill
+├── 13. F9-Article2Podcast/            # 博客文章转播客 Skill
+└── 15. F11-ViMax-A2V/                 # 多平台视频流水线 Skill
 ```
 
 每个模块目录下的 `README.md` 均为 Agent 可执行文档（供 OpenClaw 读取并自动执行），包含完整的环境检测、分阶段安装、幂等性保证和故障排查。
@@ -231,5 +334,5 @@ digital-11-enhancement4openclaw/
 
 ---
 
-**版本**: v1.1
-**更新时间**: 2026-03-22
+**版本**: v2.0
+**更新时间**: 2026-04-04
