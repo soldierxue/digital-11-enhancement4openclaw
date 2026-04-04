@@ -91,6 +91,7 @@ Article2Video（F6）已经实现了"文章→视频"的管道，但播客（纯
 | 方案 | 特点 | 适用性 |
 |------|------|--------|
 | [PodLM](https://podlm.ai) | SaaS 产品，URL/文本→播客，多语言 | 商业产品，不可本地化 |
+| [ElevenLabs](https://elevenlabs.io) | Voice Cloning，自定义音色，多语言 TTS，API 调用 | ✅ 嘉宾音色推荐方案，支持克隆真人音色 |
 | [MiniMax Speech](https://platform.minimax.io) | 100+ 系统音色，支持中文，异步长文本 TTS，API 调用 | ✅ 高质量中文 TTS，适合做 TTS 后端 |
 | [Microsoft VibeVoice](https://github.com/microsoft/VibeVoice) | 开源，90 分钟长对话，4 人多角色，支持中文 | ✅ 本地部署，需 GPU（1.5B 模型需 8GB VRAM） |
 | [Edge TTS](https://github.com/rany2/edge-tts) | 免费，多音色，逐词时间戳，无需 API Key | ✅ 零成本，已在 F6 验证，适合快速方案 |
@@ -109,10 +110,10 @@ Article2Video（F6）已经实现了"文章→视频"的管道，但播客（纯
 │  Phase 3: 音频片段 → 完整播客（FFmpeg）                 │
 │  Phase 4: 元数据生成（标题/描述/章节标记）               │
 ├─────────────────────────────────────────────────────┤
-│  TTS 后端（可切换）：                                  │
-│  ├── edge-tts（默认，免费，已验证）                     │
-│  ├── minimax（高质量，需 API Key）                     │
-│  └── vibevoice（本地 GPU，最高质量）                    │
+│  TTS 后端（Smart 模式自动选择）：                       │
+│  ├── minimax（MiniMax T2A，高质量中文，需 API Key）     │
+│  ├── elevenlabs（自定义克隆音色，需 API Key）           │
+│  └── edge-tts（免费兜底方案）                           │
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -130,26 +131,69 @@ Article2Video（F6）已经实现了"文章→视频"的管道，但播客（纯
 - 适当的追问和补充
 - 数据和案例穿插
 
-### 5. 音色方案
+### 5. 音色方案 — Smart 模式（默认）
 
-Edge TTS 中文音色推荐（默认方案）：
+采用 **Smart 模式**，自动选择最优音色组合，支持多 TTS 后端混合使用：
+
+**主持人（Host）— 随机选择，增加节目新鲜感：**
+
+| 候选 | TTS 后端 | Voice ID | 说明 |
+|------|----------|----------|------|
+| 男主持 | MiniMax | `male-qn-jingying` | 精英青年男声，专业沉稳 |
+| 女主持 | ElevenLabs | `APSIkVZudNbPAwyPoeVO` | 自然女声，亲和力强 |
+
+每次生成播客时随机选择其中一个，让节目风格更多样化。
+
+**嘉宾 薛以致用（Guest）— 优先级 fallback 链：**
+
+| 优先级 | TTS 后端 | Voice ID | 说明 |
+|--------|----------|----------|------|
+| 1（首选） | MiniMax | `jason_podcast_voice_001` | MiniMax 定制音色 |
+| 2（备选） | ElevenLabs | `Vki3eB7XF9nxH50xK1s9` | ElevenLabs 克隆音色 jasonsh |
+
+启动时自动探测首选音色是否可用，不可用则自动降级到备选。
+
+**Edge TTS 中文音色（兜底方案）：**
 
 | 角色 | 音色 | 说明 |
 |------|------|------|
-| 主持人（女）默认 | `zh-CN-XiaoxiaoNeural` | 温暖女声，亲和力强，适合主持引导 |
-| 嘉宾（男）默认 | `zh-CN-YunyangNeural` | 成熟男声，沉稳有深度，适合专家解读 |
-| 主持人（男）备选 | `zh-CN-YunxiNeural` | 年轻男声，清晰自然 |
-| 嘉宾（女）备选 | `zh-CN-XiaoyiNeural` | 年轻女声，活泼有活力 |
+| 主持人（女） | `zh-CN-XiaoxiaoNeural` | 温暖女声，免费 |
+| 嘉宾（男） | `zh-CN-YunyangNeural` | 成熟男声，免费 |
 
-MiniMax 方案（高质量备选）：
-- 支持 100+ 系统音色 + 自定义克隆音色
-- 更自然的语调和情感表达
-- 需要 API Key，按字符计费
+### 5.1 TTS 后端选择
 
-VibeVoice 方案（最高质量）：
-- 本地部署，支持 4 人对话
-- 自然的轮流说话和语气变化
-- 需要 GPU（1.5B 模型需 8GB VRAM）
+`config.json` 中 `default_tts_backend` 支持以下模式：
+
+| 模式 | 说明 |
+|------|------|
+| `smart`（默认） | 主持人随机选择 + 嘉宾 fallback 链，自动探测可用性 |
+| `mixed` | 主持人 Edge TTS + 嘉宾 ElevenLabs（固定组合） |
+| `elevenlabs` | 全部使用 ElevenLabs |
+| `minimax` | 全部使用 MiniMax |
+| `edge-tts` | 全部使用 Edge TTS（免费，零配置） |
+
+### 5.2 敏感信息管理
+
+API Key 等敏感信息**不保存在 `config.json` 中**，而是独立存放在 `credentials.json`：
+
+```bash
+# 从模板创建凭证文件
+cp credentials.json.example credentials.json
+
+# 编辑填入你的 API Key
+vim credentials.json
+```
+
+`credentials.json` 格式：
+```json
+{
+  "elevenlabs_api_key": "your-actual-api-key-here",
+  "minimax_api_key": "your-minimax-api-key",
+  "minimax_group_id": "your-minimax-group-id"
+}
+```
+
+`credentials.json` 已在 `.gitignore` 中排除，不会被提交到 Git 仓库。
 
 ### 6. 管道架构
 
@@ -201,24 +245,29 @@ Phase 4: 元数据生成 (~10s)
 | AWS 凭证 | `~/.aws/credentials`（如使用 Bedrock 模型） |
 
 可选依赖：
-- `minimax` SDK — 使用 MiniMax TTS 后端时需要
-- `vibevoice` — 使用 VibeVoice 本地 TTS 时需要（需 GPU）
+- `requests` — 使用 ElevenLabs / MiniMax TTS 后端时需要（`pip install requests`）
+- `mutagen` — 无 FFmpeg 时用于获取音频时长（`pip install mutagen`）
+- ElevenLabs API Key — 配置在 `credentials.json` 中
+- MiniMax API Key + Group ID — 配置在 `credentials.json` 中
 
 ---
 
 ## 使用方法
 
 ```bash
-# 基本用法（从 URL）
+# 基本用法（Smart 模式，自动选择最优音色组合）
 python3 main.py https://example.com/blog-post
 
 # 从本地 Markdown
 python3 main.py ~/articles/my-article.md
 
-# 指定角色音色
-python3 main.py article.md --host-voice zh-CN-XiaoxiaoNeural --guest-voice zh-CN-YunyangNeural
+# 强制使用 Edge TTS（免费，零配置）
+python3 main.py article.md --tts-backend edge-tts
 
-# 使用 MiniMax TTS（更高质量）
+# 强制使用 ElevenLabs
+python3 main.py article.md --tts-backend elevenlabs --guest-voice Vki3eB7XF9nxH50xK1s9
+
+# 强制使用 MiniMax
 python3 main.py article.md --tts-backend minimax
 
 # 指定对话轮数
@@ -238,11 +287,13 @@ python3 main.py article.md --bgm assets/bgm/tech-ambient.mp3 --bgm-volume 0.08
 └── article2podcast/
     ├── SKILL.md                       ← OpenClaw Skill 定义
     ├── main.py                        ← 管道编排入口
-    ├── config.json                    ← 默认配置
+    ├── config.json                    ← 默认配置（不含敏感信息）
+    ├── credentials.json.example       ← 凭证模板（API Key 等）
+    ├── credentials.json               ← 实际凭证（.gitignore 排除）
     ├── requirements.txt               ← Python 依赖
     ├── scripts/
     │   ├── generate_script.py         ← Phase 1: 文章→对话脚本
-    │   ├── generate_podcast_audio.py  ← Phase 2: 对话脚本→多角色音频
+    │   ├── generate_podcast_audio.py  ← Phase 2: 对话脚本→多角色音频（支持 Edge TTS / ElevenLabs）
     │   ├── assemble_podcast.py        ← Phase 3: 音频拼接+后处理
     │   └── generate_metadata.py       ← Phase 4: 元数据生成
     └── assets/

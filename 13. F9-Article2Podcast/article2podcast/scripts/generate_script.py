@@ -112,9 +112,29 @@ def generate_dialogue_script(article_text: str, num_turns: int, model: str,
 
     content = response.choices[0].message.content.strip()
     json_match = re.search(r"\[[\s\S]*\]", content)
-    if json_match:
-        return json.loads(json_match.group())
-    return json.loads(content)
+    raw = json_match.group() if json_match else content
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError:
+        # Attempt repair: fix unescaped quotes in text values
+        import re as _re
+        # Replace smart quotes
+        raw = raw.replace('\u201c', '\\"').replace('\u201d', '\\"')
+        raw = raw.replace('\u2018', "\\'").replace('\u2019', "\\'")
+        try:
+            return json.loads(raw)
+        except json.JSONDecodeError:
+            # Try line-by-line repair: find objects individually
+            objects = []
+            for m in _re.finditer(r'\{[^{}]+\}', raw):
+                try:
+                    obj = json.loads(m.group())
+                    objects.append(obj)
+                except json.JSONDecodeError:
+                    continue
+            if objects:
+                return objects
+            raise
 
 
 def main():

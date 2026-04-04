@@ -31,6 +31,15 @@ def load_config() -> dict:
     return {}
 
 
+def load_credentials() -> dict:
+    """Load API keys from credentials.json (not committed to git)."""
+    cred_path = os.path.join(SKILL_DIR, "credentials.json")
+    if os.path.exists(cred_path):
+        with open(cred_path, encoding="utf-8") as f:
+            return json.load(f)
+    return {}
+
+
 def slugify(text: str) -> str:
     """Create a filesystem-safe slug from text."""
     text = os.path.splitext(text)[0]
@@ -65,8 +74,8 @@ def main():
                         help="TTS voice for guest (default: from config)")
     parser.add_argument("--turns", type=int, default=None,
                         help="Number of dialogue turns (default: from config)")
-    parser.add_argument("--tts-backend", choices=["edge-tts", "minimax", "vibevoice"],
-                        default=None, help="TTS backend (default: from config)")
+    parser.add_argument("--tts-backend", choices=["edge-tts", "elevenlabs", "minimax", "mixed", "auto"],
+                        default=None, help="TTS backend (default: from config, 'auto' enables random host + guest priority)")
     parser.add_argument("--bgm", default=None,
                         help="Background music file path")
     parser.add_argument("--bgm-volume", type=float, default=None,
@@ -75,15 +84,35 @@ def main():
                         help="Skip loudness normalization")
     parser.add_argument("--skip-metadata", action="store_true",
                         help="Skip Phase 4 metadata generation")
+    parser.add_argument("--article-url", default=None,
+                        help="Original article URL (included in show notes)")
     args = parser.parse_args()
 
     cfg = load_config()
     host_voice = args.host_voice or cfg.get("default_host_voice", "zh-CN-YunxiNeural")
-    guest_voice = args.guest_voice or cfg.get("default_guest_voice", "zh-CN-XiaoyiNeural")
+    guest_voice = args.guest_voice or cfg.get("default_guest_voice", "jasonsh")
     turns = args.turns or cfg.get("default_turns", 20)
     tts_backend = args.tts_backend or cfg.get("default_tts_backend", "edge-tts")
     bgm_volume = args.bgm_volume if args.bgm_volume is not None else cfg.get("bgm_volume", 0.08)
     gap_ms = cfg.get("gap_ms", 400)
+
+    # Validate credentials for backends that need API keys
+    # (auto mode handles its own validation and fallback in generate_podcast_audio.py)
+    if tts_backend in ("elevenlabs", "mixed"):
+        creds = load_credentials()
+        api_key = creds.get("elevenlabs_api_key", "")
+        if not api_key or api_key.startswith("<"):
+            print("❌ ElevenLabs API key not found.", flush=True)
+            print("   Copy credentials.json.example → credentials.json and fill in your key.", flush=True)
+            sys.exit(1)
+    if tts_backend == "minimax":
+        creds = load_credentials()
+        mm_key = creds.get("minimax_api_key", "")
+        mm_group = creds.get("minimax_group_id", "")
+        if not mm_key or mm_key.startswith("<") or not mm_group or mm_group.startswith("<"):
+            print("❌ MiniMax API key or Group ID not found.", flush=True)
+            print("   Fill in minimax_api_key and minimax_group_id in credentials.json.", flush=True)
+            sys.exit(1)
 
     slug = slugify(os.path.basename(args.article))
     workdir = ensure_workdir(slug)
@@ -92,6 +121,7 @@ def main():
 
     final_podcast = os.path.join(output_dir, f"{slug}-podcast.mp3")
     final_metadata = os.path.join(output_dir, f"{slug}-metadata.json")
+    final_show_notes = os.path.join(output_dir, f"{slug}-show-notes.md")
 
     start_time = time.time()
     print(f"""
@@ -145,8 +175,9 @@ def main():
             "--timing-output", timing_path,
             "--host-voice", host_voice,
             "--guest-voice", guest_voice,
-            "--rate", cfg.get("tts_rate", "-5%"),
-            "--pitch", cfg.get("tts_pitch", "+0Hz"),
+            "--tts-backend", tts_backend,
+            f"--rate={cfg.get('tts_rate', '-5%')}",
+            f"--pitch={cfg.get('tts_pitch', '+0Hz')}",
         ])
     with open(timing_path, encoding="utf-8") as f:
         timing_data = json.load(f)
@@ -179,18 +210,23 @@ def main():
     # ------------------------------------------------------------------
     if args.skip_metadata:
         print("⏭️ Phase 4: Skipped (--skip-metadata).", flush=True)
-    elif os.path.exists(final_metadata):
-        print(f"✅ Phase 4: Metadata already exists, skipping.", flush=True)
+    elif os.path.exists(final_metadata) and os.path.exists(final_show_notes):
+        print(f"✅ Phase 4: Metadata + Show Notes already exist, skipping.", flush=True)
     else:
-        print("📋 Phase 4: Generating metadata...", flush=True)
+        print("📋 Phase 4: Generating metadata + show notes...", flush=True)
         meta_args = [
             podcast_script,
             "--timing", timing_path,
             "--output", final_metadata,
+            "--show-notes-output", final_show_notes,
             "--gap-ms", gap_ms,
         ]
         if not args.article.startswith("http"):
             meta_args.extend(["--article", args.article])
+        if args.article_url:
+            meta_args.extend(["--article-url", args.article_url])
+        elif args.article.startswith("http"):
+            meta_args.extend(["--article-url", args.article])
         run_script("generate_metadata.py", meta_args)
 
     # Load metadata for summary
@@ -202,18 +238,26 @@ def main():
     elapsed = time.time() - start_time
     podcast_duration = total_duration + len(timing_data) * gap_ms / 1000
     title = metadata.get("title", slug)
+    subtitle = metadata.get("subtitle", "")
+    show_notes_exists = os.path.exists(final_show_notes)
+    chapters_count = len(metadata.get("chapters", []))
+    highlights_count = len(metadata.get("highlights", []))
 
     print(f"""
 ╔══════════════════════════════════════════════════════════╗
 ║           🎙️ Article2Podcast 完成!                      ║
 ╠══════════════════════════════════════════════════════════╣
 ║  标题   : {title[:45]:<45s} ║
+║  副标题 : {subtitle[:45]:<45s} ║
 ║  对话   : {f'{num_turns} 轮 (host:{host_count}, guest:{guest_count})':<45s} ║
 ║  时长   : {f'{podcast_duration/60:.0f} 分 {podcast_duration%60:.0f} 秒':<45s} ║
 ║  大小   : {f'{final_size_mb:.1f} MB':<45s} ║
+║  章节   : {f'{chapters_count} 个':<45s} ║
+║  金句   : {f'{highlights_count} 条':<45s} ║
 ║  耗时   : {f'{elapsed/60:.0f} 分 {elapsed%60:.0f} 秒':<45s} ║
 ║  音频   : {final_podcast[:45]:<45s} ║
 ║  元数据 : {final_metadata[:45]:<45s} ║
+║  Notes  : {(final_show_notes if show_notes_exists else 'N/A')[:45]:<45s} ║
 ╚══════════════════════════════════════════════════════════╝
 """, flush=True)
 

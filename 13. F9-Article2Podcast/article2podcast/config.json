@@ -2,7 +2,7 @@
   "default_host_voice": "zh-CN-XiaoxiaoNeural",
   "default_guest_voice": "zh-CN-YunyangNeural",
   "default_turns": 38,
-  "default_tts_backend": "edge-tts",
+  "default_tts_backend": "auto",
   "tts_rate": "-5%",
   "tts_pitch": "+0Hz",
   "gap_ms": 400,
@@ -12,12 +12,29 @@
   "podcast_name": "军见数科·科技播客",
   "opening_line": "大家好，欢迎收听军见数科科技播客，我是主持人十一。今天请到的嘉宾是我们的老朋友薛以致用。",
   "closing_line": "好的，感谢大家收听本期节目，我们下期再见。",
-  "ai_model": "anthropic/claude-sonnet-4-20250514",
+  "ai_model": "bedrock/us.anthropic.claude-sonnet-4-20250514-v1:0",
   "output_dir": "~/.openclaw/workspace/output",
   "bgm_volume": 0.08,
-  "minimax_model": "speech-2.6-hd",
-  "minimax_api_base": "https://api.minimax.io/v1",
+  "minimax_model": "speech-02-hd",
+  "minimax_api_base": "https://api.minimax.chat/v1",
+  "elevenlabs_voice_host": "",
+  "elevenlabs_voice_guest": "Vki3eB7XF9nxH50xK1s9",
+  "elevenlabs_model": "eleven_multilingual_v2",
+  "elevenlabs_api_base": "https://api.elevenlabs.io/v1",
   "audio_format": "mp3",
   "audio_bitrate": "192k",
-  "audio_sample_rate": 44100
+  "audio_sample_rate": 44100,
+  "host_voice_options": [
+    {"backend": "minimax", "voice_id": "male-qn-jingying", "gender": "male", "label": "MiniMax 男声精英"},
+    {"backend": "elevenlabs", "voice_id": "APSIkVZudNbPAwyPoeVO", "gender": "female", "label": "ElevenLabs 女声"}
+  ],
+  "guest_voice": {
+    "primary": {"backend": "minimax", "voice_id": "jason_podcast_voice_001", "label": "MiniMax 薛以致用（克隆）"},
+    "fallback": {"backend": "elevenlabs", "voice_id": "Vki3eB7XF9nxH50xK1s9", "label": "ElevenLabs 薛以致用"},
+    "edge_fallback": {"backend": "edge-tts", "voice_id": "zh-CN-YunyangNeural", "label": "Edge 男声"}
+  },
+  "host_edge_fallback": {
+    "male": "zh-CN-YunyangNeural",
+    "female": "zh-CN-XiaoxiaoNeural"
+  }
 }
