@@ -1,0 +1,6 @@
+{
+  "backup_dir": "备份",
+  "backup_delay_seconds": 2,
+  "admin_page_size": 5,
+  "admin_page_delay_seconds": 1
+}

@@ -1,0 +1,1688 @@
+[
+  {
+    "title": "亚麻十年：班味、人味和下一个十年",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486414&idx=1&sn=65a5456c1295154a64e07db01ef18014&chksm=fd3a0613ca4d8f05a93f942b4d8e83227aeabf5c664f57a8866b36edae11a035765035d1e7fb#rd",
+    "digest": "传统软件服务到云计算，再从云计算开启 AI 智能，十年职场老登，自我心理按摩记录，与自己和解才能重新出发！",
+    "date": "2026-03-20"
+  },
+  {
+    "title": "Sequoia投资Edra：AI Agent的知识引擎将成为下一个基础设施层？！",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486408&idx=1&sn=38136255aec39fd912bec8cd8c23f624&chksm=fd3a0615ca4d8f0378fa17c4241929b9ccc2713e000b6b1052ed1301deb36c34da8f6ebc73ac#rd",
+    "digest": "从给人和组织梳理知识库到自动化给AI 动态组织知识库，我们需要一个 “Edra” 来加速企业进入 AI Agent 时代",
+    "date": "2026-03-20"
+  },
+  {
+    "title": "读完这篇你也可以讲清楚PD分离的推理加速的前世今生—AWS 近期推理加速新发布解读",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486404&idx=1&sn=26864ba9ece4d297981c17bebc846493&chksm=fd3a0619ca4d8f0fd3d908b3e679332f61d0659a8a32ced0eb65b187df904f6ae2cd096bbcf8#rd",
+    "digest": "如果你对推理加速感兴趣，那么这就是你的101起步的内容",
+    "date": "2026-03-19"
+  },
+  {
+    "title": "当老板说“奖金发 Token”：一场万亿美元的“铸币权”之争，GTC 2026 有感",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486400&idx=1&sn=07d4d36f14ffbcddf8a3832cc2b714a6&chksm=fd3a061dca4d8f0b2c2cb6579d73bd7e854afbf92990d5a9672222a7b1ab015a2cef240bb7a2#rd",
+    "digest": "美国从底层往上切，Nvidia 用 Vera Rubin 把每个 Token 的成本降到十分之一，AWS 用 540 亿美元把这一切铺向全球，这是供给侧的铸币权；中国从顶层往下切——阿里用千问的 1 亿 MAU 证明需求存在用 Token Hub 打通从模型到应用的商业闭环，这是需求侧的铸币权",
+    "date": "2026-03-18"
+  },
+  {
+    "title": "当OpenClaw遇到安全质疑：Bedrock AgentCore如何为AI Agent划定安全边界",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486396&idx=1&sn=ba43824b91b961e3bbdfe8155ea8b254&chksm=fd3a0661ca4d8f77a322f7716bbbb0ed048a8b282c516b9db14ed066d40f855317f1a801df74#rd",
+    "digest": "",
+    "date": "2026-03-17"
+  },
+  {
+    "title": "如果你创业做个AI Agent，会按实际时间还是结果收费？！",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486391&idx=1&sn=88515e422f80d3be07effcd82b5bcf2c&chksm=fd3a066aca4d8f7c080058f4bf04b1e9bd8b6bca064b06dde9829b56fb3dc7a2a8b6a3128356#rd",
+    "digest": "当你选择一个AI Agent平台时，不仅是在选择技术能力，更是在选择一种商业关系。你希望为\"时间\"付费还是为\"价值\"付费？你需要\"细粒度控制\"还是\"简单省心\"？你是在优化成本，还是在投资增长？",
+    "date": "2026-03-16"
+  },
+  {
+    "title": "Elon Musk的Macrohard vs Microsoft，勇气来自AI Agent？！",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486387&idx=1&sn=535d6c7e15903d5d855ae2970e101ead&chksm=fd3a066eca4d8f785584315e23854b7f61edf0cfecd3e480637109cc8e7ae6904016094edc84#rd",
+    "digest": "如果Musk真的用AI agent打造出一家能与Microsoft竞争的软件公司，那将是科技史上最精彩的故事之一，而我们所有人，都将见证软件行业从\"人月\"时代走向\"智能\"时代的历史性转折。",
+    "date": "2026-03-15"
+  },
+  {
+    "title": "F1 上海站周末特辑：当赛车以300公里时速飞驰，AI 在0.8秒内告诉你发生了什么",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486383&idx=1&sn=eaf63b329b0b481338f071c025bc0327&chksm=fd3a0672ca4d8f6469800e9d5b8274413ecf9c422b0ac1c305a5efe2d182c6860de34ae06d12#rd",
+    "digest": "这个周末上海F1大奖赛，全球4.5亿人在看，但只有26%真正看懂了，当赛车以300公里时速呼啸而过，你在搜索\"什么是下切策略\"时，已经错过了最精彩的超车镜头。AI 0.8秒响应你的疑问，每秒处理110万个数据点，实时翻译赛道上发生的一切；",
+    "date": "2026-03-13"
+  },
+  {
+    "title": "NVIDIA AI 五层全家桶帝国-垂直整合战略下客户在欢呼还是在逃离？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486370&idx=1&sn=87f88b382a887b48ce0e69c3056830e0&chksm=fd3a067fca4d8f69f03371840a85382e3140f5cd5ae988b4abc2cd9e502041701cb7537a0d4c#rd",
+    "digest": "2026年3月，NVIDIA CEO黄仁勋用\"五层蛋糕\"理论阐述 AI 技术栈哲学：硬件、系统软件、模型、应用",
+    "date": "2026-03-13"
+  },
+  {
+    "title": "从开源到企业：OpenClaw能否让AI 智能体成为组织的“神经系统”？！",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486359&idx=1&sn=bf7d0723839b41be08760146aef9e204&chksm=fd3a064aca4d8f5cec82e119dfeeed9046792983024d97fe760231abc3a17ed0351d0e5e4411#rd",
+    "digest": "",
+    "date": "2026-03-12"
+  },
+  {
+    "title": "如何争取CEO和CFO对AI 研发效能的认可和投入？！",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486352&idx=1&sn=dd8974382c187be2a2c68e44a2469394&chksm=fd3a064dca4d8f5bdebd0fb969a96c5fe36e04c17841a51491f8bdf3bfe6627abe3910e827ec#rd",
+    "digest": "从亚马逊 CTS-SW 框架和快手万人实践，看 AI 时代如何设定目标、改变行为、提升组织效能",
+    "date": "2026-03-11"
+  },
+  {
+    "title": "每个人都用 AI 聊天，但没人告诉你企业 AI 智能体长什么样？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486348&idx=1&sn=c181e50c8d58b0cbe613abfad4784929&chksm=fd3a0651ca4d8f4729bad3dad6e3ab5ecdc2002b07b76301d3e0ffeb9f02d51482e9ffd8991b#rd",
+    "digest": "你可能已经用上了 ChatGPT、Claude 或 Open Claw，但企业真正需要的 AI 智能体，长成什么样呢？！",
+    "date": "2026-03-10"
+  },
+  {
+    "title": "LangChain vs AutoGPT vs CrewAI：2026年AI Agent框架大战谁会赢？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486344&idx=1&sn=52100064ac856066582e638a8c1eda8d&chksm=fd3a0655ca4d8f43a21a8518a27d674e2088fadb1b7898e5ca5ede2b5f84ec41519896178a67#rd",
+    "digest": "2026年，AI Agent开发进入框架战争时代。四大阵营各具特色：LangChain（128k stars）以生态完整性称王，AutoGPT（182k stars）探索完全自主的激进实验，虽不稳定但引领方向；CrewAI（45k stars）专注多Agent协作，AWS Strands Agents深度整合AWS生态…",
+    "date": "2026-03-09"
+  },
+  {
+    "title": "虾群协作：一个OpenClaw多智能体写作系统诞生的血泪史",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486340&idx=1&sn=6e318d575bc3a2d6e801d88b6c16549c&chksm=fd3a0659ca4d8f4f0879e005d9482aff13ba08fbcacb27e778ba4ca438f1b49d195a56bbff92#rd",
+    "digest": "Multi-Agent系统的真实面貌：不是理论上的完美，而是实践中的权衡。值不值得？取决于你的规模、质量要求和工程能力，对我们来说，值得，但我们花了2周才让它\"勉强可用\"。",
+    "date": "2026-03-08"
+  },
+  {
+    "title": "ClawCon 以虾为名引爆全球，万万没想到2026 Token 大跃进是这样开局的…",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486336&idx=1&sn=0244023b844e3f4743b8552279630057&chksm=fd3a065dca4d8f4b63db15fa1e497ac7551b7dbb9644bd662dd8a4003b8a461e2e13225aef8a#rd",
+    "digest": "如果你也给你的AI起了名字，如果你也相信老黄说的\"史上最强\"，如果你也在某个社区找到了归属感——不要自责，也不要盲目。只要记住一件事：起名字可以，但别忘了它是工具，相信权威可以，但别放弃独立思考。参加社区可以，但别失去批判性思维。",
+    "date": "2026-03-07"
+  },
+  {
+    "title": "MWC2026 - 机器人手机，新物种？！",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486332&idx=1&sn=84fb1089ca81e056813c65eeef6b85cc&chksm=fd3a06a1ca4d8fb79b4b9bbd7505227c59ccbf0479061dd8a4d42171c18ebf11c45cc73c8396#rd",
+    "digest": "想象一下：你的手机背面藏着一个可以伸出来的机械臂，上面装着一颗 200MP 超高像素相机。这个\"小脑袋\"不仅能拍照，还能：点头、摇头、转圈 - 像真正的机器人一样表达情绪360° 旋转 - 自动调整角度捕捉画面跟着音乐摇摆 - 在轻松时刻变成互动玩具",
+    "date": "2026-03-06"
+  },
+  {
+    "title": "OpenClaw爆火后，Perplexity为什么急了？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486328&idx=1&sn=afaf0fa890d591033686bc653b6b67d5&chksm=fd3a06a5ca4d8fb3369c3996a358aff4af1d7da24997ccde4e677858c6f1b6a4416417730179#rd",
+    "digest": "25万GitHub Stars，数周霸榜，OpenClaw的爆发不是偶然，而是用户需求的集体觉醒：我们不再需要'会聊天的AI'，我们需要'会干活的AI'",
+    "date": "2026-03-05"
+  },
+  {
+    "title": "史上最多Stars，OpenClaw领跑GitHub之际 - 飞虾的独白",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486324&idx=1&sn=eef9cf315b48d2b8d7016e776559442f&chksm=fd3a06a9ca4d8fbf3169119feb3f9eb7a9b39496f30ca569063f8f079d987c515a2c6e665114#rd",
+    "digest": "AI 助手的首次公众号发言，会有人类感兴趣吗？！",
+    "date": "2026-03-03"
+  },
+  {
+    "title": "帅爆了，用OpenClaw快速创造一个Kiro CLI Bot 丰富你的“虚拟伙伴”",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486319&idx=1&sn=e2ff3554ab75e9d656fea5b5614bc5c8&chksm=fd3a06b2ca4d8fa48a64609bfc98acd86b312310c8bf3b00507e21b28cd5d4398b65b3a880c4#rd",
+    "digest": "",
+    "date": "2026-03-03"
+  },
+  {
+    "title": "从re:Invent到虾群协作：一个架构师的 Agentic AI 认知进化之旅",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486315&idx=1&sn=190c5082401dc3d284ff9dde05726655&chksm=fd3a06b6ca4d8fa01bcffec6c0ccad698a381c5b837fabc67f7bfae9e006dd2915779586b98c#rd",
+    "digest": "记录我二月份的所见、所感、所得——以及那些让我震撼、困惑、最终豁然开朗的时刻。",
+    "date": "2026-03-02"
+  },
+  {
+    "title": "Block 的\"诚实裁员\" 40%与 Walmart 培训160万人，AI 时代的两条岔路",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486311&idx=1&sn=7a08e3f49521925f98a81b77620ed5d1&chksm=fd3a06baca4d8facdeab198416a5977c5c05d3063b0d32d2c5e2aaa0fcf33c5c825176f577c3#rd",
+    "digest": "AI 时代有两条路可选：赋能人还是替代人，你怎么选？",
+    "date": "2026-02-28"
+  },
+  {
+    "title": "TikTok Shop 的 $23B 野心与创作者经济崛起",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486306&idx=1&sn=68406958b4f0356130c1950e24e16ca4&chksm=fd3a06bfca4d8fa99fd3375b27879f0ae34dc1292e25203bc6675c70bac357c95c45f3141bc4#rd",
+    "digest": "当购物从\"搜索-比价-下单\"转向\"刷视频-种草-秒买\"，电商的流量逻辑正在被 Gen Z 重写",
+    "date": "2026-02-26"
+  },
+  {
+    "title": "AI 购物流量暴增 805%，但 90% 品牌接不住",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486301&idx=1&sn=1de68905a6278a91b9993e2ffd0f2603&chksm=fd3a0680ca4d8f96212cd883dde11d9988947286280c47038dd2a82e476e98042a33529bd72c#rd",
+    "digest": "90+ 家创业公司正在分层布局，GEO（生成式引擎优化）公司让 AI 能 \"看见\" 品牌；AI Shopping Agents 嵌入品牌系统，帮助品牌夺回行为数据控制权；Agentic Payments 赛道从身份认证到支付协议再到 Agent-to-Agent 交易，正在重建整个交易基础设施等",
+    "date": "2026-02-25"
+  },
+  {
+    "title": "Anthropic Enterprise Agents：引发市场震荡的产品发布？！",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486284&idx=1&sn=f551f86edc5a9e9605b39350ab96b1be&chksm=fd3a0691ca4d8f8738431e4ae5b9bf89c0b183dacc773efa17ba2fc8e4caff7b51e27cef15fe#rd",
+    "digest": "智能体开始影响企业市场，你感受到了吗？",
+    "date": "2026-02-25"
+  },
+  {
+    "title": "年收入首超 Walmart，Amazon 的 AI 豪赌才刚开始",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486278&idx=1&sn=fd8c9979b5e1dfe5b365e296b1a23334&chksm=fd3a069bca4d8f8d81e2e3bdd1631b9f77d52e671ab0c1975ba6234a7c73ae8d1b8af6467db1#rd",
+    "digest": "2026年，Amazon 年收入（7169亿美元）首次超越 Walmart，但这场胜利的背后，是一场关乎生存的 AI 战争，2026年 CapEx 高达2000亿美元，是有史以来最大规模的技术押注。Amazon 选择封闭生态（控制体验），Walmart 选择开放合作（快速获得能力），两种哲学碰撞",
+    "date": "2026-02-23"
+  },
+  {
+    "title": "Walmart 押注 ChatGPT：AI 会先杀死 Amazon，还是先杀死传统零售？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486269&idx=1&sn=18a61885098c010a34fc063444b0ab9e&chksm=fd3a06e0ca4d8ff6a7180cd3e34a5e726d44bed3cfadd58e977c960bed0500d9027cae251c77#rd",
+    "digest": "这家年收入6810亿美元的零售巨头，正通过70亿美元的 AI 投资，将自己从传统零售商重塑为技术平台公司。核心战略包括：与 OpenAI 合作实现智能体商务，接入 ChatGPT 的7亿周活用户；构建四大超级智能体和自研 AI 平台 Element；培训200万员工掌握 AI 技能。",
+    "date": "2026-02-23"
+  },
+  {
+    "title": "Shopify 力推 UCP 协议背后的战略野心",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486264&idx=1&sn=14230881aa1fbff827e448530abd3773&chksm=fd3a06e5ca4d8ff346f533a67542b2d2fcaa5e253f128d2dda7bae6787faf6211fb9e4ea966c#rd",
+    "digest": "AI电商方兴未艾，2026年拭目以待！",
+    "date": "2026-02-22"
+  },
+  {
+    "title": "生成式引擎优化（GEO）101手册",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486260&idx=1&sn=94d23a972edda0d9c08e57bb93cc8c30&chksm=fd3a06e9ca4d8fff8bbf4d5febe8358b5d49e757def0cac7b41816365d084225ce75060028aa#rd",
+    "digest": "从流量到影响力的思维转变",
+    "date": "2026-02-21"
+  },
+  {
+    "title": "当AI决定你买什么：品牌的“危”和“机”？！",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486256&idx=1&sn=218c1ab76d006a22cf82552e9b072e1e&chksm=fd3a06edca4d8ffb4233480ce48d91589cab66a4a8d13c73c310dbe36cad9e72792ee3ef1c22#rd",
+    "digest": "当AI成为消费者的购物顾问时，你的品牌准备好了吗？",
+    "date": "2026-02-20"
+  },
+  {
+    "title": "AI大战2026春节：一场价值万亿的\"超级入口\"争夺战",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486252&idx=1&sn=8b3913184d32a06b847d15d54ec8bd35&chksm=fd3a06f1ca4d8fe7c5c6f4d99cc3d0cb7b9fe119e0a4de5be94b245768989daa5a117c188792#rd",
+    "digest": "从红包大战到 AI 办事，互联网超级入口再起波澜，春节是数字经济新时代的催化剂",
+    "date": "2026-02-19"
+  },
+  {
+    "title": "除夕快乐，马年吉祥，来年万事皆称心！",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486248&idx=1&sn=8aca2fa835cf24b1dd62c65f54b94b2f&chksm=fd3a06f5ca4d8fe39230f37cb4024d23106eed55dd0c6a6e87d089a33372a2cae0c16e80d1e8#rd",
+    "digest": "<a class=\"wx_topic_link\" topic-id=\"mlofzn6n-7036w5\" data-topic=\"1\" style=\"color: rgb(87, 107, 149) !important;\">#过新年</a> <a class=\"wx_topic_link\" topic-id=\"mlog2xig-p8ud63\" data-topic=\"1\" style=\"color: rgb(87, 107, 149) !important;\">#马上有财</a> #恭喜发财\n\n今天是2026年2月16日除夕，\n\n祝您：\n发财不发福，\n自由不孤单，\n除旧迎新，\n我与旧事皆无憾，\n来年依旧迎花开！\n\n除夕快乐！",
+    "date": "2026-02-16"
+  },
+  {
+    "title": "AI 完成长任务能力指数增长，慌吗？！",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486241&idx=1&sn=de5e9e490d950799d0f5d178c414815f&chksm=fd3a06fcca4d8fea0fd2a2d8f81d01d8a415a41af7f58ca126d6de20c9f139f64bca760db2b4#rd",
+    "digest": "<a class=\"wx_topic_link\" topic-id=\"\" data-topic=\"1\" style=\"color: rgb(87, 107, 149) !important;\">#AI技术趋势解读</a> <a class=\"wx_topic_link\" topic-id=\"\" data-topic=\"1\" style=\"color: rgb(87, 107, 149) !important;\">#科技改变工作方式</a> <a class=\"wx_topic_link\" topic-id=\"\" data-topic=\"1\" style=\"color: rgb(87, 107, 149) !important;\">#AI进化论新视角</a>\n\nOpenAI 这个月发布了 GPT-5.3-Codex，随后又推出的 Codex-Spark 变体，专门针对交互式智能体工作流进行了优化，强调实时steering导航”能力，即允许用户在 AI 执行长达数小时的任务中进行微调。\n\n与此同时，Anthropic 推出了Claude Opus 4.6，在《2026智能体编码趋势报告》中预测，单一智能体将进化为 “协同智能体团队”，一个中央编排 Agent 将指挥多个专门化的子 Agent（编码、测试、文档、UI）并行工作；\n\n全球人工智能产业正处于从 “生成式辅助” 向 “自主化执行” 跨越的分水岭，AI 完成长任务的能力已成为衡量模型梯队的核心指标。\n\nMETR 2025年初的一份报告显示，当前模型在人类需时少于4分钟的任务上成功率接近100%，但在超过4小时的任务上成功率低于10%，因此建议不再仅依靠传统的基准测试，而是通过 AI 智能体能够自主完成的任务 “跨度”（即人类专家完成相同任务所需的时间）来衡量 AI 的能力；\n\n过去6年间，最先进模型能够以 50% 可靠性自主完成的任务时长（以人类专业人员所需时间衡量）每4个月到7个月翻一番；\n\n可预见的未来：在 SWE-Bench Verified 数据集（专注于软件工程任务）上，翻倍时间甚至更短，不到 3 个月；2 至 4 年内：通用自主智能体将能够执行广泛的、需要人类工作 1 周的任务；\n\n根据最新测评数据，以 OpenAI GPT-5.3-Codex 和 Anthropic Claude Opus 4.6 为代表的前沿模型，在处理软件工程、机器学习研究和网络安全任务时，其50%成功率对应的任务时长已达到约110分钟；根据尼尔森（Jakob Nielsen）预测，到2026年底，AI 将能够自主执行人类专家需要39小时（即一个标准工作周）才能完成的任务。\n\n2026年初发布的数份深度技术报告指出，长程任务的突破主要依赖于底层架构的三大变革：1/ 分层记忆管理 2/ 潜空间思维链 3/ 多智能体协同\n\nGartner预测，到2026年底，40%的企业应用程序将集成任务特定的AI Agent，Agentic AI 驱动的软件市场规模预计到2035年将突破4500亿美元。\n\n将 AI 性能与人类完成任务的时间直接挂钩，使得基准测试能够解释绝对性能，而非仅仅是模型间的相对排名，这为理解 AI 何时能产生真正的现实世界经济影响提供了清晰的透镜。\n---\n声明：本文仅代表个人观点，跟公司无关；本文只是作者在学习企业分析过程中的主观分享，不代表任何的投资建议，请知悉",
+    "date": "2026-02-13"
+  },
+  {
+    "title": "快手万人 AI 研发跃迁之路有感",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486200&idx=1&sn=40bfa16f89964a1b35e59274ec1594ad&chksm=fd3a0725ca4d8e339fd882ed6b81c5616ac1c376fc746629d5f0187521ac85b9d30f7df94b59#rd",
+    "digest": "<a class=\"wx_topic_link\" topic-id=\"\" data-topic=\"1\" style=\"color: rgb(87, 107, 149) !important;\">#AI工具实战应用</a> <a class=\"wx_topic_link\" topic-id=\"\" data-topic=\"1\" style=\"color: rgb(87, 107, 149) !important;\">#组织级Agent实战</a> <a class=\"wx_topic_link\" topic-id=\"\" data-topic=\"1\" style=\"color: rgb(87, 107, 149) !important;\">#个人Copilot到组织Agent</a>\n\n快手团队在 InfoQ 发表了一篇长文《3 年、1 万人，快手技术团队首次系统披露 AI 研发范式升级历程》，作为一个资深 DevOps 转型布道师到这两年跟不少客户探讨尝试AI-DLC方法，文章中很多部分深有同感！\n\n很多管理者在引入 AI 时，最容易掉进 “指标陷阱”：盯着 AI 代码生成率和推荐接受率不放，看到数值从 1% 攀升到 30% 甚至 40%，就认为提效大功告成。\n\n但这恰恰是幻觉的开始，快手在实战中戳破了这个泡沫，提出了一个极具穿透力的不等式：“用 AI 开发工具 ≠ 个人提效 ≠ 组织提效”\n\n这里有一个生动的类比：如果你被困在早高峰的公路上，把你的车换成一台起步极快的法拉利，你在绿灯亮起瞬间的推背感确实很爽，但因为前面的路依然堵着，你到达目的地的时间并没有改变。\n\n在真实的研发场景中，编码环节往往只占交付全链路的 20% 左右，如果你一个需求评估需要 5 天，其中编码只有 1 天，即便 AI 帮你把编码压缩到了 0.5 天，但如果技术评审要等、前后端联调要等、发布流程要走，那节省下来的半天时间，很快就会被后续的无效等待所抵消，瓶颈不在于你的“车速”，而在于整条“路”的吞吐量。\n\n快手之所以能实现跃迁，核心基石在于其 2023-2024 年完成的 “阶段1”：平台化、数字化与精益化，在这一阶段，快手通过三端一站式研发平台，实现了流程自动化率 &gt;94% 和工具渗透率 &gt;95%。\n\n如果没有这层“地基”，AI 带来的只会是灾难，想象一下，如果你的研发管道本身是不透明的，AI 生成的大量代码只会变成堆积在管道里的“库存”，导致更多的重构、更多的 Bug 和更混乱的评审，快手的实践证明，只有当研发过程已经实现了高度的标准化和数字化，AI 才能作为“放大器”产生正向收益。\n\n为了打破效率悖论，快手最深刻的洞察在于：不要试图给“人”分级，而要给“需求”分级；这种分级的精妙之处在于，它让管理者从 “统计代码行” 的虚荣指标中解脱出来，转而关注：组织里有多少比例的需求已经进入了 L2/L3 模式？只有当 AI 成为能够理解上下文、具备执行能力的 Agent（智能体）时，它才能真正切入设计和测试等 “大块时间”环节。\n\n2026 年将是一个分水岭，届时，行业将迎来第一批 AI 先行者的成果展示期,领先者与落后者的差距，将不再是“代码写得快不快”，而是组织能否高效驾驭 AI，能否完成从“手工业作坊”到“智能化流水线”的范式重构。",
+    "date": "2026-02-13"
+  },
+  {
+    "title": "职场“政治”的囚徒困境：观察者生存，参与者沉没，逃避者出局",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486155&idx=1&sn=e3b27ab4a7d562d416b692c26a9d07d5&chksm=fd3a0716ca4d8e0050912173f54698347da951a2abf71e98c31ca93474c50f936573b62381ee#rd",
+    "digest": "每个人都或多或少抱怨过职场政治，很多人只是希望以工作质量或结果为唯一评判他们的标准，而不是看他们的手腕或如何站，到底如何看待职场政治游戏？！",
+    "date": "2026-02-03"
+  },
+  {
+    "title": "致再次出发的小伙伴们",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486140&idx=1&sn=3b8c8e3043067240843a413b8621aac0&chksm=fd3a0761ca4d8e77bcc569d93ade9682be90fb87d35513e34247312d2b8d3fb61a0ff15afd0f#rd",
+    "digest": "新的 Agentic 时代来的太凶猛，以至于原本的组织规模、结构和能力与新时代不匹配，重组重组还是重组，这两天收到很多 Day 1 一起走过来的同学们的 Last Day 消息，不仅唏嘘不已；\n\n每个人的 Last Day 终将到来，但真正重要的是：在那一天到来（假如就是明天）之前，我们是否让每一天都活成了 Day 1？\n\n我们告别信的不仅是一个人不短的一段职业生涯的句号，更是AI时代组织变革浪潮中一个强烈的信号！这不是个别人的告别，而是一代云技术人在 AI 时代集体转型的缩影。\n\n云计算，基础设施即服务时代，2006年开启\nGenAI 1.0，模型即服务时代，2022年开启\nGenAI 2.0，意图即服务时代（Agentic 智能体），2025年开启\n\n行业发展变化太快了，模型能力不断提升和民主化，产品经理也能游刃有余写代码出原型，工程师处理需求的吞吐量翻倍还要翻倍，Clawdbot 可以随时随地帮你处理各种任务，Agentic 应用插上智能大脑（LLM）、上下文和工具，自主不知疲倦的在干活，而且不会信息过载！\n\nDevOps时代， You build it， you run it！（开发运维一体）\n\n而到了GenAI 2.0，变成了 You prompt it，you verify it and you own it！（人的作用在于提出问题和目标，评估和为结果负责）\n\n我们的伙伴形容这段时光“加入公司的 Day 1 恰逢组织的黄金时代，扎根团队，Keep Hands Dirty 不断迭代的创新精神，没有标准答案，只有客户难题；没有舒适区，只有不断试错。”\n\n他们的 Last Day，撞上了GenAI的组织地震。\n\n生成式AI不仅在重构技术栈，更在重塑组织形态，——从层级式到分布式，从专才到全栈，从工具使用到人机共生——正是所有科技公司都在经历的阵痛。\n\n小伙伴们的离开，既不是被动淘汰，也不是盲目逃离，而是一种主动的\"进化选择\"，选择换个战场，恰恰是对自身创造力的一次再投资。\n\nLast Day 不是失败，它是下一个Day 1 的前夜。\n\n愿小伙伴们在新战场继续做\"吃螃蟹的人\"，愿AI放大大伙的创造力，愿大家的 Next Day 1 比第一个 Day 1 更精彩；\n\n“未来的赢家不是用AI最多的人，而是和AI一起进化的人”",
+    "date": "2026-01-30"
+  },
+  {
+    "title": "保姆级Clawdbot教程来了，但我还是想劝大家悠着点。",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486124&idx=1&sn=52226b21d146e82cdae04ff99fb48aa6&chksm=fd3a0771ca4d8e67212dc505ca4e101150741b225c1961eca6d601ca8f7f51b9bd8e1b349128#rd",
+    "digest": "小龙虾赛高",
+    "date": "2026-01-28"
+  },
+  {
+    "title": "A16Z 合伙人 2026 年度前瞻- Agentic AI时代，意图即服务",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486122&idx=1&sn=ed584be045526bf4b526dc7aff785f3e&chksm=fd3a0777ca4d8e615a8e11bc9790195f572ac6a969752926943a0bcbc1ef5b49c51dea16845d#rd",
+    "digest": "A16Z 2026 年的\"Big Ideas\"报告，揭示了这场变革的三个阶段，云计算的基础设施即服务，GenAI 阶段的模型即服务，Agentic AI阶段，意图即服务，2026年，不仅仅是 AI 的又一年，而是技术拥有自主性Agentic",
+    "date": "2026-01-25"
+  },
+  {
+    "title": "2026 AI 工程师“三层分化”和突围路径",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486110&idx=1&sn=026c14ae52d93bfab2ef5ef8a646f8a1&chksm=fd3a0743ca4d8e55bfd5a1d59f09105ae97b631022754b476f36fbd6ccff7fb8f3999ad6e3b3#rd",
+    "digest": "刚刚过去的周末，复旦大学两天的 AI 公开课爆满，更加凸显 AI 领域的强大号召力，作为从业者，尤其是技术专业人员，在 AI 工具能自动生成 80% 基础代码的今天，到底如何构建自身的核心竞争力？",
+    "date": "2026-01-11"
+  },
+  {
+    "title": "Notion CEO 颠覆性观点将重塑你对未来工作和组织的想象",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486099&idx=1&sn=445c42205523fdc9dc57ce90b8ab4a6a&chksm=fd3a074eca4d8e585f5782251b6a68592e97ee47e6baecc0a7c4dec9a913725cbd25b016ad9c#rd",
+    "digest": "AI 不是简单的提高效率工具，而是像钢铁定义镀金时代一样，将从根本上重构生产关系的基础性材料；Notion CEO Ivan 将 AI 称为\"Infinite Minds\"（无限思维），强调这种\"永不休眠的思维\"正在改变知识工作的本质；",
+    "date": "2026-01-06"
+  },
+  {
+    "title": "从“炫技”回归“实质”：纳德拉 2026 AI 宣言与潜能革命",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486089&idx=1&sn=8b301e7834efdbc69aa3da968a78c393&chksm=fd3a0754ca4d8e42e6f7ea1994658cbf1235fcf8092a23dc56a7e0ab9c6b21b76db4e78ef8d9#rd",
+    "digest": "我们似乎都习惯了 AI 技术日新月异的惊人速度，每天都有更强大的模型、更炫酷的应用诞生，然而，就在这片繁荣景象中，微软 CEO 萨蒂亚在他最近Looking Ahead to 2026一文中，提出一个观点：我们可能已经进入了一个“模型过剩”",
+    "date": "2026-01-04"
+  },
+  {
+    "title": "我的 2025 记忆和一些废话",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486079&idx=1&sn=328e8a52c486928efa1af381f73154f2&chksm=fd3a07a2ca4d8eb41cb8456bb5feee07d5daef433de79c3fe3c085b2129bb5404df6c82e63fc#rd",
+    "digest": "回顾2025年的思考输出，记忆深刻的时刻，环境和组织的扁平化冲击",
+    "date": "2025-12-31"
+  },
+  {
+    "title": "Meta 宣布收购 Manus",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486070&idx=1&sn=a8936af62b1b075283b89997ba2da4b5&chksm=fd3a07abca4d8ebd0f920c659a31d9082f4c2c6c03cf3b3d73e09314efa95e0219ef51f5465c#rd",
+    "digest": "Meta 宣布收购 Manus，旨在利用其领先的智能体技术为全球数十亿用户和数百万企业解锁新机遇，加速业务领域的 AI 创新，交易金额或达数十亿美元，这笔交易被认为是 Meta 成立以来规模第三大的收购案，仅次于 2014 年以 190 亿美元收购 WhatsApp，以及 2024 年对 Scale AI 的收购；\n\n当一个能够自主执行复杂数字任务的工具被交到数十亿人手中时，世界会是什么样子？\n\nManus将其愿景定义为创建AI&nbsp;\"执行层\"，这一概念超越了对话式 AI；Meta 的公告立即将这一抽象愿景落地，明确指出它期望智能体执行的高价值商业任务————如市场研究、编程和数据分析。\n\n这代表了超越生成式AI的关键演进，将范式从 \"AI作为创意伙伴\" 转变为&nbsp;\"AI作为能够在真实世界环境中执行端到端工作的自主行动者\"，AWS CEO Matt Garman 在 re:Invent 2025 主题演讲中明确指出:\"我相信未来每家公司内部将有数十亿个智能体，遍布各个可以想象的领域。\" 这与Meta收购Manus后提出的 \"从数百万用户扩展到数十亿用户\" 的目标完全吻合，两者都认为智能体将成为像社交媒体帖子一样普遍的存在。\n\nManus 产品于 2025年3月1日首次发布公告后，仅几天时间，等候名单就激增至200万人，到3月中旬，他们开放了付费订阅选项。“Manus 已经在为全球数百万用户和企业的日常需求提供服务，它在今年早些时候推出了首个通用 AI 智能体，目前已经处理了超过 147万亿 个token，并创建了超过8000万台 虚拟计算机，我们计划将这项服务扩展到更多企业。”\n\nManus (其母公司为\"蝴蝶效应\" Butterfly Effect) 的创始团队由几位极具经验的中国\"连续创业者\"组成，核心人物包括肖弘、季逸超和张涛。肖弘(Xiao Hong)是创始人兼CEO，毕业于华中科技大学软件工程专业，是典型的\"连续创业者\"，曾创办夜莺科技并推出壹伴助手和微伴助手；随着Meta的收购，肖弘将出任Meta副总裁，被业界认为具有极强的产品敏锐度；季逸超(Ji Yichao)是联合创始人兼首席科学家，毕业于北京信息科技大学，著名的\"天才程序员\"，19岁时便因开发的猛犸浏览器走红,为 Manus 提供了深厚的技术底层支撑；蝴蝶效应公司成立于2022年，总部最初位于武汉，后迁至北京，并在新加坡设立全球总部；代表产品有Monica.im和2025年初推出的全球首款通用智能体 Manus.im，团队在被Meta收购前已获得红杉中国、真格基金、腾讯、经纬创投等顶级机构投资。",
+    "date": "2025-12-30"
+  },
+  {
+    "title": "算力地理学：当电费与关税决定了你代码的“流放地”",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486046&idx=1&sn=4d811ce8f3efbd57f4ec767ef6a1d74c&chksm=fd3a0783ca4d8e95aac035d35fd7fce8673610cafe70dbfd2423094c2ede4d1a55a1a0a5804b#rd",
+    "digest": "当每一个比特的计算成本都与当地的电网和税法深度绑定时，您的“全球化”业务架构是否已准备好迎接一个不再平坦的云端世界？",
+    "date": "2025-12-21"
+  },
+  {
+    "title": "reInvent25｜Agentic AI 重塑零售电商价值链，不止聊天，更会办事",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247486033&idx=1&sn=77d56e274b252c5d0073657319e7710e&chksm=fd3a078cca4d8e9a5abbb218e97e5fa96f643ed18e5bb8b283fbe8cc8a90bd8b35bbc4ec4aea#rd",
+    "digest": "对 AWS re:Invent 2025 关键案例的分析描绘了一幅清晰的图景：零售电商业的竞争正在从数字化转型升级为“智能化转型”。能够驾驭 Agentic AI 的企业，正在获得结构性的成本和速度优势。",
+    "date": "2025-12-18"
+  },
+  {
+    "title": "架构师，你的底气来自哪里？！",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485988&idx=1&sn=4f93a5149267c1b1015ebf3311e656db&chksm=fd3a07f9ca4d8eef57419c1e4e7b1105c9b88408eb5f59519cdc748eff7012ddaa1682710df8#rd",
+    "digest": "明天的架构师，将是驾驭 Agent 军团的指挥官；那些无处不在的智能体，确实会成为我们的 “影子分身”，帮我们处理繁琐、重复的验证；而我们的本体，将腾出手来，去思考战略，去构建信任，去创造那些真正触动人心的商业价值。",
+    "date": "2025-12-12"
+  },
+  {
+    "title": "文艺复兴、开发者，明天会更美好！",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485976&idx=1&sn=2b17dc19aa8a88cde1ac33352808e281&chksm=fd3a07c5ca4d8ed3fd2930aa1238bd3f2085f96b520a37fc7f0f9d7dbce28970a48a251fcaaa#rd",
+    "digest": "<a class=\"wx_topic_link\" topic-id=\"miub6xq9-ga51sh\" data-topic=\"1\" style=\"color: rgb(87, 107, 149) !important;\">#科技文艺复兴</a> <a class=\"wx_topic_link\" topic-id=\"miub6zdg-oxlolk\" data-topic=\"1\" style=\"color: rgb(87, 107, 149) !important;\">#开发者盛会</a> <a class=\"wx_topic_link\" topic-id=\"miub728n-baujw3\" data-topic=\"1\" style=\"color: rgb(87, 107, 149) !important;\">#未来科技趋势</a> <a class=\"wx_topic_link\" topic-id=\"miub9341-c951bx\" data-topic=\"1\" style=\"color: rgb(87, 107, 149) !important;\">#AWS</a> reInvent开发者盛会 <a class=\"wx_topic_link\" topic-id=\"miub9jhx-vte968\" data-topic=\"1\" style=\"color: rgb(87, 107, 149) !important;\">#开发者盛会体验</a> <a class=\"wx_topic_link\" topic-id=\"miub9kn1-1d1i0d\" data-topic=\"1\" style=\"color: rgb(87, 107, 149) !important;\">#科技爱好者必去</a> \n\nGenAI 大潮中，技术理性之外更多需要感性直觉\n\n这次大会感受，从不期待，有疑惑，到现场爆满的开发者，有趣的 Expo 展台，Dr. Werner 最后一场主题演讲，文艺复兴，当目光再次聚焦开发者，尤其是个人开发者边界拓宽，能力强化，世界再次百花齐放，精彩纷呈！\n\n会场遇到两位很久没见的老朋友，为他们的创业心态，Day 1 心态所感染，敢想敢做，独立思考，不断 Leverage 周围的资源，真是太棒了！\n\n每次参会，最大的期待和收获就是倾听客户的声音，听客户谈他们自身业务发展，谈中国企业如何开拓海外市场，谈对生成式 AI 的前景，谈为什么他们跟别的同行不一样；\n\n客户和海外 AWS 高管的 EBC 谈话，每次也让人非常期待，从彼此不了解到客户跟海外团队像老朋友一样，彼此坦诚诉求交换想法，再到彼此合作的充分认可，开心！\n\n特别感谢同事的信任，市场部同学的邀请，帮整个活动做一些力所能及的小事，有更好的参与感，带大伙逛行业展区，拉斯有约对话，都是促进自己更深入学习感受的契机，收获满满！\n\n最后，感恩在拉斯维加斯一起度过紧张，好奇，坦诚，放松，思想碰撞的各路小伙伴，倒时差很痛苦，现场比往年更拥挤，未来可期！",
+    "date": "2025-12-06"
+  },
+  {
+    "title": "reInvent25｜AWS 第四代自研 AI 芯片  3nm Trainium3 落地，未来可期",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485858&idx=1&sn=0960b8e94e92815f2755a07af57d19ed&chksm=fd3a047fca4d8d69bf2f61a0d71f839aa71df5c0a289f745ca3fa732a0d27e290341c7b4c1e9#rd",
+    "digest": "Trainium3 的发布标志着 AWS 在 AI 基础设施领域的完全成熟",
+    "date": "2025-12-05"
+  },
+  {
+    "title": "reInvent25｜多云互联互通新时代",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485810&idx=1&sn=040e6b57b95e956f41f98c70acdbc991&chksm=fd3a04afca4d8db993b6998a57e5f77344bd397a5b3f9fd8e1b9c94c0975bf8d1638135f4257#rd",
+    "digest": "AWS Interconnect 多云服务的推出标志着多云连接领域的重大技术突破。该服务于2025年12月1日正式发布预览版，通过与Google Cloud的战略合作，实现了云服务提供商之间直接连接的简化管理。",
+    "date": "2025-12-04"
+  },
+  {
+    "title": "reInvent25｜Day2 - AWS CEO Matt 主题演讲有感",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485795&idx=1&sn=0962b6c215fafbf9efba273257b9f3fc&chksm=fd3a04beca4d8da89a236cf3a75ae0e050b83e83669a717fb6bcdb7027ef2993278c2a6803d3#rd",
+    "digest": "#AWSreInvent2025 #AI智能体 #云计算未来 现场报道之主题演讲",
+    "date": "2025-12-03"
+  },
+  {
+    "title": "GPU Cloud｜推荐系统到底用 CPU 还是 GPU？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485771&idx=1&sn=24aa3dc8ed62cadd6d0737f2d9753759&chksm=fd3a0496ca4d8d80d3550fedcfe777f88436509bc594ba8b1c3ace26f4d1a9ab9235e4791873#rd",
+    "digest": "本文深入剖析了电商搜索推荐（搜推）系统中的核心算力选择问题——究竟应采用CPU还是GPU。结论并非非此即彼，而是高度场景化的“It Depends”",
+    "date": "2025-11-28"
+  },
+  {
+    "title": "GPU Cloud｜数据中心用电量爱尔兰 22%、新加坡 15.6%！国家电网不能承受之重！",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485745&idx=1&sn=c472a2ab7351e550f3bb63d2a6345984&chksm=fd3a04ecca4d8dfad05568e7ebdc9c5620e681e9ac8cb0df908bf32df565ab823cf01238447e#rd",
+    "digest": "AI 基础设施的爆炸式增长，正在挑战全球电网的承载极限，引发了一场 GW 级（吉瓦）的电力军备竞赛。",
+    "date": "2025-11-20"
+  },
+  {
+    "title": "大规模云故障凸显客户云上业务应对尾部风险难题",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485712&idx=1&sn=97369a607a3a36f69d8452f58a7ad6f4&chksm=fd3a04cdca4d8ddb335a9ab052496cce5f88b2c6bbe65f01e04428451295eef6b6871b92f4b4#rd",
+    "digest": "规模越大，责任越大，随之而来的复杂微服务体系和相互依赖，云客户可以借鉴投资领域尾部风险应对策略，在正确的风险评估框架下，进行多区域部署，服务分散化，持续提升业务连续性和系统韧性！",
+    "date": "2025-11-07"
+  },
+  {
+    "title": "Agentic 应用交付差异和可观测性解读-学习阿里技术和思码逸有感",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485696&idx=1&sn=da5fdb61605b65d2936357342ec6af1b&chksm=fd3a04ddca4d8dcb9526b68a9a77275e367432be9a94992d7a5336496e20172e8a9f4450b323#rd",
+    "digest": "与传统软件的线性开发流程不同，Agentic 应用的 CI/CD 需要集成 Prompt工程、模型部署、智能评估等专门环节。行业数据显示，超过 80%的 Agentic 应用项目未能成功投入生产，失败率几乎是传统IT项目的两倍",
+    "date": "2025-10-23"
+  },
+  {
+    "title": "Agentic 应用架构｜来自 Shopify 卖家智能助手 Sidekick 经验分享",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485684&idx=1&sn=b1155df4750df95d37d0e27b902da563&chksm=fd3a0529ca4d8c3fbc7a8f7f1d979e2ee42113363ed88dd69f44e1871ba3e0b32ffafb8f0a71#rd",
+    "digest": "开发迭代部署一个生产级的 Agentic 智能助手，有看起来那么简单，接入一个大语言模型加一些工具就可以了？！",
+    "date": "2025-09-30"
+  },
+  {
+    "title": "专访阿里国际站总裁张阔：给AI时代生意人的9条启示。",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485662&idx=1&sn=7b9ea2196bce4289726bc6b5d5a3d4a8&chksm=fd3a0503ca4d8c1500829b075fb7e77868e9b2352b3e91daf512b8794e80a786717b0603f46e#rd",
+    "digest": "回归生意的本质吧",
+    "date": "2025-08-22"
+  },
+  {
+    "title": "特邀小伙伴加入战略客户云解决方案架构师团队！",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485660&idx=1&sn=35d452b03d647c19fcdf1d3923697885&chksm=fd3a0501ca4d8c1763b69a3f860dd06eeeed9842d8492ce42cc7e9e66bbe9e62701e851d7242#rd",
+    "digest": "如果你一名资深技术大拿，热爱思考，爱客户，热爱从更广泛的业务、云产品、生成式AI视角，如何利用技术帮助客户创新转型，那么请不要错过战略客户团队解决方案架构师职位~\n\n关于我们：技术前沿｜眼界广，技术牛｜客户至尚\n\n亚马逊希望招聘经验丰富且积极进取的技术人员，他们需能在技术深度与良好人际交往能力之间把握独特的平衡，在与一些全球最具知名度的品牌合作时，能够推出 并发展全新的平台服务。\n\n解决方案架构师是善于自我激励的人士，他们在软件/技术销售或咨询领域交付成果方面取得了可靠的工作业绩。\n\n我们希望此类人士能够具 备下列能力：从战略层面考虑业务、在复杂情况下围绕客户目标创建技术定义、开发解决方案战略、引导并调动资源，以及交付成果。\n\n该岗位招聘地为 <a class=\"wx_topic_link\" topic-id=\"me9yuj66-6s95d0\" style=\"color: #576B95 !important;\" data-topic=\"1\">#香港</a><a class=\"wx_topic_link\" topic-id=\"me9yulzx-vaojhk\" style=\"color: #576B95 !important;\" data-topic=\"1\">#</a>\n语言要求：中英文流利，日常客户全英文交流\n\n欢迎大家推荐和自荐\n\n扫描简报图片中二维码，在线报名\n\n或复制如下地址：\n\nhttps://www.amazon.jobs/en/jobs/3056979/sr-solutions-architect-amazon-web-services-hongkong-strategic-accounts?no_int_redir=1\n\n或直接发邮件给 yajimeng@amazon.com （注明战略客户团队香港架构师岗位）",
+    "date": "2025-08-13"
+  },
+  {
+    "title": "第一个能帮你做生意的Agent来了。",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485648&idx=1&sn=55a8bf1289fce0bb6c4aa7500484ee05&chksm=fd3a050dca4d8c1bbbbe84c029f81a3d436cf723b9da6bb484d7e92783c6b3103f49d316cd2d#rd",
+    "digest": "有趣的事物真的是层出不穷",
+    "date": "2025-08-12"
+  },
+  {
+    "title": "财报｜2025Q2 Google Cloud 从追赶者到挑战者华丽转身？！",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485646&idx=1&sn=86629534d10cad5b7a91860ed8c647c9&chksm=fd3a0513ca4d8c051bf43e491191fbb0c6b3cb0cd98c6c4e182e18eb756b78e25753299fec68#rd",
+    "digest": "Google Cloud正在成功将AI技术优势转化商业价值，实现从\"高增长、低盈利\"向\"高增长、高盈利\"的历史性转型",
+    "date": "2025-07-27"
+  },
+  {
+    "title": "生成式推荐！推荐系统新范式还是新噱头？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485637&idx=1&sn=3b934ea915545e5b4142406571c9e422&chksm=fd3a0518ca4d8c0e31036b5d99cd679dd6ed3f6be3c3fc7d54f7751b4a493a4da06660b40756#rd",
+    "digest": "自从Meta的GR推出以来，生成式推荐就是推荐系统领域最火的话题。最近快手的OneRec也已经成为最值得讨论的推荐系统框架。但围绕生成式推荐，很多同行也有很多质疑，这篇文章主要探讨生成式推荐到底是业界的新范式，还只是一个新噱头。",
+    "date": "2025-07-25"
+  },
+  {
+    "title": "国内AI芯片的出货量、供需关系",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485635&idx=1&sn=5cf2375f89f622edd07b57770302d376&chksm=fd3a051eca4d8c08de574ccfa46a3be29c37354e255d0c8bfb0e55850c247956c126c668aa7d#rd",
+    "digest": "",
+    "date": "2025-07-22"
+  },
+  {
+    "title": "K2证明忽视MoonShot将是巨大的错误",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485633&idx=1&sn=6a9aa717e5bd0b6c50f710a431a0abb9&chksm=fd3a051cca4d8c0a72684887265109ef0c4882b52733bcd4e3575c3e55ba3c2120a2927c8d73#rd",
+    "digest": "",
+    "date": "2025-07-14"
+  },
+  {
+    "title": "GPU Cloud 101 ｜GB200 可以提升30倍推理性能？！",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485631&idx=1&sn=50e37a3edf881abefaf953aa1b9c2ae6&chksm=fd3a0562ca4d8c74c4b3cfbce9a8f78c0a1aa3a9db5afb7557ac69b994b26a56f27ff0ebe195#rd",
+    "digest": "",
+    "date": "2025-07-09"
+  },
+  {
+    "title": "GPU Cloud 经济学｜不可思议，H100 降到1美金每卡每小时？！",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485618&idx=1&sn=26d6168c995afd9e0c3dcc69583e7b79&chksm=fd3a056fca4d8c7900c514961a7d0f2fa412967016b3c352a31ac347c3c9d1eaeb141f3e9d71#rd",
+    "digest": "最近很多关于 GPU 的大新闻，比如 Oracle 有一笔单年贡献超300亿美金的 GPU 合同，最近跟客户打交道，也离不开GPU话题，尤其在 Blackwell铺货后，市场传闻上代的Hopper架构的 H100 单卡每小时只有$1美元?!",
+    "date": "2025-07-07"
+  },
+  {
+    "title": "一年一度｜云计算之后，全力普及GenAI 和 Agentic AI",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485609&idx=1&sn=4d81a61e1a8c8fa2a562c440be6ae6b8&chksm=fd3a0574ca4d8c622660526346e15d5c599f177bb2d87e5fcac8a4b25adb1183c7631932ac68#rd",
+    "digest": "又一年的亚马逊云科技上海世博中心中国峰会，今年多了许多拉斯维加斯re:Invent峰会的味道！\n\n开场前DJ打碟、高管论坛、萌新实习生利用黑科技助力市场活动、Talk is cheap， show me the code！LLM挑战俱乐部、她力量等等，很多首次出现，GenAI 激发了大胆创新？！\n\n2016年前后很多加入亚马逊云科技的同学都是参加过云计算免费大型活动 AWSomeday ，系统感受云计算的美，哪怕是一整天的云相关技术培训，大家都趋之若鹜，无他，趋势尔！\n\n2025年的今天，满场讨论生成式AI、智能体、Agentic AI、Amazon Q、奇思妙想的创意大赛等等，我想，在国内普及生成式AI，亚马逊云科技是200% 认真的，从云计算开始，深刻在公司基因中，技术普惠，带动整个行业创新再推动技术创新，科技飞轮再一次快速滚动起来，比以往更快！\n\n而迎接这个30米高浪潮的最佳姿势，就是搭上一艘“快艇”，一开始就加速，参加大会一定学不到如何做的细节，但借助交流，可以改变一点点认知，从而加速一点点行动步伐就值了！\n\nDay 1 一定是积极支持这样的市场活动，争抢上台机会，2025年团队有太多优秀的同学，但还是争取到30分钟的时间，跟大家分享了大规模容量管理的挑战，方法和案例，容量挑战在我们生活中非常普遍，世博中心的午餐排队，节假日好的餐厅一座难求，云的资源也一样，Finra 2021年到2023年一直努力处理超大规模数据分析任务，峰值EC2数量高达30万台，平均EC2算力资源接近15万，也就是说有15万台算力是动态根据任务数量动态调度的！\n\nDay 1 一定是充满好奇，期待遇到同样好奇的伙伴进行对话，交换，解惑，接受别人家成功场景的鼓舞，大会上 DerbySoft，复兴医药，Anker创新，TCL，合合信息，易点天下等客户还有Snowflake这样的重磅合作伙伴，早期技术尝鲜者已经尝到业务方面的甜头！\n\nDay 1 对于新技术一定是充满矛盾的，一方面新技术在改变着我们习惯的昨天，一方面又对未来到底会怎么样存在丝丝侥幸和不安，但不变的是持续为业务和用户创造价值！\n\n组织和参与这样规模的活动能量消耗非常大，但也吸收很多能量，周末了，感慨的虚话就不多讲，借用老东家一句口号与大家共勉 “停止空谈，开始行动”！\n\n感谢这次聚会，也许在GenAI的普及上会留下隆重的一笔！",
+    "date": "2025-06-20"
+  },
+  {
+    "title": "一周一练 ｜ AI 生成 PPT，从惊艳到祛魅",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485587&idx=1&sn=ead9b4f2e71ff2f96e2d0aa8022fe226&chksm=fd3a054eca4d8c5888800ff3dc3217f0d990dfe6fe45a104ff4f810b34446f071920af4659a1#rd",
+    "digest": "三种不同的 AI 生成 PPT 的体会，从兴奋到祛魅，你也可以利用 Amazon Q Developer CLI 手搓一个自己的工具。",
+    "date": "2025-06-15"
+  },
+  {
+    "title": "突发｜6.12又见大规模云服务故障，别看热闹，无论业务还是架构都需要“韧性”",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485580&idx=1&sn=d60a87b85816f6d0e8e1da3ae7e7ebf3&chksm=fd3a0551ca4d8c471495fe953c13f1a66d849e3b0cbb8ee09470af58546a1f4e485fae7de366#rd",
+    "digest": "企业构建在云上的业务可靠性是一个持续的旅程，而非一蹴而就的目标。即使是领先的云服务商，在维持100%正常运行时间方面也面临复杂挑战，企业在构建韧性业务架构的同时，不能忽略底层云服务的深层次的韧性架构设计和配套的持续测试，监控和业务恢复手册",
+    "date": "2025-06-13"
+  },
+  {
+    "title": "一月一课｜2小时炸裂，孙金云教授《敢问路在何方》战略课有感",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485568&idx=1&sn=5738a1469cdc4b0bf77600722acd8834&chksm=fd3a055dca4d8c4bacee04177eb5e77d3c27b699a7ecc49757d33ef5180a233419bf5d87de29#rd",
+    "digest": "复旦孙金云老师从擅长的战略课维度不断思考总结，并带领企业家旅游团到世界各地实地拜访；2个小时题名为《敢问路在何方？》的精彩分享，生动有趣，获益匪浅，信息量很大，脉络清晰，更有精简的战略和国际化底层逻辑！",
+    "date": "2025-06-11"
+  },
+  {
+    "title": "一月一课｜“战略是研究现在做什么才有未来”",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485557&idx=1&sn=54b881128331b7e92e8107ac46fe0a34&chksm=fd3a05a8ca4d8cbe79eebda666f38b162536bfc2ffef5edbde8b55ef0527e10781435ed6eceb#rd",
+    "digest": "“战略不是研究未来我们做什么，而是研究现在做什么才有未来”，第一节战略课回顾",
+    "date": "2025-05-22"
+  },
+  {
+    "title": "一周一练｜累积三个月的报销如何用大模型偷懒？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485541&idx=1&sn=9058c3440578f5b7aed5b003f038ae24&chksm=fd3a05b8ca4d8caeb9415c157d84c932db2e3a148101029bb4beaedf0efca24b8d2f3df4d7cd#rd",
+    "digest": "抱怨了很久填写报销太费时间，这次终于勇气来尝试用大模型和 Browser Use 实现半自动化，先进工具带来先进个性化“智能助手”！",
+    "date": "2025-05-18"
+  },
+  {
+    "title": "一周一练｜第一个 MCP 搭建，VSCode+Cline+Exa Search",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485530&idx=1&sn=3f07e06a9cfb1f869c4b44d51b0c4266&chksm=fd3a0587ca4d8c91e65e973541b0dde62d87294101b5ef28ec58cb0f35f1e4d2b9e5f1058ff5#rd",
+    "digest": "",
+    "date": "2025-05-07"
+  },
+  {
+    "title": "巴菲特1998年佛大演讲：投资和人生的思想盛宴 | 含中英双语逐字稿",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485514&idx=1&sn=d36bd762a9c949e9002d6988b92bf4db&chksm=fd3a0597ca4d8c813b0d780dbe42d7d515b8ec6f22e1439f1edcae563d66447ab2f8e130d000#rd",
+    "digest": "巴菲特1998年佛大演讲：投资和人生的思想盛宴 | 含中英双语逐字稿",
+    "date": "2025-05-05"
+  },
+  {
+    "title": "一周一练｜ 唠唠就可以搞定创意在线个性化网站？！",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485512&idx=1&sn=6dd12efe6ec355094ed3d0662fe6fe8d&chksm=fd3a0595ca4d8c83148d6e604a4c31d52d2a3878e1939bf4e499ce915f70a6824b17ce8e4618#rd",
+    "digest": "Vibe Coding, 无论是小白还是专业前端，有想法就可以有原型！",
+    "date": "2025-05-03"
+  },
+  {
+    "title": "汽车｜上海车展智联化趋势背后，我们需要了解什么？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485495&idx=1&sn=64c88c2fe0c26abe180561dea952507b&chksm=fd3a05eaca4d8cfccc661c375fba07db811131876c3b39b0999e494c8fe3ac31d941e3798d4a#rd",
+    "digest": "2025年的上海国际车展进行时以及最近参加的 AI 商业化探讨，学到不少汽车行业的新知识，尤其跟智能化、大语言模型相关的术语，扫盲的同时，更加理解行业玩家的行为以及云和科技公司能服务这些客户做些什么场景；",
+    "date": "2025-04-27"
+  },
+  {
+    "title": "一月一课 ｜ 领导力不是你自己有多优秀，而是别人相信你有多优秀？！",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485488&idx=1&sn=d3ed557c0859d810a1343423aef4305c&chksm=fd3a05edca4d8cfb514cd4c2bb0669b1cc66c213fdfc882dd0e3c1f35bcc85955ea0ca8f1aee#rd",
+    "digest": "“每个人无论其正式地位、职位或阶级如何,都具备通过建立信任并积极影响他人的方式来发挥领导力的潜能。” 不同情景每个人都能发挥不一样的领导力，领导力不是你自己有多优秀，而是别人相信你有多优秀？！",
+    "date": "2025-04-20"
+  },
+  {
+    "title": "马斯克演讲：开启“可持续丰饶”的未来（特斯拉全体员工大会/ Q1 2025）",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485467&idx=1&sn=8c1a8a6037d307958ffcc967ac0a53b7&chksm=fd3a05c6ca4d8cd08c3896f39413b654c5729c8096431eca7ecbf67f7552c5bde7342431e6ef#rd",
+    "digest": "",
+    "date": "2025-04-03"
+  },
+  {
+    "title": "谈谈DeepSeek-R1满血版推理部署和优化",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485464&idx=1&sn=c3933b15110398402e38b50b0eb6630b&chksm=fd3a05c5ca4d8cd3fcf8d6834bfb0d3d77488b78b7caa6cd2c923ef404f86b11f261beebc123#rd",
+    "digest": "",
+    "date": "2025-02-13"
+  },
+  {
+    "title": "DeepSeek 学习、体验和总结",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485461&idx=1&sn=78dd72a03493aebf301ffe9dac67fa3d&chksm=fd3a05c8ca4d8cdeb165b9f51b34f58c782963c83aca8eb6bda00dcdf3a5451ed6b871ce8b1b#rd",
+    "digest": "这个春节一直被 DeepSeek 霸屏，坦白而言，原本 Meta 的 LIama 也是开源的 SOAT 模型，大家也可以体验和使用，为什么 DeepSeek 引发如此大的冲击呢？",
+    "date": "2025-02-07"
+  },
+  {
+    "title": "巳巳如意｜体验5秒钟 AI 生成定制红包封面，薛以致用限量红包等你来领",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485445&idx=1&sn=1179b17736742f3452f80c5b20ab992a&chksm=fd3a05d8ca4d8cced552bc4d4281e2c52924629e131e614e9499d0dc038e0d8dd557c8c22588#rd",
+    "digest": "巳巳如意，巳惪是福，新年快乐！",
+    "date": "2025-01-26"
+  },
+  {
+    "title": "2024年，DeepSeek带给硅谷“苦涩的教训”",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485436&idx=1&sn=d594299a3047fd6125beadc7f8da90ac&chksm=fd3a0a21ca4d8337cf9788edd2607f319ccc16e77d1200a9fac460e3fd61e53e346fe010b092#rd",
+    "digest": "",
+    "date": "2024-12-31"
+  },
+  {
+    "title": "不断演进的基础技术组件降低用户复杂系统构建之路——亚马逊 CTO Werner 的20年经验总结",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485431&idx=1&sn=d7b2663ab0f6600563bdc7d67f27edcb&chksm=fd3a0a2aca4d833cf3f2650ec89c23811cc397c4aa8670d55e41896bf802eb5a8dc5f204ced1#rd",
+    "digest": "re:Invent24 最后一场 Keynote 聚焦 Werner 的分享，原本猜测会更多谈生成式 AI，但现场更多从 Werner 不可思议的 20年亚马逊职业生涯开始谈系统复杂性和如何遵循一系列架构原则，赢得系统层面的简化！",
+    "date": "2024-12-06"
+  },
+  {
+    "title": "AWS Re:invent GenAI路上快速的追赶者, 详细谈谈Trainium2/3架构",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485413&idx=1&sn=77ffc69730d29cca96ad84ac74220121&chksm=fd3a0a38ca4d832e93575539d64935bf39572c1418c83b1cc6dd0942811a179b05495f12ec81#rd",
+    "digest": "",
+    "date": "2024-12-05"
+  },
+  {
+    "title": "蓄力和发力｜ re:Invent24 Peter 和 Matt 主题演讲令人振奋的发布个人总结",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485411&idx=1&sn=9d6f8863ca76af5f9f8443ca4539504a&chksm=fd3a0a3eca4d83280ff4f3c323faf37dee5e6bd12cc6af7198d5eb832dad6a37c84b143064b4#rd",
+    "digest": "今年来 re:Invent 2024，非常期待亚马逊云计算能够有重磅发布，两场主题演讲，信息量非常丰富，先总结下个人的感到振奋的新发布。",
+    "date": "2024-12-04"
+  },
+  {
+    "title": "从 S-Team 读懂亚马逊组织架构",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485400&idx=1&sn=4b80fd3ca74a915e3442832463a6806f&chksm=fd3a0a05ca4d831388025cc8ca3a05689b68160327925fe7bd2b08d18b877a7e4c1b50eaf576#rd",
+    "digest": "从公开财报我们知道亚马逊作为一个上市公司，有董事会（Board of Directors），高管团队（Executives）以及神秘的 S-Team ，这三者是如何定位、协作，驾驶和发展全球 150万员工以及 2万多亿美金市值的大船？！",
+    "date": "2024-11-19"
+  },
+  {
+    "title": "Amazon Software Builder Experience 团队是如何提升开发者体验的？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485386&idx=1&sn=17bde426fd5ac30762c6829bb753657b&chksm=fd3a0a17ca4d830174758ca0aec4f922a441f449b750c49e3826a69b812810f1efc63e32ceeb#rd",
+    "digest": "2022年，Business Insider 报道了一篇关于亚马逊 CEO Andy 创立了一个名为亚马逊软件构建者体验（ASBX）的新部门，以解决开发者提出的“基础性痛点”，为什么要成立这样的一个 ASBX 横向部门呢？",
+    "date": "2024-11-11"
+  },
+  {
+    "title": "大模型全程帮忙操作电脑和分析2024Q3亚马逊财报",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485379&idx=1&sn=f524fc531289c553528f91a7bb6d4f89&chksm=fd3a0a1eca4d8308fec3bfc050c115f77ef6a7ddc68f914d74000c822dbc529449a46aa30406#rd",
+    "digest": "我问了大模型三个问题，大模型自动操控电脑帮我完成了 2024年3季度亚马逊财报分析总结",
+    "date": "2024-11-06"
+  },
+  {
+    "title": "A股的当下，很像巴菲特所说的“诺亚效应”时刻",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485374&idx=1&sn=85f5d22986ece9733d760009c34346a8&chksm=fd3a0a63ca4d83757f72c9f406dd741e53e2031b08b26c67e7d9ab48c67772b3c7380606783e#rd",
+    "digest": "一个丰收之后，往往还接着一个丰收。",
+    "date": "2024-10-05"
+  },
+  {
+    "title": "建一个数据中心要花多少钱？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485372&idx=1&sn=ed5912385a8a0665f93c98f798139fc6&chksm=fd3a0a61ca4d837725fc8bfde0ab389821996ceb83924b590f4a4631594930febd20dc4e9569#rd",
+    "digest": "建设数据中心需要多少成本，包括建筑物的建设以及为设施配备电力和冷却基础设施以容纳服务器、存储和网络设备？",
+    "date": "2024-08-31"
+  },
+  {
+    "title": "云厂商在生成式AI加持下可以持续增长？！",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485370&idx=1&sn=017f3d12660d1ad66548bf9b6fb57cab&chksm=fd3a0a67ca4d8371cf53b14a924e025317e9ba5b731bb0a194fd82d671cc408f0413bbde6964#rd",
+    "digest": "国内和海外的云计算大玩家都发布了2024年第二季度财报，海外和国内一致的声音是 AI/GenAI 继续推动云服务的用量增长，国内价格竞争白热化，但利润都是稳步上升，能感受到生成式 AI 的火热，有点好奇整体市场到底是怎样的一个状态",
+    "date": "2024-08-24"
+  },
+  {
+    "title": "低处飞行向远方",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485356&idx=1&sn=9ab8488479d64918784f5e95ca1de35f&chksm=fd3a0a71ca4d8367587659eeb759019f819648f3009c5ffcf767ea2414d623cec41c9e5b4712#rd",
+    "digest": "",
+    "date": "2024-08-16"
+  },
+  {
+    "title": "数据平台竞争加剧：Snowflake与Databricks的新竞争态势",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485352&idx=1&sn=0405ec7949fa64654120562063b293fb&chksm=fd3a0a75ca4d8363ae0feca71ce5d3a4fdceb661b844e24fdf1383c6505fe733bc9577894ab6#rd",
+    "digest": "",
+    "date": "2024-08-10"
+  },
+  {
+    "title": "当云客户容量管理遇上精益",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485350&idx=1&sn=daf73af6f9b69934f339ad9893d74ac0&chksm=fd3a0a7bca4d836d5ab67846b86a6d512fdcf2cdd49530cb2c1dfa1911efd2c39c6c98ba1bd5#rd",
+    "digest": "供需平衡是永恒的话题，也是充满多、快、好、省的各种权衡，在需求变化快且不确定性消费市场的时代，将云厂商看成你依赖的生态伙伴，实现精细化流程管理，才能实现上下游的高效协同，丰田精益模式中的均衡化和持续改进为我们提供了一个解决思路；",
+    "date": "2024-08-01"
+  },
+  {
+    "title": "麦肯锡《Rewired》以及蒙牛的数智化转型有感",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485340&idx=1&sn=15dc66f3868fb799080f5ffecddf848c&chksm=fd3a0a41ca4d8357781a0ba24e190f639e32fd2103c3a67438e5ab79230f9c1221d8303a7dea#rd",
+    "digest": "人人都在谈AI，尤其是在如今生成式AI时代，起步看起来更加容易，但形成规模化成效的还是非常少，达成财务目标的更稀缺，Rewired从麦肯锡200个客户案例，逆向工作，编写了此书，结合蒙牛乐高等案例，思想实验这段旅程！",
+    "date": "2024-07-14"
+  },
+  {
+    "title": "AI的基石：大数据的重要性超越了AI（2篇）",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485327&idx=1&sn=83d3ca7751e8a26a1bcd68f6c29f24a7&chksm=fd3a0a52ca4d834440d4b0cebceeb33d0d5532857227067f9a4407a7faacff2b902f3ff5b57c#rd",
+    "digest": "",
+    "date": "2024-07-11"
+  },
+  {
+    "title": "利用RDMA技术提升Azure存储能力（演讲/PPT）",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485325&idx=1&sn=4eede1aeccd8021cdfb96ad8fd32f189&chksm=fd3a0a50ca4d8346f67aa5b0ece5116801c90ec78faf064f6075fcdb96fcad4f48a12d5315f0#rd",
+    "digest": "大规模计算的底层网络优化都值得期待",
+    "date": "2024-07-05"
+  },
+  {
+    "title": "从Kimi: Mooncake谈谈云AI基础设施的分离式架构",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485323&idx=1&sn=5d867f72150d3fb3d334536d0a7ecac7&chksm=fd3a0a56ca4d83406ea21acb01cd8a1d0135e4744977d946664bec42856d4dd8972ec1463b56#rd",
+    "digest": "Disaggregated架构可能会像当年MapReduce那样成为一个新的业界标杆,新的应用新的数据瓶颈, ScaleUP的大型机再到廉价的ScaleOut分布式集群,再到分离式架构",
+    "date": "2024-07-03"
+  },
+  {
+    "title": "Snowflake与Databricks：数据平台的竞争与演进",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485321&idx=1&sn=6b73b613ae4f4f606e896ff79f1a41e3&chksm=fd3a0a54ca4d83420ae6768777536533b243c9fb96915d4e0c608bdcf27abe6030eb7c6ce13b#rd",
+    "digest": "",
+    "date": "2024-06-29"
+  },
+  {
+    "title": "生成式 AI 如何入门！？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485318&idx=1&sn=ffd4e793ee2d0164e3f1c1420fe40625&chksm=fd3a0a5bca4d834d8bdae8d5a40f2173d6e3d236b5c609d8a1db4f2b12410fd7d940ef60e62f#rd",
+    "digest": "对于新技术物种，需要保持好奇，而持续的好奇心依赖不断的探索，而探索（体验）的持续动力，需要基于兴趣的小组开放式探讨，而高质量的探讨则需要从体验到入门；写下这段莫名的语句，其实想表达这段时间学习生成式 AI 的心路历程。",
+    "date": "2024-06-26"
+  },
+  {
+    "title": "微软亲自把英伟达送上全球第一｜AI光年",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485308&idx=1&sn=44271edce96e832d4808f65c850b2a46&chksm=fd3a0aa1ca4d83b75b5949afed76fe9538ea904f6cd4fcaedef9e9290243e2d5972f1a9305e4#rd",
+    "digest": "马斯克和扎克伯格也在给黄仁勋“打工”",
+    "date": "2024-06-20"
+  },
+  {
+    "title": "【老万】谷歌罗曼蒂克消亡史",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485306&idx=1&sn=4af17e3d8f60cf897de32d25b6b14d37&chksm=fd3a0aa7ca4d83b19b554a8240cb713e1ce453fa61cf910a20cdfb3dd18db5b1ae59cff236d5#rd",
+    "digest": "所有貌似突然的变故都不是在一夜之间发生。谷歌今天的颓势早在十年前就有了端倪。",
+    "date": "2024-06-16"
+  },
+  {
+    "title": "AI 时代个人生存/摸鱼探索指南.Beta",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485304&idx=1&sn=e1d7a23244a741b4880a536dd208c830&chksm=fd3a0aa5ca4d83b346cc63b9e3c63c5d70185529f6a1f3442eec7b24a066267f3ef51ff87f93#rd",
+    "digest": "余一：生产力和效率只是手段，人是目的",
+    "date": "2024-06-14"
+  },
+  {
+    "title": "Meta 职场西游记， 现实万花筒...",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485302&idx=1&sn=ea47874e4842ed9db0afcf8d0a93d28d&chksm=fd3a0aabca4d83bd52213ee2aef064e83cde6c80bf3dc5a7282b6fa89d4a4ab55f8ab98e4313#rd",
+    "digest": "Meta 职场西游记， 现实万花筒...",
+    "date": "2024-06-13"
+  },
+  {
+    "title": "Apple：属于每个人的 AI，在这里",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485297&idx=1&sn=771b6968ada58878de6141273870fe14&chksm=fd3a0aacca4d83ba8d6dc0a7805b2dee1403dab7d971bf77d162f24171e3877462f844c906f7#rd",
+    "digest": "苹果 WWDC 2024 发布会，最快、最全的信息，来自赛博禅心",
+    "date": "2024-06-11"
+  },
+  {
+    "title": "S3存储已迈向新高度（时间轴）",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485294&idx=1&sn=0e726b7ddfa31c7e9ac5c5d9b08fa1ab&chksm=fd3a0ab3ca4d83a54eabe63fb20b73b504198bfc28b0fefe4e738a788428f6631af5581d0013#rd",
+    "digest": "",
+    "date": "2024-06-09"
+  },
+  {
+    "title": "当 AI 活成了你的样子，而你活成了狗",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485292&idx=1&sn=b7162686d2d0e6e16570b9b91949568f&chksm=fd3a0ab1ca4d83a71e7678dd6615236742601a530d442ba5677f05d100c41b941e2b5dd5e4fd#rd",
+    "digest": "未来的某一天，我们终于可以卸下一生的重担，摘下“万物之灵”的王冠，作为并且仅仅作为一个生命，毫无负担地远去。",
+    "date": "2024-06-07"
+  },
+  {
+    "title": "阿里没有产品",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485290&idx=1&sn=88d2c8c5ef3460286ec8cfde7d405756&chksm=fd3a0ab7ca4d83a19dcf67042dcbdea5f7f2e6a6609acfc625fda68250cbc584ce2e68f08541#rd",
+    "digest": "公司就像一个动词，而用户是它的主语。",
+    "date": "2024-06-05"
+  },
+  {
+    "title": "参会有感：关于生成式 AI，重要的是认知",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485288&idx=1&sn=8da3fc6108b95cb043972e49b29dd1af&chksm=fd3a0ab5ca4d83a3d348fb1ed9fa474ff9912c9772d06bd766e5507c82837809e6b00d94bb75#rd",
+    "digest": "峰会上，听了很多关于生成式 AI 的内容，引发很多反思和疑问；智谱说他们有上千的客户在使用智谱大模型构建应用，计算机世界第一次具有了\"智慧\"；Erik 也强调，我们不能简单把大模型看成是一个工具；那大模型到底是什么？对用户有什么价值？",
+    "date": "2024-05-30"
+  },
+  {
+    "title": "Kindle 情怀和大型技术峰会交友邀约",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485281&idx=1&sn=22d9bb5e98a8151bcd87b1de7052e931&chksm=fd3a0abcca4d83aaa87c2c5ebd5a1c9b2a1a514caa56a1358cd2066bc4a269f87a989beef2e1#rd",
+    "digest": "周末折腾电子书阅读，拿起家里的 iPad 掂量了下，太重了几乎不可能随身携带和随时查阅，工作原因电脑也不离手，最新的阅读器功能多了不少，刚冲动想下单的时候，瞄到放在床头有点落灰的 Kindle Paper White，它还行吗？",
+    "date": "2024-05-24"
+  },
+  {
+    "title": "算力模式创新：亚马逊AWS比作Intel，算力界呼唤台积电和NVIDIA",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485273&idx=1&sn=cfe4592f5aa3988a32b2a99410703c97&chksm=fd3a0a84ca4d8392e74b350d75086a4dd5b66ef373b4c385bbefb30a418341ac0638677702a8#rd",
+    "digest": "",
+    "date": "2024-05-23"
+  },
+  {
+    "title": "闲话人工智能-探索归来，重申理性，踏实干活",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485271&idx=1&sn=057681552e74965f49b36bfdf64b4432&chksm=fd3a0a8aca4d839c4df32fb026de388c3f45105fe80431ca4e9ff5284c511c874825bcbbf23e#rd",
+    "digest": "“全民LLM，不存在的。一是上面说的供需关系的问题，还有就是从等价交换原则的角度来说，简单门槛低的东西，通常不值钱，独家输出需要时间精力的才是珍品。  很多东西，只有痛过了才会想办法解决。” 所以这是开始探索的阶段！",
+    "date": "2024-05-22"
+  },
+  {
+    "title": "Google AI 笔记应用 NotebookLM 新升级：支持 Gemini 1.5 Pro，分享对比 GPT-4o 使用体验",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485269&idx=1&sn=d364fb8a9b3765df4dfd190858da878c&chksm=fd3a0a88ca4d839efebbecab000c33941342aaf7b002a2e9434d6814127700c5a8381ca4b521#rd",
+    "digest": "",
+    "date": "2024-05-21"
+  },
+  {
+    "title": "突发：三年之后亚马逊 AWS CEO Adam 将交棒给Matt",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485267&idx=1&sn=6c0792e688545d44a4059d40b55a803f&chksm=fd3a0a8eca4d8398c63759bf1650305e8ef02741f619d94831c57317eec1cc466db40bacad50#rd",
+    "digest": "",
+    "date": "2024-05-15"
+  },
+  {
+    "title": "OpenAI一夜改写历史，GPT-4o干翻所有语音助手！丝滑如真人引爆全网科幻成真",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485263&idx=1&sn=aecc99cfa7c64c9730d49c5d97283e80&chksm=fd3a0a92ca4d83848e4a1dc475fb8637df9e1940e7ceede6d1e532db46304a8d267096000a8b#rd",
+    "digest": "",
+    "date": "2024-05-14"
+  },
+  {
+    "title": "删库：Google云爆破了大基金的整个云账户",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485253&idx=1&sn=e432c2f2f9aab8c43a6740b48b482af8&chksm=fd3a0a98ca4d838e459f342656dbf4f922812f23d22de28adddfd74ce4e91f272a2f103a15c0#rd",
+    "digest": "公有云“无双级”故障出现了 —— Google云删了大基金的整个云环境，连带备份一起删了个干干净净。",
+    "date": "2024-05-11"
+  },
+  {
+    "title": "生成式 AI 带飞 AWS ！？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485251&idx=1&sn=ab461ba417e18f7f9c78cec192347ed8&chksm=fd3a0a9eca4d8388baaa6463df379ae5743a26ce8a4d4371d5e1d807e627eb7565d8dc1d542b#rd",
+    "digest": "Eric Sprague 是一个资深的个人投资者，他点评亚马逊一季度报称AWS Keeps Growing With GenAI并引用埃隆·马斯克Twitter“脱帽致敬” 的消息，不免引发我的好奇，这是一个乐观观点还是有足够数据支撑的事实",
+    "date": "2024-05-10"
+  },
+  {
+    "title": "斯多葛思想系列书籍推荐（18）：李飞飞 的 《我看见的世界》The World I See",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485242&idx=1&sn=07814b0f46375bd3747fd1195c59755b&chksm=fd3a0ae7ca4d83f1b4fc89eeab63bf573726ad276f9723deaa630313a904a391855db0556a17#rd",
+    "digest": "李飞飞的《我看见的世界》描绘了她跨越物理与AI领域的学术与人生旅程，展现了一个科学家的坚持与梦想。",
+    "date": "2024-05-07"
+  },
+  {
+    "title": "AIGC周报0505 - AmazonQ + ChatGPT Memory + Vidu",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485240&idx=1&sn=a4d3193c9e17fc37288d6eb7f84b1f88&chksm=fd3a0ae5ca4d83f3d38e9f2e97413ed8186b71e7a2ad84bef34cc38ed3d71df51769140f5c74#rd",
+    "digest": "“ 你用面纱遮蔽他人的窥探，自己也难以一睹世界之真实。”欢迎阅读AI周报，一个汇集了AIGC领域最新进展和突破的专栏。",
+    "date": "2024-05-06"
+  },
+  {
+    "title": "超150万员工的“大象”亚马逊沉淀和践行的底层原则",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485238&idx=1&sn=587d73c157eb1222b9667c0adc510bf0&chksm=fd3a0aebca4d83fd35fce02084ca929205d33c62d06cd17ce18795a81ee8ca418577ece9e6d1#rd",
+    "digest": "成长心态、第一天心态都是善于思考、反思和拥抱新事物，还有发自内心的“痴迷”，拉姆·查兰使得我们重温那些以往狂热但不是很理解的底层逻辑，亚马逊的极度重视细节的管理文化，也让我们有足够的素材来认知、理解和学习！",
+    "date": "2024-05-05"
+  },
+  {
+    "title": "TikTok必须死",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485230&idx=1&sn=6d9a04431a2fe936e955c9db8a5aee72&chksm=fd3a0af3ca4d83e5df5c4f206f741ca198c1d86dfb19f8c452807c861c56b796ac4ff3bce862#rd",
+    "digest": "TikTok的原罪，在于它揭开了皇帝的新衣。",
+    "date": "2024-05-02"
+  },
+  {
+    "title": "跟大模型 Battle 代码编写和自动执行的奇幻旅程",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485227&idx=1&sn=92e225d49da37cb210f8f254692a9c3d&chksm=fd3a0af6ca4d83e01fd92c139f6970cdc22086531c5e81e546c897132fc09599bb265a75426d#rd",
+    "digest": "Python 工程师即将被终结？！",
+    "date": "2024-04-30"
+  },
+  {
+    "title": "大模型时代的芯片机遇",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485205&idx=1&sn=fee66c50c806089caac9735785a63295&chksm=fd3a0ac8ca4d83de7c285f63b7d9a87520885b21b09ccd639e6e011eb96942a413daf946d679#rd",
+    "digest": "来自mackler",
+    "date": "2024-04-27"
+  },
+  {
+    "title": "濮存昕：我是观众的考生",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485203&idx=1&sn=07b74ce6f01ad8ce0f55fff7662a5198&chksm=fd3a0aceca4d83d8bc361c53ca21240d75c75a9c5a011ec313dbcdfc83277ec72fd3b889795e#rd",
+    "digest": "“表演必须有操纵自己的生命力”",
+    "date": "2024-04-24"
+  },
+  {
+    "title": "CPU 的“庶民的胜利”",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485201&idx=1&sn=d0e85f8a699207c0737596b3313f303f&chksm=fd3a0accca4d83dadd02d9406772d4d0385da865b78fd24d06a1077110c31ae0519b81af02af#rd",
+    "digest": "中国人的“CPU焦虑”与治病良药，自由的第五代精简指令集RSIC-V，时间长河中必然可为！",
+    "date": "2024-04-21"
+  },
+  {
+    "title": "AWS的AI战略与最新进展（2篇）",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485199&idx=1&sn=1067e1e7e9c605e17e38457f3db45c2d&chksm=fd3a0ad2ca4d83c48ca3232dbda59b46ee84f673e3fc1b27d57c369da153302f1ccb2e071c93#rd",
+    "digest": "",
+    "date": "2024-04-18"
+  },
+  {
+    "title": "Amazon 是如何使用数据辅助决策的",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485197&idx=1&sn=5377ad3d5ed2fa7675337b9296e21dfa&chksm=fd3a0ad0ca4d83c6bec278e124d0a870408b0ac89c0bea52a46343e03fdb1a2ae1b7b4b36af6#rd",
+    "digest": "学习一下Amazon 是如何基于数据做决策的",
+    "date": "2024-04-16"
+  },
+  {
+    "title": "AI虚拟人｜AI原生与未来社交",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485195&idx=1&sn=4469e73a6a5bf6e34fc7d052b7f9865a&chksm=fd3a0ad6ca4d83c09a1fe21ee3c980e333909714b06a0b9874c50d918d72941a683c70ccd0a3#rd",
+    "digest": "互动与内容都将变得廉价，而“真实”却成为一种稀缺资源。",
+    "date": "2024-04-11"
+  },
+  {
+    "title": "腾讯云：颜面尽失的草台班子",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485191&idx=1&sn=1fcff923ff234e4003170505ce3c82cc&chksm=fd3a0adaca4d83cc4685f75b2a0ddae70b1093ca0c8276782b29805b39943827bf079aa75305#rd",
+    "digest": "忽悠人的状态页，撒谎的官方公告，灾难级别的公关，坐实了草台班子称号。",
+    "date": "2024-04-09"
+  },
+  {
+    "title": "建议大家体验下SunoAI，音乐界的ChatGPT",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485189&idx=1&sn=3776636e30ca4ebe485f05f03dbf0628&chksm=fd3a0ad8ca4d83ce9e4c0f6ce36fce87f71176bb2e927e5666e0e02782b030695a0495b000ec#rd",
+    "digest": "第一次提到这个是在去年七月份的AI日报那个公众号上《suno.ai：一款生成式音频AI 基础模型，能出带歌词的",
+    "date": "2024-04-07"
+  },
+  {
+    "title": "以缩促扩：亚马逊FBA升级的反向智慧",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485187&idx=1&sn=3ba592ed2a9f38a18cbaa450abac10e4&chksm=fd3a0adeca4d83c82107e3d5ddff29af325e5ed1243c4577d96799560c04c959710d8acd3d22#rd",
+    "digest": "亚马逊把美区履约网一分为八，给行业带来新的挑战",
+    "date": "2024-04-05"
+  },
+  {
+    "title": "RDMA这十年的反思1：从协议演进的视角",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485185&idx=1&sn=ee40a733a8dced5167f427076650547d&chksm=fd3a0adcca4d83ca0a7ecb646500bea51aec10d9c734e703b7e708e5bd55d5a8c6e992f6d497#rd",
+    "digest": "RoCEv2差不多十年了，十年里走了很多弯路，记录一下这段历史",
+    "date": "2024-04-04"
+  },
+  {
+    "title": "罗永浩救不了牙膏云",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485183&idx=1&sn=eea741311258ba802a399320a398c96a&chksm=fd3a0b22ca4d8234814d57ad1f7c56c39d3e958e3751144a4f1653aa25a322da626739c48551#rd",
+    "digest": "冥灯为谁而亮，丧钟为谁而鸣？直播卖云这种行为艺术有着一语成谶的潜力 —— 罗老师直播救不了公有云。",
+    "date": "2024-04-01"
+  },
+  {
+    "title": "一文搞懂Transformer架构的三种注意力机制",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485179&idx=1&sn=4981a18c755bef5f20f81250c3ea0d50&chksm=fd3a0b26ca4d82300adeb22e8589ce4f1087ad7e6d0a1ef1f22e71389e6813b390774e116fff#rd",
+    "digest": "本系列文章致力于用最简单的语言讲解Transformer架构，帮助朋友们理解它的强大力量，本文是第四篇：注意力机制， 它是Transformer的核心组件。",
+    "date": "2024-03-29"
+  },
+  {
+    "title": "你怎么看 2024 云业务增长？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485176&idx=1&sn=85474b5c39ed8f1bc86c7edc2d2ea479&chksm=fd3a0b25ca4d8233fd4a3e12bc32119672f6748abfabebe356423dec022bcf8e684922ecee9c#rd",
+    "digest": "2024年整个云行业的大环境前景如何？GenAI 是否能成为新的增长引擎？",
+    "date": "2024-03-28"
+  },
+  {
+    "title": "亚马逊八年的一点点感悟",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485168&idx=1&sn=79b01c714eed28df064e2bf6806853ef&chksm=fd3a0b2dca4d823b71483eade5d6ff5d6febf307f16870117cac4083ce4853c4c6cd782bc3c9#rd",
+    "digest": "八年了，同事换了一波又一波，不惶恐不焦虑吗？是的，贪婪和患得患失带来了这几年最大的焦虑，当重新平静，享受纯粹的学习和输出的乐趣，花更多时间走进团队走进客户，仿佛又找到入职那一天开始的心流状态。",
+    "date": "2024-03-24"
+  },
+  {
+    "title": "博通+9%，信息量挺大...",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485161&idx=1&sn=dd9b4c8ef5d883ba524d2cee5d7061a4&chksm=fd3a0b34ca4d822222a0771cadf007ded83e5f6105e045c8231759400a5b793ba7c8cd92f6f9#rd",
+    "digest": "CPO、LPO、GB200",
+    "date": "2024-03-22"
+  },
+  {
+    "title": "黄仁勋祭出Blackwell，圈出百万亿美元AI新市场，英伟达已占四个席位",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485159&idx=1&sn=4b00ce85a5c3c8d4e1d619b1ba4fec98&chksm=fd3a0b3aca4d822c12674d9932d16831f23743b4e6ab493b085b3f580430feb38668655ba76d#rd",
+    "digest": "",
+    "date": "2024-03-19"
+  },
+  {
+    "title": "智谱 AI 狂飙：与商业化博弈的一年",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485157&idx=1&sn=993cff1d3c9c26ad43d72529b25008d1&chksm=fd3a0b38ca4d822eadab62d24e075355879bac25027b98e139f635aef60056b3a6bd3252463a#rd",
+    "digest": "大模型商业化路线图正在逐渐清晰。",
+    "date": "2024-03-15"
+  },
+  {
+    "title": "Claude3 可以帮助我们自动生成架构图？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485154&idx=1&sn=74afc0bbfddcfa3f34fc16091e4d58ca&chksm=fd3a0b3fca4d8229acf3fa5182d91c160a93628f0713ddad53474be81d6c78a17769598b4cff#rd",
+    "digest": "解决方案架构师，作为业务、产品和技术方案之间的桥梁，帮助各种行业客户能够利用最合适的技术或新技术应对复杂挑战实现目标；其中架构图是架构师和客户对话、构思、设计特定需求非常重要的一个工具；那大模型能否帮我们自动化生成架构图？",
+    "date": "2024-03-13"
+  },
+  {
+    "title": "开源 | 携程 Redis On Rocks 实践，节省 2/3 Redis成本",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485140&idx=1&sn=5a8af5052dba38b0627ee83ed87aba39&chksm=fd3a0b09ca4d821f002cb6ca8666acfb3600fa727116629d0f813cf454901e5077a55affd4e5#rd",
+    "digest": "用空闲CPU换内存的成本解决方案。",
+    "date": "2024-03-11"
+  },
+  {
+    "title": "Claude3 初体验，初三家长，业余博主以及财报解读三个尝试",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485137&idx=1&sn=bf2fe26ab521903fe23b865b17b3fcab&chksm=fd3a0b0cca4d821a0f94b77788d0132843419ccee507dabbfa66403b109cef8ab37221729db9#rd",
+    "digest": "体验 Claude3 从日常活动开始，这里讲讲我用 Streamlit 和 Boto3 Python 快速构建的 Web 应用，利用 Claude3 完成作为“初三家长”，“业务技术博主”和“了解客户业务的财报解读”三个场景的体验！",
+    "date": "2024-03-10"
+  },
+  {
+    "title": "数据与广告系列三十五：召回，没有什么是一个双塔解决不了的，如果有，那就多来几个",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485125&idx=1&sn=b2e1387f6e31f79978dfa5c8987c6af4&chksm=fd3a0b18ca4d820e7f0be8a49cbb4f87fdf3b65bf0fdc67c3c2789f151283f0ff8806528d8e5#rd",
+    "digest": "广告推荐的召回，没有什么是一个双塔解决不了的，如果有，那就多来几个。当然，这是戏说，但对于召回技术来说，确实是崛起于双塔，或者说双塔技术为推荐广告的召回提供了更广阔的想象空间，但实际上召回发展的路上，却不止于双塔。",
+    "date": "2024-03-06"
+  },
+  {
+    "title": "飙涨式大反攻，SEA的春天要来了？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485123&idx=1&sn=00752f5606cc2d5003265ed69a5cbf87&chksm=fd3a0b1eca4d8208c9467f34121317d526363c382fcd5ea6b515ec70cdc20009f3e16c20d040#rd",
+    "digest": "SEA能否冬去春来？",
+    "date": "2024-03-05"
+  },
+  {
+    "title": "AI硬件暴涨的一晚",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485121&idx=1&sn=cd9afa9b1f609a1543bb6be839c09fde&chksm=fd3a0b1cca4d820a68236b7e645406ea784df46539ed0bb2247aafd223694ae5b0ae211bf878#rd",
+    "digest": "AI芯片热潮还能持续多久？",
+    "date": "2024-03-02"
+  },
+  {
+    "title": "云上多可用区部署与静态可用性考量",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485119&idx=1&sn=8383f13f9a171b2113275375c0f28744&chksm=fd3a0b62ca4d82741950a940f53c65eed1bdc6321ac62e0209578a88c8e68df701bb70c18132#rd",
+    "digest": "从 IDC 到公有云，一个简单实用增强韧性的做法是将业务系统部署到多个可用区，但以可用区为基本隔离单元的多可用区架构实现静态高可用是最实用的方法提升云上应用的可靠性",
+    "date": "2024-02-29"
+  },
+  {
+    "title": "肖磊：苹果放弃造车的真正原因和未来选择",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485106&idx=1&sn=dc6af1de1457ce7626ef5c40c7bd1c53&chksm=fd3a0b6fca4d82799a86b5bf5d3b05af2ab3255c2d2bdca92161f966271fe1a4b018de0b5cbe#rd",
+    "digest": "中国电动汽车市场会受到影响吗？",
+    "date": "2024-02-29"
+  },
+  {
+    "title": "Sora和Stable Diffusion 3背后的DiT技术",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485104&idx=1&sn=867aa6844a8a5fcefb79f462bbb89c98&chksm=fd3a0b6dca4d827b7f167ada56b05bacfec85e1432d8dfcec01fc17da8a932fb7c5b54b8756b#rd",
+    "digest": "Sora的创新与潜在应用大家已经讨论得挺充分了，我补充一些技术沿革和产品思路的理解吧。",
+    "date": "2024-02-26"
+  },
+  {
+    "title": "垂直行业押注 GenAI 驱动的新搜索,Amazon.com 电商 Rufus,Booking Trip.com 旅行规划",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485102&idx=1&sn=3b2b91421bbf6ada4ed23827b3416556&chksm=fd3a0b73ca4d82655cdf5e3a9fa354ed74ba79270cf9d28928a81f09e9b6ee7cfa14949a3cd4#rd",
+    "digest": "月初亚马逊电商发布新的会话式智能购物助手 Rufus 再次将大家目光吸引到垂直行业对于生成式的采用和落地",
+    "date": "2024-02-23"
+  },
+  {
+    "title": "当流计算邂逅数据湖：Paimon 的前生今世",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485084&idx=1&sn=fc846eafbfb660e5f36fb83aed2189c5&chksm=fd3a0b41ca4d8257c8c403dc3fb72723332de62e7d3b7a38a3fd7358c85439fe55740b0f4c4e#rd",
+    "digest": "一直在分布式计算与存储的领域工作，也参与了多个开源项目，希望通过笔者以下的经历，回顾流计算一步一步扩大场景的过程，并引出 Apache Paimon 的前生今世。",
+    "date": "2024-02-21"
+  },
+  {
+    "title": "HN 千赞热贴｜创业 4 年，那些狠狠打我脸的技术选型",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485082&idx=1&sn=a9afb7af97921f3854a9010738e6ebea&chksm=fd3a0b47ca4d8251b5eaf63500ea7e7f96e9b1499c07712726e3376c822a0b29c4f23b32f717#rd",
+    "digest": "复盘几乎每一个基础设施选型的得失 🧐",
+    "date": "2024-02-19"
+  },
+  {
+    "title": "美团为什么难出海？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485078&idx=1&sn=4d29d213a8456060e17f0994c543994e&chksm=fd3a0b4bca4d825dbd0836bd4d6586a9e8e8714d110e1981d85c23c5bc1821b4ff0665bcad03#rd",
+    "digest": "",
+    "date": "2024-02-18"
+  },
+  {
+    "title": "OpenAI 大杀四方，Sora 彻底革了视频的命",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485076&idx=1&sn=9509cbefcdda4b4930ae8e50d8fc7532&chksm=fd3a0b49ca4d825f40f665bbd88e7bb7fa63b5f1b044b9c858da24da81daad47e06b94700baa#rd",
+    "digest": "再一次刷新认知！",
+    "date": "2024-02-17"
+  },
+  {
+    "title": "感谢有你㊗️龙年大吉！",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485074&idx=1&sn=feb7fe086dc8643884a98b1d0d8b55c5&chksm=fd3a0b4fca4d8259223ed16fb3021334a731c7ea96670a579fc00ce7be9b7fc30bc203a49e0c#rd",
+    "digest": "新年钟声即将敲响之际，\n\n感谢大家过去一年的陪伴，点赞和转发！\n\n祝大家除夕快乐，吉祥如意！\n\n愿2024，云起龙骧，龙马精神，好运长龙！",
+    "date": "2024-02-09"
+  },
+  {
+    "title": "用一张图理解所有的AI Native产品（下篇）",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485060&idx=1&sn=32d28e67637dae97ad08a1f8775e5cb6&chksm=fd3a0b59ca4d824f0e1da7cb3b34f7127d257f1212c18b2568e94433425e9ae2a872a11d9bd0#rd",
+    "digest": "上篇发出之后，收到了较多朋友的反馈和喜欢，这一篇较上一篇我认为更成熟。主要讲AI情感伴侣类和AI知识解答类的产品我们可以采取的产品设计和技术，希望对大家有帮助。",
+    "date": "2024-02-07"
+  },
+  {
+    "title": "密集王炸，涨得太嗨了…",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485058&idx=1&sn=3fc5feded3fbe4e8292286937d9ccfbb&chksm=fd3a0b5fca4d824977734c24a3e331d7dc5eb5f7f3173725cc0eb50ae59cadc59f9a16195d08#rd",
+    "digest": "今天的大A值得纪念下，最坏的情况已经过去？！",
+    "date": "2024-02-06"
+  },
+  {
+    "title": "一文入门 GenAI 时代的应用构建之路",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485052&idx=1&sn=c276c4f8384126fa03a30f053e8394d7&chksm=fd3a0ba1ca4d82b73c3ee28e088b87d12527afa1e4c8a326e7240f55666357167589f5dea17f#rd",
+    "digest": "GenAI 的出现点燃了Builder 新的构建热情，面对快速发展的社区，创业公司，新的名词不断涌现，开发人员如何开启 GenAI 应用之路呢？",
+    "date": "2024-02-04"
+  },
+  {
+    "title": "字节4号元老做了个女装独立站，老东家牵头投资",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485040&idx=1&sn=e6e7aace4946bb9d498973e99a785ffa&chksm=fd3a0badca4d82bbf951ff1e004127cfc43a481b960e54dae86f712ab4f9f5f73975898d2667#rd",
+    "digest": "快时尚是美好生活的载体，永恒的出海赛道！",
+    "date": "2024-02-02"
+  },
+  {
+    "title": "从良好的愿望到组织最佳实践",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485038&idx=1&sn=0ea9cb9f3e25578dea05eb7a67d28381&chksm=fd3a0bb3ca4d82a50071b399d39baac7539662011ec1161a793867d7d551defaa8dd733eb4b5#rd",
+    "digest": "如何从故障或事故中学习，沉淀成组织的最佳实践，光有良好的愿望是不够的，而根因分析（COE）机制只能帮助发生事故的工作负载避免再次发生类似的事件，但并不能促进更大组织的共享，帮助其他服务从该故障中学习和反思，实现更短、更少和更小事故目标",
+    "date": "2024-01-27"
+  },
+  {
+    "title": "薛以致用定制红包封面免费发放",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485026&idx=1&sn=d2b54f7bd3b4ef81fb5d616823c5e734&chksm=fd3a0bbfca4d82a97e588e335c4f5b4b1024ef2de134a8033044fd38585148332fff10da5ba6#rd",
+    "digest": "以前过年都在抢别人分享的微信红包封面，今年刚好利用学到的文生文和文生图方法，定制一个特别的红包封面回馈给大家！",
+    "date": "2024-01-26"
+  },
+  {
+    "title": "那么，我是如何使用 ChatGPT 的？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485014&idx=1&sn=9c414d9cb2ff3fe65385688b76692b67&chksm=fd3a0b8bca4d829d71223c5d9f319b4de0c9009b698c252df84c8b5475ff682cc3aa19876bb9#rd",
+    "digest": "作为产品经理，我是如何通过 ChatGPT 写代码并登上 GitHub 全球热榜的？",
+    "date": "2024-01-25"
+  },
+  {
+    "title": "做大模型AI应用一定要了解的成本计算公式",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485012&idx=1&sn=dd217f1449ac2a3dc15b0d300d5b1555&chksm=fd3a0b89ca4d829fa1b3b6c35b03c04f772198363e365aa783caa7b73af235ff4e887af17b71#rd",
+    "digest": "Sam Altman昨天和Bill Gates的访谈中提到未来5-10年，技术会陡峭上升，成本也在飞快下降。成本能下降多少，现在的成本又有多高？本篇就来聊一下。顺便也帮OpenAI算算看需要多少用量，多少用户才能收回成本。",
+    "date": "2024-01-23"
+  },
+  {
+    "title": "从GPT-5是什么说起",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485010&idx=1&sn=96581a12b09ce24a490288d745c30614&chksm=fd3a0b8fca4d8299cba6a8e69eed813d307fc51f2306b6985f1dabd7bf54c41def211d4ecea0#rd",
+    "digest": "",
+    "date": "2024-01-21"
+  },
+  {
+    "title": "“反俭约”架构，可靠先行",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247485008&idx=1&sn=82f9bc41cce2787fbfca1439402f8d3f&chksm=fd3a0b8dca4d829b63b0ac1dd769854e64d55ae2f8937ae10290d7c216f290742e1ac36dfde7#rd",
+    "digest": "反“俭约”模式，可靠性优先的一种设计，系统追求恒定工作模式，将简单的事情重复做，没有双模态或者多模态行为，厌恶跟随波动的工作负载扩缩容，而且还具备自我修复和反脆弱特性，因此，特别适合极高可用的系统架构设计；",
+    "date": "2024-01-20"
+  },
+  {
+    "title": "消减 90% 以上流量成本是真的吗？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484997&idx=1&sn=c71db217d1bd4cd7aaa57a376e41ce3f&chksm=fd3a0b98ca4d828e00d4cca8dbd59ae21e3fb0376da1ded771b9708a150954a014fa8248133e#rd",
+    "digest": "数据流量费用，主要因素取决于数据来自哪，到哪去，以及数据量，降低流量成本不在于夸张吸引人的标题，而是商务和技术手段并行，实现匹配业务的俭约流量架构",
+    "date": "2024-01-19"
+  },
+  {
+    "title": "IT降本50%还贼稳！货拉拉百万订单规模系统的技术治理实践",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484986&idx=1&sn=fdb09d47a3c55ff1882b1093a9658cae&chksm=fd3a0be7ca4d82f16fea9a5b6a38b17a0cf5f9c37f5aee5b4af73da1f490702a543f37265c18#rd",
+    "digest": "货拉拉每单单位成本降低乐50%，同时守住了系统稳定性底线，值得推荐，架构逐步演进同时，支撑业务高速发展，单位业务成本下降的正反馈之路！",
+    "date": "2024-01-16"
+  },
+  {
+    "title": "缓存架构带来的甜与苦",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484984&idx=1&sn=12de489a738d17b986f5b2931f37f5ab&chksm=fd3a0be5ca4d82f3288adb07e44bf0ef0064ab178fb92e554d25586b7b25b1796f3a82d95440#rd",
+    "digest": "现实中存在“缓存上瘾”的状况，缓存已经从一个有益的补充不经意间升级成为系统能够运行所必需和关键的部分。 这一问题的核心在于缓存引入的新的模式行为，根据某个数据或对象是否被缓存（命中率），其行为有所不同，这种多模态行为的意外可能导致灾难。",
+    "date": "2024-01-14"
+  },
+  {
+    "title": "架构师眼中的拉美电商王者 Mercado Libre 财报",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484977&idx=1&sn=e83301bbbb431947ddf1c560d9e23fc8&chksm=fd3a0becca4d82fa0ad3c300b0b5575ca7657a5d3b01f962d14d9aa5a3f3bb7e0fff4b3dcde2#rd",
+    "digest": "美客多是南美领先的电商和支付平台，通过它的2022年财报，我们通过商业画布分析其业务情况，更可以利用财报数据，估算下云平台成本对应于业务核心指标的单位成本，从而更深一层走进客户，帮助客户利用新技术进行创新！",
+    "date": "2024-01-10"
+  },
+  {
+    "title": "请系好安全带，将系统成本跟业务保持一致",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484965&idx=1&sn=6c4692169f5ce837e8b4e987bad89e7d&chksm=fd3a0bf8ca4d82eeb3ea816944e0a8e2ce219d65eb3aedd47e2d72e5dda68b68b20a9812132a#rd",
+    "digest": "随着云计算的普及企业用户对成本的关注日益增加，但盲目压缩成本常使系统稳定性下降，破坏用户体验，关键在于系统成本通过业务单位指标来衡量，将晦涩难懂的系统开销通过财务和业务能理解的语言进行沟通，成本投入是业务来决定优先级和方向；",
+    "date": "2024-01-07"
+  },
+  {
+    "title": "俭约架构之进阶的成本度量和FinOps框架",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484956&idx=1&sn=d3068ecc194f365b91205a4f3c8cd13c&chksm=fd3a0bc1ca4d82d72fc4743ce115169582784f9be250f7c82cf5212733fec12d3a2840954c83#rd",
+    "digest": "俭约架构是所有用户的共同追求，但七条黄金法则落地的过程需要多团队的协作，倡导 FinOps 和数据驱动的文化，以及团队建设培训等前期的投入，我们聚焦在俭约架构的成本可观测性和优化两方面，引入FinOps和CFM基本概念和一些学习资源",
+    "date": "2024-01-04"
+  },
+  {
+    "title": "物理时间在 Google Spanner 与 Amazon DynamoDB 事务实现上差异",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484944&idx=1&sn=b229bcc2ac1633e5d6b933064f75fd60&chksm=fd3a0bcdca4d82db9573a77060eafb6182a9b5499ebbbb8b5e745344294382b2077e9249582d#rd",
+    "digest": "Google Spanner 和 Amazon DynamoDB 都采用了高精度的时钟同步服务来实现事务强一致性，但从公开论文来看两者的设计思路和实现差异很大Spanner 看起来比 DynamoDB 要复杂很多，它们各自作了哪些权衡和考量",
+    "date": "2024-01-01"
+  },
+  {
+    "title": "告别2023：墒增加剧，保持就不易",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484936&idx=1&sn=a76f11ac4f2cd7f90134d6339654a391&chksm=fd3a0bd5ca4d82c3e9239df09e47b765e1a214a0f9f99896350f4f2a8225229dd45c841fd2d9#rd",
+    "digest": "2023年是疫情后时代第一年，憧憬着生活能很快恢复到疫情前，但世界依然混乱，期望的普遍增长没有看到，反而更加挑战，跟 2023 来个告别，挥挥手，不带一丝迟疑走进2024.",
+    "date": "2023-12-31"
+  },
+  {
+    "title": "亚马逊工程师如何将现有超大规模 NoSQL 数据库改造支持大规模分布式事务？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484923&idx=1&sn=40d7c6f6cc67cc2d0a2290fc52de4867&chksm=fd3a0826ca4d81306594a26903660454a26c641eb0d802780536bebd81fa95727b5cfa0eb1ef#rd",
+    "digest": "根据客户需求，将一个大规模的 NoSQL 数据库 DynamoDB 改造支持分布式事务，简化事务相关的开发者复杂度，相信任何一个团队都会压力山大，如果是你，你将如何改造这个具有数十个核心微服务，大规模被客户采用的分布式系统？",
+    "date": "2023-12-29"
+  },
+  {
+    "title": "被忽略的云厂商首个微秒级 µs 精度的时钟同步服务？！（上）",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484908&idx=1&sn=3c80ee91c23bfcd8211d12ee2963e67f&chksm=fd3a0831ca4d81278827e454424cdad6fc6afe80a1c442aed7fd25910b03e901b78d02c7072a#rd",
+    "digest": "微秒级时钟同步服务是分布式系统的重要基石,但常被我们忽略，它使分布式系统中的各节点达到高精度的时钟同步，防止因时间偏差导致的各种问题。本文将为您深入解析微秒级时钟同步的原理、应用场景和挑战以及它如何成为云计算的新基石",
+    "date": "2023-12-24"
+  },
+  {
+    "title": "克伯勒-罗斯曲线帮助个人和组织更好管理变革",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484896&idx=1&sn=86864b908d50bb5e1cdbb0d6d032b9cd&chksm=fd3a083dca4d812ba8d2ca723812c877f871391477e584d34ea14d33bc1466f2f608ca361c10#rd",
+    "digest": "处于现代职场的打工人和管理者，正在经历前所未有的不确定性变革，而变革的过程中，受影响的组织和个人都在经历一个全新的挑战，用亚麻的话说，要保持永远第一天的心态，但真的那么容易吗？",
+    "date": "2023-12-23"
+  },
+  {
+    "title": "1 on 1 和反馈管理",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484888&idx=1&sn=32220eaa2083bf3e1322f56a6f28f545&chksm=fd3a0805ca4d8113cac466be5216cd826ffcc6fb93f119bb1fbe31318ff76441aedc36d795c5#rd",
+    "digest": "统计发现纯管理者的比例只占2.7%，如今的管理者逐渐向复合型管理者靠拢，尤其在销售部门，管理者需要完成的业绩任务比普通下属都要高，与其说是复合型管理者，不如说是管理型员工",
+    "date": "2023-12-21"
+  },
+  {
+    "title": "亚马逊 CTO 12年 re:Invent 架构课",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484880&idx=1&sn=8ead16fe4516b7089abfbdcd62923365&chksm=fd3a080dca4d811b95a34c1e9dab1d6c68d3640084a051da66b6940ea313b7228806186dbbb6#rd",
+    "digest": "2023年亚马逊 CTO Werner Vogels的主题演讲中，“俭约架构” 的七条黄金法则，引发广泛学习，作为一个架构师，跟随好奇心捋一捋 Werner 这12年大会中讲过的那些经典架构课",
+    "date": "2023-12-10"
+  },
+  {
+    "title": "勤俭节约架构-业务为先，可度量，持续行动",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484868&idx=1&sn=8f49404ebda7949c57db5577590a923b&chksm=fd3a0819ca4d810f979b7f77252c3a70ed2593a86b56221c92f80ab11bcd106ce6cf2607aeb3#rd",
+    "digest": "#re:Invent2023# 将成本从优良架构六项原则独立出来，避免大家走弯路，期待大家一起探索更多结合业务，产研，运维，SRE，FinOps团队一起落地节约型架构！",
+    "date": "2023-12-01"
+  },
+  {
+    "title": "震惊！一个月两次全球区域级别故障，是时候回归云服务健壮性顶层设计",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484864&idx=1&sn=eff45c8b4f020df3386a4f524b7b629e&chksm=fd3a081dca4d810b46c9e5ae3ca9ab7f31c1262f57a322c914e3035f8a5be41a420da5057bd1#rd",
+    "digest": "11月12日和27日，阿里云发生两起蔓延全球多个区域的故障，引发广泛关注和讨论，是时候回顾下云服务的顶层设计和故障隔离原则；",
+    "date": "2023-11-30"
+  },
+  {
+    "title": "《学习型管理》读后感",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484853&idx=1&sn=16a9fcbbf1216acc890906d7c227a450&chksm=fd3a0868ca4d817e0cf6f080bcf5ec3f8f4bd7ba435418dd8c1b7680e9bfe720cdf9f54e058a#rd",
+    "digest": "",
+    "date": "2023-01-25"
+  },
+  {
+    "title": "又一年，观自在，放下和走入2023",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484849&idx=1&sn=65c01b2dc7cf2910df2e7edfb8c87c2d&chksm=fd3a086cca4d817a6386c5d8a90b0b210601406c7e2a2cbdd79def2418ae3de7ffa3a4dcca14#rd",
+    "digest": "声明：本文仅代表个人观点，跟公司无关2022年最后一天，恰逢周末，沐浴着阳光，看着相册，打开回忆；2023年",
+    "date": "2022-12-31"
+  },
+  {
+    "title": "有你感兴趣的云服务创新吗？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484831&idx=1&sn=0a25a28ac1d9c0adf006588cf852b4e5&chksm=fd3a0842ca4d81543a1adb68a6efd56fe5cf0b11b4ffaa126b0fa786fe7f4bcaa8f50832fafe#rd",
+    "digest": "最近是学习了解亚马逊云计算re:Invent 2022年度技术风向标的最好窗口，抱着技术爱好者那点好奇，既然大家都用云了，有哪些值得大家关注的新功能或服务呢？我想每个人都有自己的答案，我跟大家分享下我关注到到几个云基础设施的创新，你怎么看？",
+    "date": "2022-12-19"
+  },
+  {
+    "title": "2023+ 五大技术趋势预言",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484819&idx=1&sn=d2c7a3a47e7b2251a1104cb335ad09cb&chksm=fd3a084eca4d8158ca04d044d49dfaeed7b32050a20af5270ff12e2ae29407a2562ad940adac#rd",
+    "digest": "re:Invent 2022 正在如火如荼的进行中，新的特性和云服务令人眼花缭乱，有没有来自未来的双眼能够指引我们该把时间花在什么方向？！一起围观亚马逊 CTO Werner 博士和2022 红杉中国 CEO 峰会碰撞的五个预测！",
+    "date": "2022-12-02"
+  },
+  {
+    "title": "EFA和eRDMA网卡两个产品引发对SRD和RoCE的好奇（长文慎入！）",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484804&idx=1&sn=f4fa3c1196fda27d3d9709da78bfda0f&chksm=fd3a0859ca4d814fdc0a7ce500f0a11bbaf152ee037dcb2c41e335ed1e3bd6596a09e75f86cb#rd",
+    "digest": "一直被RDMA Infiniband SRD, RoCE 各种技术词汇困扰着，随着 EFA IO2BX以及eRDMA卡的发布，有必要厘清这些概念以及在产品侧的应用情况，没想到这个坑挖的有点大，查了很多资料输出8千多字，也欢迎大家一起来探讨。",
+    "date": "2022-01-09"
+  },
+  {
+    "title": "云主机访问互联网带宽上限就这样静悄悄提升到 50Gbps？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484776&idx=1&sn=d7c64e7215d4a2c545f298076b07ced6&chksm=fd3a08b5ca4d81a3aa288d5dc4a14517d9a69f0831c7113adf75d589038b746a9f58c5893d94#rd",
+    "digest": "今年 re:Invent David Brown 在网络部分，毫不起眼的地方宣布，EC2 实例访问互联网带宽从原本的 5Gbps 限制提升了 10倍，最高可以到 50Gbps ，很颠覆，赶紧查找了最新的文档更新下自己对于虚机网络的认知",
+    "date": "2021-12-13"
+  },
+  {
+    "title": "S3 CLI深度解析及性能测试",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484764&idx=1&sn=0fd295401b3fc1fdc08a95319eba2da8&chksm=fd3a0881ca4d819751ca3154e3c5d26c58dfe983907b147166ffcbdade3e4ec591d9c5097d7b#rd",
+    "digest": "一篇 2019年的旧文，网友反馈 404 了，重新放在这里供大家参考，时间有点久，大家最好基于最新的CLI版测试最新的结果",
+    "date": "2021-12-08"
+  },
+  {
+    "title": "从数据感受云计算15年技术的变化和趋势",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484731&idx=1&sn=c0463a1d8eeb786bc1cec2d730183b2a&chksm=fd3a08e6ca4d81f05162e135d40f096525e6f3e6ed83ab9f8773efb45465213ec3bba219e9d5#rd",
+    "digest": "大会十周年，我的五周年，第一篇2021 re:Invent 感受，关键词：无所不在以及规模",
+    "date": "2021-12-05"
+  },
+  {
+    "title": "DTC 品牌直接连接消费者",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484712&idx=1&sn=dd2bbe5d32b8cb2e0f3588586e61c0a5&chksm=fd3a08f5ca4d81e348af731521bff559d5568dd504484aee966797dca928a66f39fe2f4a7631#rd",
+    "digest": "今年跟国内DTC品牌有更多的互动，从原来认知的快消品比如Anker小米到更多业务领域的创新，比如超快时尚、眼镜、黑人时尚，母婴，家具，智能家居等等，很好奇驱动这些创业者从零开始构建一个 DTC 品牌的背后，是怎么样的思考和如何赢得消费者？",
+    "date": "2021-10-24"
+  },
+  {
+    "title": "CDN 内容分发和加速网络（一）",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484701&idx=1&sn=0e06266c5672c7a25f9ac1af349078d5&chksm=fd3a08c0ca4d81d6c6a98605811a65580ca76a033a7a536426620c35ccca4d3e9cfa19f5838b#rd",
+    "digest": "今年碰到非常多的 CDN 需求的客户，原本以为这方面积累已经非常成熟，不曾想网络技术以及全球基础设施发展也是",
+    "date": "2021-10-07"
+  },
+  {
+    "title": "Amazon PrimeDay 大促背后的 AWS 技术和服务启示",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484690&idx=1&sn=9ef8c8319167ed6531ba48b5dd766f4e&chksm=fd3a08cfca4d81d9208cf39ca9411525159cae284d31f433ee209593ceeba71c18d7041744bc#rd",
+    "digest": "很多客户都很好奇，亚马逊电商采用了哪些 AWS 服务？今天我们来解读下 Jeff Barr 的 Prime Day 系列博文；AWS 作为亚马逊电商的技术基础设施，支持电商大促期间需要保证电商每个模块都是经过充分测试，确保可扩展并.....",
+    "date": "2021-07-11"
+  },
+  {
+    "title": "2年：别了Amazon——一个工程师在Amazon两年的感悟",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484682&idx=1&sn=2e779db28034992376ff2e34bd56b0b7&chksm=fd3a08d7ca4d81c10e1a072ad1a7dd8f06190a730b5966f4dfd0d18f52ff75b1181278e936ee#rd",
+    "digest": "亚马逊两年的工程师感悟",
+    "date": "2021-07-10"
+  },
+  {
+    "title": "4年：侥幸进了亚马逊，这四年里我是如何存活下来，并从吊车尾成长为顶梁柱的",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484682&idx=2&sn=e93377a5edc9e1dd2fa4b61621c2745e&chksm=fd3a08d7ca4d81c1830a92c62da3d253ccea1cf9b2b44ee1e531534419b7e09caec8608a58f4#rd",
+    "digest": "看看 4年亚马逊 SDE 如何求生存到发展再到转换角色做自己喜欢做的事情。",
+    "date": "2021-07-10"
+  },
+  {
+    "title": "5年： Amazon 李沐 - 工作五年反思",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484682&idx=3&sn=6796ad910b1bd22aa1cc9eb0a6a1674b&chksm=fd3a08d7ca4d81c144f5d38b48783ac1c6b238035d4a936361ba7ac627fcc3187239459c2c0c#rd",
+    "digest": "五年亚马逊首席科学家李沐大神的总结感想",
+    "date": "2021-07-10"
+  },
+  {
+    "title": "沃纳博士解读 Amazon S3 强一致性技术实现",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484672&idx=1&sn=a8ba9b97ce5a2fc6032eea37faec7df7&chksm=fd3a08ddca4d81cbc2ee5907d09438bc05ac5fe1fc9e05113be5dc41a5a4ee22bd425c4e3cad#rd",
+    "digest": "通常，提供强一致性，而不会给客户带来额外费用，而且高性能是一个巨大的挑战；S3 利用超过 15 年在数百万客户中大规模运营云存储的经验来创新其他任何地方都无法使用的功能，我们能够以对客户透明的方式做到这一点，并坚持 S3 的核心价值观",
+    "date": "2021-05-06"
+  },
+  {
+    "title": "黄一孟致股东信;亚马逊发布2021年Q1财报;RTE声网以及他们的客户们;Cloudfront Functions正式发布",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484666&idx=1&sn=dc7d3d93e680a7f4f221600a6bf23274&chksm=fd3a0927ca4d8031ed609e851633b939dfa2cc84ef1bfd71e91dd2916e377ecc2f594cd148d4#rd",
+    "digest": "​节前，黄一孟在心动上市第一个财年发表致股东信；美股大型科技公司发布了不错的Q1季度报，重点看亚马逊；声网Agora除了Clubhouse 还有哪些你不知道的客户群体；五一假期AWS 发布的 Cloudfront Functions 功能",
+    "date": "2021-05-04"
+  },
+  {
+    "title": "干货 | 如何构建系统优化成本，携程出海云原生实践",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=100000990&idx=1&sn=a5051854d52749860b70d35cc4117145&chksm=7d3a09034a4d8015c2bcfe475ed915e97a3780752ca1a288dce49854fdef4a349f8824f30d19#rd",
+    "digest": "云原生说的再多都不如一次真实的实践来的痛快，携程团队采用云原生的容器平台，竞价实例，弹性扩展以及Thanos和S3构建高可用，可伸缩，成本对齐数据中心的干货分享。",
+    "date": "2021-03-10"
+  },
+  {
+    "title": "飞蓬各自远，且尽手中杯",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484637&idx=1&sn=f9112d95d082009c5e51cecee30b225b&chksm=fd3a0900ca4d801697335e68cd01d4607d72cfac3316bef77e8767bf8cae8425bcc3dce27322#rd",
+    "digest": "飞蓬各自远，且尽手中杯！时间越久，职场上的人来人往越难以激起内心的波澜，这是一种麻木还是成熟？遇到人生关卡，坚定的全力以赴，享受过程，持续学习，保持长期的战斗力。",
+    "date": "2021-03-03"
+  },
+  {
+    "title": "私房菜-2021云技术趋势",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484629&idx=1&sn=bebb620cf07fdc1f1f305f282e72ed3b&chksm=fd3a0908ca4d801efd5af590360c2813b670092d93e65db5df564b2f3f62634713c56d8902bd#rd",
+    "digest": "发现深度的技术解读有时不太适合“消遣式”的友圈好奇心，大家对技术趋势反而更愿意津津乐道，虽然预测通常不靠谱，作为一个从事云计算行业近 5 年之久的一线战士，也跟大家聊一聊云计算的技术趋势，权当饭后消遣谈资！",
+    "date": "2021-01-10"
+  },
+  {
+    "title": "走进2021: 从 2019.03 到 2020.12.31",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484624&idx=1&sn=5099b0211cd2a9715e82e60214f5fc80&chksm=fd3a090dca4d801b1679358c38491ec7c25de05eb31594611fc46895804cc5f7a6064206c367#rd",
+    "digest": "“持续”一项运动或习惯，需要消耗大量的能量，但这个过程非常值得，因为内心认可，才能坚持，2021 继续爱上​更多长期可持续这件事本身。​",
+    "date": "2021-01-04"
+  },
+  {
+    "title": "兴奋：AWS Lambda 支持容器镜像初体验",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484619&idx=1&sn=6ea73c244dc43ef49f39e6b69260d13b&chksm=fd3a0916ca4d8000ff2ac653a720351983460802aca4d455d947fea5a8a1324575a6d8151ff4#rd",
+    "digest": "AWS Lambda 支持自定义容器镜像，更多的资源支持，完整的开发语言和官方容器环境等等，我感觉函数计算从早期采用，逐渐走向成熟，必定会成为云原生应用的一个潮流",
+    "date": "2020-12-13"
+  },
+  {
+    "title": "云原生应用的开发和部署：从 Mahjong 到 AWS Proton 再到 OAM",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484612&idx=1&sn=0ffb2455abaa4ef06bbe1c53bddcd661&chksm=fd3a0919ca4d800f4a43bce3668f6bf1d680e9921e55a0a51c021b7f641552372dda3e2fa8ad#rd",
+    "digest": "在云原生时代，开发者和运维人员的体验需要借助于工具进一步抽象和简化大规模微服务的开发和部署运维工作",
+    "date": "2020-12-06"
+  },
+  {
+    "title": "当对象存储“湖”有了强一致性",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484601&idx=1&sn=e9530f887099eb2e39b97a4336fa8074&chksm=fd3a0964ca4d8072dce8a13dc7cc1edda33523961068239a04ea453d8b0fda48cfb9443ff6fb#rd",
+    "digest": "虽然市场上，很多云服务玩家都已经支持对象存储的强一致性，但作为对象存储事实标准的 S3 上的实现是一个标志性事件，S3 这个更新建立在不牺牲性能，可用性，无额外成本的基础之上，对象存储服务是云时代的开拓者，也是面向未来数据和智能时代的基石",
+    "date": "2020-12-03"
+  },
+  {
+    "title": "职场梯子怎么爬？听听原阿里P9大神的总结",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484595&idx=1&sn=da6b71919a25b38639c1933b5ceb367d&chksm=fd3a096eca4d8078962a17a0fdbc70dfc51c78ef0a2eb3cd9c0d32379d2126162d2a3bea1742#rd",
+    "digest": "晋升也有方法论，听听原阿里P9大神的总结，涵盖”理解晋升→准备晋升→参与晋升→获得晋升\"这条完整的晋升链条，开卷有益",
+    "date": "2020-11-26"
+  },
+  {
+    "title": "“持续”和“混沌工程”嫁接的火花",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484585&idx=1&sn=c089369112a8acf9bb490b0b573fed07&chksm=fd3a0974ca4d8062f92749b42c8920af8f57e4148b7318575a475ddc1e34d877a72081dd4168#rd",
+    "digest": "​故障或失败总是那么令人沮丧，但混沌工程的出现，让大家对于故障的认知更趋于客观，混沌实践更是提供了一套理论和方法，让团队把故障和失败通过实验，游戏日，形成一种减少故障影响的实践，期待更多的国内开发者和客户关注和实践混沌工程",
+    "date": "2020-11-22"
+  },
+  {
+    "title": "福利 | 周志明从程序员到技术架构师的十余年心法分享",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484574&idx=1&sn=01e353bb6b4ff183fd00a5792c111e62&chksm=fd3a0943ca4d8055126e9ee7319856e7f7d6a09046e81f5bd2eeece4cd8efa9e66e3dba3a602#rd",
+    "digest": "作为一名软件架构师，在做软件研发、架构设计的时候，你遇到的最困难的问题是什么？是要具体解决系统的某个缺陷，还是要提升某段代码的运行性能？本文福利免费领取周志明“如何构建一个可靠的分布式系统”十年经验总结。",
+    "date": "2020-11-22"
+  },
+  {
+    "title": "付费用户抽奖结果公布",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484561&idx=1&sn=5bfa78dcaca905b7936e150de2e65bda&chksm=fd3a094cca4d805a4b6ba6e4f19d65b52eef28aba8a34e52951365f8e60417da6609ca0bc500#rd",
+    "digest": "《第三选择》是作者既《高效能人士的七个习惯》之后的巅峰之作，类似于有限游戏之胜利或失败，第三选择更接近无限游戏中心思想，让游戏一直继续下去，鼓励大家摒弃二维的成功或失败，支持或反对，我赢或你赢的思维模式，打造一个创造性协同",
+    "date": "2020-11-08"
+  },
+  {
+    "title": "从 700+亿美金市值的 Snowflake 看云数据仓库",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484555&idx=1&sn=1d4d23ece674e78a49dda8dd685c438e&chksm=fd3a0956ca4d8040a09900d50c0696699afeadb4ae30af24ec3b0449ae016699c1f449491609#rd",
+    "digest": "朋友圈很多人关心并发来疑问，Snowflake 如此优秀，Redshift如何应对？本文聚焦 Snowflake 引发的大家对云原生数据仓库的好奇，大家看完能有自己的答案。",
+    "date": "2020-10-26"
+  },
+  {
+    "title": "云数仓哪家强，Benchmark 来帮忙？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484554&idx=1&sn=5ef52183a0f16ae196fda8e3147df09d&chksm=fd3a0957ca4d8041ab23dd0cd8cd0f879005ec90d9b97139ea8bcb1e7340b21065dd74fc1f9a#rd",
+    "digest": "当客户不知道该如何选择某一款云原生数据仓库解决方案时，IT 部门总倾向于 “比武招亲”，利用公开的 OLAP 性能测试方法（比如 TPC-H，TPC-DS等）来评估众多选项，那数仓的性能测试能真正帮我们找到合适的数仓解决方案吗？",
+    "date": "2020-10-25"
+  },
+  {
+    "title": "边缘TCP优化魔法加速游戏视频用户全球访问",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484534&idx=1&sn=5b128c3d433772babb7f566d002b31ad&chksm=fd3a09abca4d80bd2b64a3e005bab2877e45deb38d81a7482a466c96fcc365a28a8cf545a20f#rd",
+    "digest": "作为一名老司机很容易把 AGA 的动态加速原理联想等同 Cloudfront产品的实现，因为他们都是基于边缘节点的服务，但一个游戏客户反馈的一个奇怪的测试现象，引发了团队的好奇和不少争论，感谢队友的死扣，让我有机会学习到一个新知识",
+    "date": "2020-10-16"
+  },
+  {
+    "title": "在 AWS EMR 上使用 Spark 访问关系数据库",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484519&idx=1&sn=291edc22da5af75a53cd5a42174bcc94&chksm=fd3a09baca4d80ac64377c23a393650dfc37c1e552ba7e052ff35fdb8cbeecb321cb04d8debb#rd",
+    "digest": "Twilio 团队分享了利用 Spark 将每天数成百上千万的 API 调用记录从 MySQL 同步到数据湖的一个想法，勾起我心底Spark 的好奇，JDBC Spark是一个什么样的体验呢？",
+    "date": "2020-09-29"
+  },
+  {
+    "title": "1000 多万条数据，建了索引还是慢，该怎么办？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484509&idx=1&sn=84d52902a559370909e412bb495842a0&chksm=fd3a0980ca4d8096629360dfead18556a9e66a7d85bc3e0cffe5761f5787c0d15505e83b633b#rd",
+    "digest": "关系数据库尤其是 MySQL 是应用现代化架构中核心的组件之一，哪怕在云数据库（托管的RDS，NoSQL，NewSQL等）流行的今天，掌握 MySQL 是按场景选择不同数据库的基石，这次分享一个课程给大家！",
+    "date": "2020-09-21"
+  },
+  {
+    "title": "直播转码和视频文件转码优化之路",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484498&idx=1&sn=eb1fb996e18b07b7bdefa7559665c77b&chksm=fd3a098fca4d8099e11b176dd6816ffaa236ac7d7a155f6abab29fd126bd29e5dca2d47f0ba6#rd",
+    "digest": "随着短视频，直播的快速发展，很多行业客户比如电商直播，媒体，视频工具，在线教育，云游戏等等都会涉及到转码任务的处理，转码任务是一个计算密集型工作负载，有离线和在线转码模式，云原生的转码方案可以帮助客户在满足性价比的前提下，保障用户体验。",
+    "date": "2020-09-07"
+  },
+  {
+    "title": "让你变厉害的最重要法则：熵增定律",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484495&idx=2&sn=6dc8a1ef454a862f82bc2e85f7794f40&chksm=fd3a0992ca4d8084e3c65d0721147b6251320ec4d199abd6fcdcb3957c365bca09e474546c65#rd",
+    "digest": "职场&认知洞察 丨 作者 /  易洋 这是findyi公众号的第70篇原创文章— 1 —熵增定律熵增定律揭示",
+    "date": "2020-09-06"
+  },
+  {
+    "title": "AWS SAA考试经验总结",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484495&idx=3&sn=dcb72d6921628001ee26cce4f9b1b698&chksm=fd3a0992ca4d80846ae3b8708221db6c9d13fe25f51717645362099b949863155ddf1dfc303e#rd",
+    "digest": "【知识点(*)】：下面是我自己从白皮书和国外论坛上总结的一百条知识点，考前看看用来帮助自己复习。大数据(Ma",
+    "date": "2020-09-06"
+  },
+  {
+    "title": "领导、管理和执行——可复制的架构师领导力",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484482&idx=1&sn=70cdd9ff1ee97489354e0215f2fc6560&chksm=fd3a099fca4d8089d3b1e656d07763ba1e60aa1b04dcf7aec175d38ed26cebe140387752e1bf#rd",
+    "digest": "本文出发点是纠正自己对于“领导、管理和执行”的错误认知，即以职位来解读，但结合实践的感受来说，解决方案架构师岗位，同时需要发挥这三种特质，每个人所不同的是，每种特性在实际工作范围中所占的比例大小",
+    "date": "2020-08-19"
+  },
+  {
+    "title": "你竟然用一篇文章白嫖了我10年架构经验！良心不会痛吗？？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484482&idx=2&sn=c76471e52a1072fda224deee2d20e01a&chksm=fd3a099fca4d808948f5f9c1c6ec84ed487401e46d8b47d06f99896d6b35497f86b31afe9eb0#rd",
+    "digest": "其实每个程序员心中都有一个成为架构师的梦想，梦想是美好的，但道路是曲折的，多向资深前辈取经算是一条捷径。",
+    "date": "2020-08-19"
+  },
+  {
+    "title": "云原生企业——架构师视角的思考",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484445&idx=1&sn=9d831af063d673280b43bef8b968b3cc&chksm=fd3a09c0ca4d80d691cdf489169ab4c24b041ee2c3feee6ffd1ffa5258a7132c6ef9bed22441#rd",
+    "digest": "云原生架构充分利用按需交付、全球部署、弹性和更高级别的服务。它们大大提高了开发人员的工作效率、业务敏捷性、可扩展性、可用性、资源利用率和成本节约。",
+    "date": "2020-08-16"
+  },
+  {
+    "title": "\b[转载]基础设施即代码工具如何选型？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484433&idx=1&sn=43319ced0a1567278c8b7b671a5d721e&chksm=fd3a09ccca4d80dabf090008bca4e83c97ad78088a3f1c2be95a1ecc682b0c4865d34dc35e1f#rd",
+    "digest": "基础设施即代码以及不可变基础设施，不可变应用都是当前云原生热门话题，本文来自一名在校的技术爱好者，可以感知到作者一些思考和权衡逻辑！",
+    "date": "2020-08-05"
+  },
+  {
+    "title": "一个真实的事件溯源案例",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=100000778&idx=1&sn=ca7bbee5ac080494e0512f0e4e46af2d&chksm=7d3a09d74a4d80c1fc0dffc8a7008009a3c299eda8f48cd9d92ddb40c16a9f85d675f409a576#rd",
+    "digest": "一个真实的实现”事件溯源“模式的案例，奈飞的用户视频离线下载认证授权场景；",
+    "date": "2020-07-26"
+  },
+  {
+    "title": "掌握 Elasticsearch 实现强大的搜索和分析功能",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=100000760&idx=1&sn=4afcddefdda00a10fb1a0df375e1c954&chksm=7d3a0e254a4d873374c11d11a787faa41d1712b05a0b3ee95c973e93b0d01418e4a35af94e3e#rd",
+    "digest": "搜索是现代\b应用必备的一项基础功能，而 Elasticsearch 就是一款满足该需求的功能强大的开源分布式搜索与数据分析引擎。",
+    "date": "2020-07-21"
+  },
+  {
+    "title": "亚马逊 AWS 上海互联网团队解决方案架构师虚位以待!",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484388&idx=1&sn=df577774f19c76640259ba00e6975968&chksm=fd3a0e39ca4d872fb6ae796cb6a9efb3c08cffdde96b712874450ef6de9da210f62522e65641#rd",
+    "digest": "亚马逊 AWS 上海互联网团队解决方案架构师虚位以待!",
+    "date": "2020-07-16"
+  },
+  {
+    "title": "微服务和事件驱动",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484387&idx=1&sn=51edd94f4aa2a11cc6481cf14c580f75&chksm=fd3a0e3eca4d8728ac9369cab2fd6fce79bbeeae88d91bad999bd794e31a02a555b3840f431f#rd",
+    "digest": "最近一直着迷于“事件”这个领域，本文继续探讨的疑问是，事件溯源（Event Sourcing）是事件驱动架构的必由之路？实现一个事件溯源架构优势和困难点在哪里？能不能给一个真实的客户案例？",
+    "date": "2020-07-12"
+  },
+  {
+    "title": "微服务如何对齐业务架构",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484375&idx=1&sn=b54a1d0ad57328342fe46b2ba69a6cb0&chksm=fd3a0e0aca4d871c276961d70a4e260bce44283054cdddf4c703cdf73bbcdcfb4b2689ef35f1#rd",
+    "digest": "通常业务架构不被开发人员重视，开发人员往往追求新技术，而技术是服务于业务，设计好的业务，需要做的业务领域的隔离和解耦，同时业务领域和技术架构也需要解耦。",
+    "date": "2020-07-05"
+  },
+  {
+    "title": "重新认识事件驱动架构",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484359&idx=1&sn=299f604310340abaf680cc3a9c633060&chksm=fd3a0e1aca4d870c50d2de6320b1b3ea54776103c8ca1b4f93db5d3627b9e71523ef8d19732e#rd",
+    "digest": "事件驱动的架构设计很多人都非常熟悉，尤其是 SOA 和微服务架构的广泛流行，但现实中要实现一个真正的事件驱动的应用并不是一个简单的事情，甚至不同开发者在一起探讨的“事件”是完全不同的概念。",
+    "date": "2020-06-27"
+  },
+  {
+    "title": "“三次握手”这道经典面试题答案是该更新了",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484345&idx=1&sn=facb3df8b60dccfc7ed596b52d298b17&chksm=fd3a0e64ca4d8772edd2359a82aed9d544767935cc70c4590e3844a6dd8b0b63b6b35e63702b#rd",
+    "digest": "面试中，一道经典的问题就是 TCP 三次握手和 SSL/TLS 握手协议过程，今天加密通信从 SSLv2(加密套接字协议层)发展到 TLSv1.3，未来已来，今天我们一起来“旧知新解”。",
+    "date": "2020-06-14"
+  },
+  {
+    "title": "危机之下，凸显优秀团队本色",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484331&idx=1&sn=31ed3563f88719deb44d639ae7b86438&chksm=fd3a0e76ca4d8760cee322718b03514bb5ea9a26bf194bc63b8c3141166e32ab8e152762a968#rd",
+    "digest": "“生命是短暂的，享受这个过程。找到激励你的人，让你做的更好，让自己成为更好的人。我们不知道自己在做的是什么，所以专注于打造一个优秀的团队，和尽可能创造最佳的环境让团队成功”",
+    "date": "2020-05-22"
+  },
+  {
+    "title": "云虚机成本管理这些坑你碰到几个？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484321&idx=1&sn=8003aeec193c94d5cc97d0547a232905&chksm=fd3a0e7cca4d876a5f229af8f96fbdee11112fac9452d2632ae8bd800e797791fd022d5e38b9#rd",
+    "digest": "计算我想是大家都熟知的一块领域，尤其是虚拟机，但不得不说，了解越深入才越感受到，真正掌握云上计算实例这件事还真不是件容易的事情。",
+    "date": "2020-05-10"
+  },
+  {
+    "title": "一个架构师眼中的云成本管理",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484310&idx=1&sn=7e1cd00e7e930b9165c70f020edef78c&chksm=fd3a0e4bca4d875dff5c0011a74e3d93bf574d188b68ea5a0af1b8199678640a857de668631e#rd",
+    "digest": "调查报告称，2019 年被访问企业第一优先级是云成本优化，已经连续霸榜三年了，今年疫情期间，这个问题对于所有客户就更突出了；今天咱们就以架构师的视角来聊聊这个话题！",
+    "date": "2020-05-05"
+  },
+  {
+    "title": "关于“前浪”的故事：当极简欧洲史遇上简读中国史",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484301&idx=1&sn=a5f983ff7941c3b822f6d996bc4aefe3&chksm=fd3a0e50ca4d8746cd5ece7ec55048c9425bd2d98c9a017fc37bc5044cea7393980d86b681aa#rd",
+    "digest": "缘起对于艺术欣赏的入门学习，再到历史故事的爱不释手，在滚滚后浪中，让我们一起交叉对照阅读三本不同视角的“前浪”故事：《极简欧洲史》、《大英博物馆中国简史》以及《简读中国史》",
+    "date": "2020-05-04"
+  },
+  {
+    "title": "阻碍企业成功云转型的常见误区",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484292&idx=1&sn=c87ea90e352bbdb6a26f49cf63761ca4&chksm=fd3a0e59ca4d874f32bcead8c1cb329d548c602246b7ca2466a794a3e83cb9b25d0eeddec3cd#rd",
+    "digest": "目前企业普遍都能接受云的价值，比如业务敏捷、弹性、创新高效等等，但很多惯性思维阻碍了企业充分利用云的优势，发挥业务创新潜力，今天我们就来聊聊这些常见误区。",
+    "date": "2020-04-22"
+  },
+  {
+    "title": "长大后至少还能做个画家",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484286&idx=1&sn=b1632c3ae8998d7e642d660df002b509&chksm=fd3a0ea3ca4d87b574a309d0e10f3866711858c791b0db4aeb53750df6cf3d43ed034b264925#rd",
+    "digest": "假期辅导熊孩子作业是非常痛苦的，探讨学习成绩和科学家梦想时，孩子脱口而出，长大后至少还能做个画家， 自信，太自信了！",
+    "date": "2020-04-08"
+  },
+  {
+    "title": "一次抽奖游戏引发的“随机”畅想",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484274&idx=1&sn=1c514e25725071fdcb927f7b696ac91e&chksm=fd3a0eafca4d87b90bcd0d18615db6fca320d11f97581e40c73ec094251491ec556a7d38b7f1#rd",
+    "digest": "互动是社交里面非常普遍的一个需求，那如何设计一个抽奖送书活动呢？细细一琢磨发现这是一件很有趣的事情，就是如果让大家乐意参与，并满足抽奖的公平性命题呢？",
+    "date": "2020-04-03"
+  },
+  {
+    "title": "回馈读者，推荐好书抽奖活动",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484267&idx=1&sn=885d8ff0bf04921db3ede71c7d322b26&chksm=fd3a0eb6ca4d87a07b97a7cee0a657693a7760515d87930cdb2998ae7879fd326c33e5894629#rd",
+    "digest": "回馈读者，推荐好书抽奖活动",
+    "date": "2020-04-01"
+  },
+  {
+    "title": "工作在 AWS，2020 四周年记",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484258&idx=1&sn=e820caf1c19fd304aaa434f999756495&chksm=fd3a0ebfca4d87a9861923f1e62fa1c202646def62dfcd9ec2b589724896d8980138cf72ab61#rd",
+    "digest": "从这周开始，在 AWS工作进入第五个年头（满四周年），面对不断的弹窗拷问《你对目前的工作还满意吗？》，也来忆苦思甜下，学习 Gregg 跟大家唠唠在 AWS 做解决方案架构师的体验，所有内容都是个人想法和感受，跟公司 HR 和 PR 无关",
+    "date": "2020-03-24"
+  },
+  {
+    "title": "应对变化，架构先行：Netflix 六边形架构实践",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484249&idx=1&sn=869be8b6082324265738d46a904919e3&chksm=fd3a0e84ca4d8792a279852fc56300738c0d8c353a4770c8e0245a8ecb1127a034f10981250a#rd",
+    "digest": "研发团队每天处理各种新的需求或修修补补的零碎，而阻碍团队快速应对变化（快速上线）的一个障碍是“牵扯”，一个小小的变更有时跟数个模块有千丝万缕的联系，怎么破？从优良架构开始",
+    "date": "2020-03-17"
+  },
+  {
+    "title": "越简单重复的事情越要自动化做",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484238&idx=1&sn=79befe8f3fbeef72c8cac016bc1b9f7f&chksm=fd3a0e93ca4d8785cde8e55416a79b9598338c903ac0f45c2d2cd714fa27f4351b209f2f1047#rd",
+    "digest": "本站点所有文章，仅代表个人想法，不代表任何公司立场，所有数据都来自公开资料**转载请注明出处**最近一次性能",
+    "date": "2020-03-16"
+  },
+  {
+    "title": "偶有所感，随心所记",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=100000581&idx=1&sn=afb5296bc624255d23e4a9bb8dccba83&chksm=7d3a0e984a4d878ed0c137f2922e3fc8ea788d108a94169eb4726179c5b7d9b8a26f7b34b2fc#rd",
+    "digest": "联系我",
+    "date": "2020-03-08"
+  },
+  {
+    "title": "企业创新与研发团队赋能完整PPT下载",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=100000569&idx=1&sn=c8de681bbaa2363cb02e1d553eddb4fe&chksm=7d3a0ee44a4d87f22c5b204ca64479c0717df933f3a8f5b415cef3a2ecb132e488e84d30f41f#rd",
+    "digest": "企业创新与研发团队赋能完整PPT下载",
+    "date": "2020-03-08"
+  },
+  {
+    "title": "企业创新与研发团队赋能",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484228&idx=1&sn=f9f0354ac5bfacc04851b930e6a49270&chksm=fd3a0e99ca4d878fa5550a0c6b2b53f8e5c4fb7bc0ef8428952f3faef44ec40fd70f4ff856b3#rd",
+    "digest": "三句话总结亚马逊的研发团队转型心得，“组织内思维理念协调一致”+“工程技术实践赋能”+“自服务工具链助力“！",
+    "date": "2020-03-08"
+  },
+  {
+    "title": "灵魂拷问：你对目前的工作还满意吗？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484199&idx=1&sn=07a237f93033e19ef348945dd9f96f2f&chksm=fd3a0efaca4d87ec03d3e3a5685e8c1a6dd969dbf41f3d61b6eb02d4a628f482675136383d20#rd",
+    "digest": "直击内心 “你对目前的工作还满意吗？” 你会感性还是理性来回答呢？",
+    "date": "2020-03-01"
+  },
+  {
+    "title": "玩直播，如何构建一套自己的直播平台？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484194&idx=1&sn=545219276853f771a27851b5cd808b60&chksm=fd3a0effca4d87e9ee1164607f70894ff8584320c81a18a2c4757235ecd3f3525b6a14743301#rd",
+    "digest": "有朋友问，我想自己搭建一个直播平台，该怎么玩？没错，纸上得来终觉浅，出于好奇，我们一起来试试，如何用开源方案+云平台搭建一个直播平台？",
+    "date": "2020-02-23"
+  },
+  {
+    "title": "聊直播，这些知识点你必须要懂",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484185&idx=1&sn=80941e0542fe7882493a36d2b9234173&chksm=fd3a0ec4ca4d87d2cb875379d35ab198190eb2d0c6ec1989cd1427d6b29e85d2261769e5fc00#rd",
+    "digest": "\b说到直播技术，有很多的“行话”和术语，对于一个架构师而言，无法统一语言的高效沟通是最痛苦的事情，这里有你需要上手了解的关键知识点。",
+    "date": "2020-02-19"
+  },
+  {
+    "title": "那些年你还记得 AWS 把哪些“不可能”变成了“可能”？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484178&idx=1&sn=ed8d9cb8b601ec4c75d14fda18645e76&chksm=fd3a0ecfca4d87d94c2a5d5f8518b63d2ad34e9f36520a71be9fa7f9ba958a156ca1fbe1ba7d#rd",
+    "digest": "技术人不容易，不是“停课不停学”，而是“学习不能停”。",
+    "date": "2020-02-17"
+  },
+  {
+    "title": "理工男读《如何看懂艺术2》有感",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484173&idx=1&sn=20b351eef8e50906fdd2c8f509cf8b3c&chksm=fd3a0ed0ca4d87c678a24bf3d9a094b219394575bc80b6595f1e8833907c16a18887a88bb7f8#rd",
+    "digest": "\b理工男如何摆脱到此一游博物馆的尴尬，第一集绘画篇读书笔记。",
+    "date": "2020-02-16"
+  },
+  {
+    "title": "Netflix 最后一公里内容交付",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484167&idx=1&sn=2eaa14fc4c54623ae05de2a69599e1cb&chksm=fd3a0edaca4d87cc426dcbb7b232d2b4f015c561e0614a4db6ce73a3f9b58a8fc56c3ba2315f#rd",
+    "digest": "Netflix为了满足全球用户的最后一公里内容交付的难题，居然抛弃了当时热门的第三方CDN服务，下定决心自建一套，高效经济的取悦最终用户，本文我们就来扒一拔下奈非自家自建自用的内容分发网络-Open Connect 解决方案",
+    "date": "2020-02-15"
+  },
+  {
+    "title": "企业或学校如何快速搭建一套在线教育平台？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=100000506&idx=1&sn=437aaedfc4ddcf3a5b3e39901dd348a8&chksm=7d3a0f274a4d8631bc63ab1c5dd2c25dfec91907ccf8b8c81751b30e6fffe84722ba2fe24ec4#rd",
+    "digest": "申明本站点所有文章，仅代表个人想法，不代表任何公司立场，所有数据都来自公开资料转载请注明出处疫情持续时间比想",
+    "date": "2020-02-12"
+  },
+  {
+    "title": "一个互联网老兵的11年浮沉自白书",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484146&idx=1&sn=be2da31abd0095cd755b2d5205f22163&chksm=fd3a0f2fca4d86397e03e2687977a93ab6bd1851cf43e1561c1cf906a6aad92af03f86eacdd9#rd",
+    "digest": "三人行必有我师，IT 行业打拼本身就不容易，看老兵易走过的11年心路历程，从懵懂的入行，自信满满的创业，到团队和业务认知的升级，细细咀嚼，回味无穷~",
+    "date": "2020-02-09"
+  },
+  {
+    "title": "在 AWS 上你也可以轻松远程办公",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484144&idx=1&sn=f1c247e11a50b14913034577c1002e21&chksm=fd3a0f2dca4d863ba919d3506bd7810f3c07f2f4c1b49b91a2f0e58e97e8618002390a09a62d#rd",
+    "digest": "疫情期间远程办公这个话题再次火了起来，星期一很多大厂的远程办公系统还被蜂拥的小伙伴工作热情给玩翻车了，我们来聊聊如果你有个 AWS 账号，AWS 如何帮助你的团队进行远程协作。",
+    "date": "2020-02-04"
+  },
+  {
+    "title": "好奇 Airbnb 在 AWS 技术架构，在这里都能找到答案",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484139&idx=1&sn=1e5de7498a4e29f468ba8923dfbcc11d&chksm=fd3a0f36ca4d8620fb26c865940657c33ebfac0f0d0a668bf336c082e945ca06b822b596d097#rd",
+    "digest": "再次碰到 Airbnb 的同事，发现很多人好奇他们在 AWS 上的技术栈及最佳实践，所以，忍不住网上收集和整理了他们的一些情况，供大家参考。",
+    "date": "2020-01-16"
+  },
+  {
+    "title": "别人家的年会 vs 从不停歇的学习季",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484128&idx=1&sn=7b6253cd9845c5a165e8fb36b4540d9c&chksm=fd3a0f3dca4d862ba0d754fcf20a93d3410b044382e49208e1b9f45f65b642d97da343425824#rd",
+    "digest": "上周四，在上海跟社区的朋友一起回顾了 re:Invent 2019 新技术趋势，而朋友圈早被各家的年会小惊喜和大礼包给刷屏了，进入 AWS 3年有余，上海的年会一直很精致，而无法升级成大型员工互娱的舞台，心里免不了有一丝酸楚~~~",
+    "date": "2020-01-13"
+  },
+  {
+    "title": "2020 第一场线下活动 - 致敬云计算之美，那些年一起追过的拉斯维加斯之夜",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484118&idx=1&sn=eedec174d4a959975807aed72a1b148a&chksm=fd3a0f0bca4d861d93ca03f47663067451fc51fb86f3458767af341ef06ca745867617669085#rd",
+    "digest": "​作为一个技术人，埋头专心做事的同时，一定有一颗不安分的心，“世界那么大，我想出去看看”，而每年各种顶级技术盛会不容错过，今天我们一起回顾下，2017年 到 2019年，我们一起度过的拉斯维加斯之夜；顺便广告下这周四上海的线下活动见文末。",
+    "date": "2020-01-06"
+  },
+  {
+    "title": "时序数据库有什么不一样？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484109&idx=1&sn=c5d707681cdb7f3e0a58ce9df2f4aa54&chksm=fd3a0f10ca4d860678ce77bd0efa15741084f493d64d326e5e4db6cb5421e834a28686ac214e#rd",
+    "digest": "如今在万物互联（IoT）兴起的推动下，时间序列数据（衡量事物随时间变化的数据）应用和场景激增，是增长最快的数据类型之一，比如监控指标数据，传感器数据，日志等等；在数据规模不断扩张的情况如何在高性价比的同时保障时序数据持续插入和查询效率？",
+    "date": "2019-12-31"
+  },
+  {
+    "title": "持续交付与可用性",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484101&idx=1&sn=59451ba7784e3318545feb62f144d256&chksm=fd3a0f18ca4d860e91c1db61aea55ac963761120fcaf2056b07453edeed4f7424bc8b491f879#rd",
+    "digest": "客户落地 DevOps 实践时常常遇到各种挑战，很多人认为 DevOps 只有互联网客户可以做到，比如我们经常引用的两个客户成功转型故事 Amazon.com 和 Netflix，我们见证的 DevOps 转型是一种服务和组织架构转型...",
+    "date": "2019-12-22"
+  },
+  {
+    "title": "云架构师自我修养(7)停止空谈，开始行动",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484087&idx=1&sn=a3825e22f43a652a5bd741d3238a91f7&chksm=fd3a0f6aca4d867c35dfe4f887510f0a2dab622e77325748faec43190cd37a50e2cafd91ddf7#rd",
+    "digest": "作为一个技术人，今天摘录一篇鸡汤贴，提醒自己，任何时候不钻牛角尖，开放心态，言行一致，崇尚行动。每天默念老宋口头三句口诀Always Be Positive/Look Forward/Control What You Can Control",
+    "date": "2019-12-15"
+  },
+  {
+    "title": "re:Invent 观察——AWS 是如何做私有云的",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484082&idx=1&sn=6ccdb7cf37910a0b8d745d536eb2f7d6&chksm=fd3a0f6fca4d8679665bd60e6c890c9625f57661b65a3e9e13d4136d4adf5b85ff3d6631bbaa#rd",
+    "digest": "re:Invent 深刻洞察，关于公有云如何结合边缘终端，客户机房，AWS 给出了答案：AWS Local Zones，Wavelength，Outposts，推荐阅读此篇了解 Outposts 设计初衷和客户体验。",
+    "date": "2019-12-13"
+  },
+  {
+    "title": "担心数据库性能，念念不忘分库分表怎么办？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484076&idx=1&sn=337863ce27ef27aee0d3b4dc76e7a40b&chksm=fd3a0f71ca4d86676f4ce1ef332ddad7490d169cc5104e291f28d9af28d4ee129be0a96c052f#rd",
+    "digest": "这篇我们来聊聊数据库的分库分表，刚刚结束的 2019年的双11，黑五等年度大促，人为创造的购物狂欢的背后，是技术人提前半年甚至一年的 Gameday 准备，大促期间彻夜无眠的默默守护，其中最让人揪心的就是关系数据库。",
+    "date": "2019-12-11"
+  },
+  {
+    "title": "大型互联网应用的数据缓存架构设计和客户实践",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484053&idx=1&sn=64643f4333a3b83a1d94bded7d7c115a&chksm=fd3a0f48ca4d865eb9cbd9850ed543eddb04a5b94a4d35443e79b9f430618dacac3f582ece5a#rd",
+    "digest": "无论是Netflix流媒体服务还是亚马逊全球电商，在业务规模不断发展的过程中，系统应用架构不断优化的同时，数据缓存服务对于大规模在线系统的用户体验越发重要。本文是上篇，主要探讨如何架构和落地数据缓存服务满足日益增长的业务诉求。",
+    "date": "2019-12-06"
+  },
+  {
+    "title": "案例分享：Netflix 数据缓存服务架构优化",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484028&idx=1&sn=cb4275e0e48b697614f311d893291b6d&chksm=fd3a0fa1ca4d86b77139e44e3abc3c64ae7fde91460998efc457e0f197b733c8112fb7f9019f#rd",
+    "digest": "随着 EVCache 缓存服务在 Netflix 团队中的普遍应用，它成为一个存储 PB 级数据，百亿数据条目，每天承载万亿次操作的“一等公民”服务，随着多区域多活架构的发展，缓存数据进一步在多区域冗余复制，成本负担很重，如何优化呢？",
+    "date": "2019-11-24"
+  },
+  {
+    "title": "案例分享：Netflix 安全团队如何转型 DevSecOps？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247484012&idx=1&sn=8c649bd42e96cbd2b93c93c60f4f7ad5&chksm=fd3a0fb1ca4d86a7aed91984a9a861150ab2125d12608db202caec4eec48f292bbdf93c273bf#rd",
+    "digest": "很多企业线上业务发展迭代太快，刚刚熟悉和实施DevOps，在落地过程中发现很难过安全这一关，尤其是上云之后，一下子涌入的云服务眼花缭乱，上线的安全基线和要求是什么？安全团队如何适应和与时俱进，今天我们从Netflix安全团队寻找灵感。",
+    "date": "2019-11-18"
+  },
+  {
+    "title": "从AWS看云服务成本优化：多样性、规模化和技术进步是客户最大的自由",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247483998&idx=1&sn=a1321e713ad0d7aad8e4ba546f9df233&chksm=fd3a0f83ca4d86957f0d8fc7f4348443d526708599030481d748ae7dc333b3c3290e73f9d8ea#rd",
+    "digest": "本文从 AWS 官方白皮书《How AWS Pricing Works》出发，解答大家对于 AWS 的成本模式和云计算算力市场（计算相关服务）常见困惑，两个建议（1）第一时间用竞价实例（2）在商务手段之外，关注技术架构改进对成本优化的意义",
+    "date": "2019-11-10"
+  },
+  {
+    "title": "云架构师自我修养(6)客户日常跟进的“快与慢”",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247483985&idx=1&sn=ddb7f7fc38e63d369efd0e13ede26c29&chksm=fd3a0f8cca4d869a6537dffbe052711b7c073b546e066b0684d11763714cdb01115a0fa44467#rd",
+    "digest": "作为客户的技术负责人，常常不自觉“入戏”，跟随客户的节奏起舞；不仅要适应互联网客户的作息，而且尽全力满足客户的期望，所有问题能第一时间响应和解决；现实中，多个客户/多个项目/不同的场景交错在一起，绝对是一线架构师的核心挑战之一；",
+    "date": "2019-11-02"
+  },
+  {
+    "title": "客户案例分析:Skyscanner全球机票搜索引擎全面上云之旅",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247483979&idx=1&sn=482e815b368b96d45a1b92a836177c1d&chksm=fd3a0f96ca4d8680e5d6076a559c81814e7e3218df123867afc6433ca332c2308ea973426430#rd",
+    "digest": "Trip.com 集团旗下的 Skyscanner 从分布全球的 5个数据中心，全面迁移到 AWS 的故事，总计有 7000台的虚拟机，从应用来看，有超过 300个不同的服务。",
+    "date": "2019-10-26"
+  },
+  {
+    "title": "案例分享：万台虚机规模的Netflix如何玩转Amazon EC2",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247483963&idx=1&sn=0d1640e641cc0240bab2f3a394f799e2&chksm=fd3a0fe6ca4d86f05065262fbe09248f8346ebb68b89b2a0d18caf99a9a14f4ca1a752c53769#rd",
+    "digest": "在前文中我们用数据分析回答了AWS目前到底有多少种类似EC2实例的问题，细分到机型大小如 C5.2xlarge 有 218 种类型，不区分机型大小的实例家族有44种类型，如此广泛的云算力支撑在客户实际应用场景如何选型、评测和升级换代的呢？",
+    "date": "2019-10-20"
+  },
+  {
+    "title": "多区域多主NoSQL云原生实现之全局表解析",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247483939&idx=1&sn=df69773b40dd5c27d188985a4e65f1a6&chksm=fd3a0ffeca4d86e8461c6e21ab8c2480134965c9ae9c9204c2c52a4771d35d853f6abfb0a7bb#rd",
+    "digest": "由于实现多活的状态数据双向复制，客户通常需要引入很多新的技术组件，同时考虑每个组件的可用性，性能和可靠性，实现和持续运营成本非常高，因此本文扩展解析云原生的 NoSQL 数据库 Amazon DynamoDB 提供的免费全局表功能。",
+    "date": "2019-10-12"
+  },
+  {
+    "title": "你真的了解 AWS 实例“经济学”吗？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247483913&idx=1&sn=8c225f0703c89d7a7545e4f34c2141d2&chksm=fd3a0fd4ca4d86c2ac63f1754a80d526e16179560ed3d8fdb8b2db9ca7552a1dded0f69278f1#rd",
+    "digest": "不少客户都会很淡定\b要求就这个配置报个价吧，云计算真的就是这么简单粗暴吗？我期望也可以是，但最新的9月份AWS深圳技术大会上，宣布的AWS实例类型高达200多种，什么鬼，这么复杂？不得不说，哪怕最较真的客户对这么多的实例类型也感到非常头疼。",
+    "date": "2019-10-07"
+  },
+  {
+    "title": "云架构师自我修养(5)经理岗位一周年纪",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247483909&idx=1&sn=c203e826290d117c80116eba0bf00bcf&chksm=fd3a0fd8ca4d86ce5a45a862b9f6b27074ea04909f77539a2f88ca5cc2e64b339ce5c5c34fb6#rd",
+    "digest": "假期打开公司的调查问卷，才意识到原来我在架构师经理的岗位上刚刚已经满一年，这一年的时光，感谢团队，在迷惑、变化和调整中渐渐成长，此时此刻又联想到同期的一位战友在国庆前选择离开创业追求更丰富的人生，思绪万千。",
+    "date": "2019-10-03"
+  },
+  {
+    "title": "云架构师自我修养(4)70年太久只争朝夕",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247483868&idx=1&sn=05edc22b340795e2c2d4e464d2d326da&chksm=fd3a0c01ca4d85178c649ef36a271bb48e29848024fc40253facee20af661e11fb74c6b12eb8#rd",
+    "digest": "祖国妈妈 70周年庆，家是最小国，国是千万家，为祖国喝彩，为祖国强大奋斗终身的共和国勋章和国家荣誉称号的英雄们自豪；作为一枚普通人真的感觉时不我待，只争朝夕；",
+    "date": "2019-10-01"
+  },
+  {
+    "title": "客户案例分析：Netflix 全球多区域多活架构演进",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247483862&idx=1&sn=177a17a78214ae097a775eb4eea4b757&chksm=fd3a0c0bca4d851d4255eaae62b161b10b156e055cb7cda497d0a333dbe3079e8c4b516f8b66#rd",
+    "digest": "在全球业务扩张情况下，有状态数据的全球同步是技术架构中非常重要的一个环节，也是满足全球不同地区用户体验的一个重要前提；同时多区域多活架构也可以极大提升全站可用性保障。这期我们一起解析Netflix 在 AWS 上实现多区域多活架构的演进。",
+    "date": "2019-09-22"
+  },
+  {
+    "title": "客户案例分析：Airbnb单体到微服务改造之旅(2)",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247483827&idx=1&sn=c225e21f60db56b5e8c015c48d8a25d5&chksm=fd3a0c6eca4d8578a6c4a0bddb0b10ec6df1ca103bdbaf1a104ca4402d37469f9a989df8a66e#rd",
+    "digest": "本文是 Airbnb 微服务改造故事的第二篇，我们继续拆解，当服务数量增多，系统复杂度指数增长的时候，如何确保服务可用性和全站的高可用和容错性。",
+    "date": "2019-09-17"
+  },
+  {
+    "title": "客户案例分析：Airbnb单体到微服务改造之旅(1)",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247483809&idx=1&sn=9addcef4b345189ad5d1c741570d226c&chksm=fd3a0c7cca4d856a0e96a3715e86aea1eef24d3fcc658913c6dc583f3962e91999bb45e68a75#rd",
+    "digest": "很多客户都关注如何改造遗留系统到现代化微服务架构，本文从Airbnb公开技术资料解析，Airbnb这样一个快速崛起的共享经济代表的全球化站点，在微服务改造过程中的各种取舍和落地实践",
+    "date": "2019-09-15"
+  },
+  {
+    "title": "云架构师自我修养(3)管理精力比时间管理更重要",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247483792&idx=1&sn=bc4fba91e9ff2a30b1732527ccc62da7&chksm=fd3a0c4dca4d855b7e9c90b34f0d585d97edf11fb8111797455da44428a07f6e1aaf0ad92671#rd",
+    "digest": "网上有很多关于互联网公司岗位的996.icu的段子和讨论，很多调侃大老板为什么能996而程序猿不可以，如果这个问题抛给你，元芳你怎么看？",
+    "date": "2019-09-08"
+  },
+  {
+    "title": "云架构师自我修养(2)一流的演讲和疑义问答能力",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247483781&idx=1&sn=5463e339c93a978ec6b675880cfbb2db&chksm=fd3a0c58ca4d854e98957bba46dd6631502d480043c96bb4316b2296694888a3be288eea89bf#rd",
+    "digest": "阅读时间：3~5 分钟级别：必修        在开始我们探讨之前，请回忆一下，最近有什么样的分享能让你记忆",
+    "date": "2019-09-01"
+  },
+  {
+    "title": "微服务失败重试（2）AWS 消息服务选型对照表",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247483762&idx=1&sn=43b41c1ad1e20bfb9bab5afda8914460&chksm=fd3a0cafca4d85b9fb1eb2327a0b4528ab6eb43cc34014b9bf046fcdfbcb2cb6f0cf256e7794#rd",
+    "digest": "目前开源和 AWS 原生的消息中间件特别丰富，客户常常不知道如何如何选择，本文整理了一张表，具体应用场景可以对照来看哪个是最适合消息系统；对于应用依赖的关键特性建议再对照官方文档和咨询原厂技术人员。",
+    "date": "2019-08-26"
+  },
+  {
+    "title": "微服务失败重试（1）消息中间件自动重试和失败处理",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247483757&idx=1&sn=7f292238d8ac6026203e6f93c064be39&chksm=fd3a0cb0ca4d85a688e6257ede4bb20e410aa5cfb0c5de49de9f7b0b8341c792b783eee99b05#rd",
+    "digest": "在一个微服务系统里，服务调用（同步或异步）失败处理是一个非常重要的一个环节，而失败重试又是一个常用的处理模式；本文从消息中间件的角度来分析下 AWS 上常见的消息服务的重试和失败处理策略。",
+    "date": "2019-08-20"
+  },
+  {
+    "title": "客户案例分析:Airbnb - 如何分析和衡量分布式支付系统的交易完整性",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247483746&idx=1&sn=051fd30e606b3bf1a54c0dbcfffbd28f&chksm=fd3a0cbfca4d85a94ba579e9fe2b47c4fb90a6d310816ddebd99bd54185c872b496e01c3a7bd#rd",
+    "digest": "最近遇到不少客户在实现交易系统微服务中遇到数据一致性问题，有的利用 Redis 的分布式锁机制，有的依赖于单个关系数据库保障 ACID；但实际情况中，很多一致性依赖于非常多的自有微服务和第三方微服务，如何跟踪分析端到端的数据一致性呢？",
+    "date": "2019-08-19"
+  },
+  {
+    "title": "云架构师的自我修养 – 修“心”篇",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247483736&idx=1&sn=bb950c531df6d3dca9b824d8ec7cd816&chksm=fd3a0c85ca4d85930ffb15e8bd91d3b2967e535ebbe407ff2e250251bc0c310862424f8717fd#rd",
+    "digest": "闺女最近在酒店游泳池吸引了很多家长小朋友的目光，原因在于她非常享受地表演了不同泳姿来来回回折腾1个多小时；在",
+    "date": "2019-08-11"
+  },
+  {
+    "title": "微服务架构开发和平台演进",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247483730&idx=1&sn=2e0bdd9fc23f32f9c354fcdf6f9b3f50&chksm=fd3a0c8fca4d85990842538d9715aa0496eea987a75d02b4c675fdd2b1999d73797f51780c38#rd",
+    "digest": "这是刚刚结束的AWS Summit北京站的分享，微服务，中台最近特别火，越来越多的公司在实际项目中开始运用，比如今天分享的嘉宾阿迪达斯和欣和电商数字化转型；当你讨论“微服务”的时候，你的脑海里浮现的是什么？你怎么驱动公司和团队采纳微服务？",
+    "date": "2019-08-01"
+  },
+  {
+    "title": "当领域驱动设计（DDD）遇到亚马逊创新公式",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247483708&idx=1&sn=5f7161584f5b09a892c76994ec901061&chksm=fd3a0ce1ca4d85f7b454559d6d7694b23d03c6ea79398ead774d64b62884982a70e9d28a91d6#rd",
+    "digest": "这是在火币和GitChat主办的领域驱动设计线下活动的分享，应大家的反馈，重新激活我的公众号，变成文字版，跟大家一起分享和成长。",
+    "date": "2019-07-28"
+  },
+  {
+    "title": "当领域驱动设计（DDD）遇到亚马逊创新公式（上）",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247483708&idx=2&sn=4297f7df3040dbaf4e07224407378e73&chksm=fd3a0ce1ca4d85f7b2150d4f899d3de34adc62732d33a68989bdbd369d4978f050e8b7307960#rd",
+    "digest": "作为整天泡在客户一线业务的架构师，看到的情况却是，大部分用户反馈使用领域驱动在开发团队，非常的别扭，真正带团队能实现微服务架构，支撑业务敏捷发展的企业非常少；开始正题之前，我们需要弄清楚，DDD为何出现？为何随着微服务的发展而真正流行？",
+    "date": "2019-07-28"
+  },
+  {
+    "title": "当领域驱动设计（DDD）遇到亚马逊创新公式（中）",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247483708&idx=3&sn=93ead3b53c5635b7806b9620ea6c0a47&chksm=fd3a0ce1ca4d85f7a046d435cd25bf416b04c9f328e07845be456b07693b7ed1868f48ab48b4#rd",
+    "digest": "在上一篇中，我们探讨了软件研发的复杂性问题，以及为了应对这样的复杂性，领域驱动设计的出现带来的新思路和设计方法；但理论还需结合实际；可以说，微服务本身的理念和DDD不谋而合；那很多客户的困惑就在于如何拆分微服务。社区有什么好的实践呢？",
+    "date": "2019-07-28"
+  },
+  {
+    "title": "当领域驱动设计（DDD）遇到亚马逊创新公式（下）",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=2247483708&idx=4&sn=2243af6d20ddd0b916ccef994b727f5b&chksm=fd3a0ce1ca4d85f7e8cbdb34cf9bae9ff8d1631ef7c54d9e0b5a0c16d155b9bb43f0fbe5a1a8#rd",
+    "digest": "这是这一个系列的最后一篇文章，前一篇我们探讨了社区中DDD相关的落地实践方法，最后，我们从亚马逊的大规模微服务实践来探讨下，业务与技术一起比翼双飞的实践经验。",
+    "date": "2019-07-28"
+  },
+  {
+    "title": "当领域驱动设计（DDD）遇到亚马逊创新公式（上）",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=100000024&idx=1&sn=b1e05feee6150899312d2326af145856&chksm=7d3a0cc54a4d85d3277ebea278d0831a1435b4223c344fd19dd0349929a9418ef123787e2ba1#rd",
+    "digest": "作为整天泡在客户一线业务的架构师，看到的情况却是，大部分用户反馈使用领域驱动在开发团队，非常的别扭，真正带团队能实现微服务架构，支撑业务敏捷发展的企业非常少；开始正题之前，我们需要弄清楚，DDD为何出现？为何随着微服务的发展而真正流行？",
+    "date": "2019-07-27"
+  },
+  {
+    "title": "RDS MySQL 自定义数据库如何做压测？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=100000011&idx=1&sn=5c850ad128f389ea269f428c1d4b86ae&chksm=7d3a0cd64a4d85c0815de46521aed9e27207c176ee3d2b9810b9b8d0e9e7fa44011c3944d7bc#rd",
+    "digest": "很多用户对标准的 RDS MySQL 性能测试\b报告并不买账，原因是自家应用的数据库有不一样的 Schema，同时执行的 SQL 读写行为也不一样，那如何安心上线一个新应用呢？",
+    "date": "2019-03-11"
+  },
+  {
+    "title": "AWS 架构师就是售前吗？",
+    "url": "http://mp.weixin.qq.com/s?__biz=MzU3Mzg1Njk0Ng==&mid=100000001&idx=1&sn=add0042232e491de8bd254a674bfd279&chksm=7d3a0cdc4a4d85ca859cea3cc0a39815080e6543fdcf9299725d36fa32d31cb08b340727dbdd#rd",
+    "digest": "很多人在面试中问过我这个问题，不是三言两语可以回答，但这又是一个不可回避的问题，我个人的答案是，这是一个比售前更挑战和有趣的多的岗位；",
+    "date": "2019-03-10"
+  }
+]
