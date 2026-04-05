@@ -20,6 +20,19 @@ KB_FILE = BASE / "knowledge_base.json"
 PIDS_DIR = BASE / "pids"
 POLL_INTERVAL = 30
 API_PORT = 17890
+
+# ── daemon_error 去重抑制 ─────────────────────────────────────────────────
+_last_error_hash: dict = {}   # key: error_key, value: last_logged_ts
+_ERROR_SUPPRESS_SEC = 300     # 同类错误 5 分钟内只记一次
+
+def _should_log_error(error_key: str) -> bool:
+    """Return True if this error should be logged (not suppressed)."""
+    now = time.time()
+    last = _last_error_hash.get(error_key, 0)
+    if now - last < _ERROR_SUPPRESS_SEC:
+        return False
+    _last_error_hash[error_key] = now
+    return True
 FEISHU_URL = "http://localhost:18789/feishu/messages"
 FEISHU_USER = "ou_65860c1079b77609db7c77be7f133531"
 
@@ -746,7 +759,10 @@ def _build_gantt_html(tasks: list) -> str:
     sections = []
     for date_str in sorted(by_date.keys(), reverse=True):
         day_tasks = by_date[date_str]
-        # Find time axis range
+
+        # ── Step 1: Unified t_min / t_max ──────────────────────────────
+        # Both the axis ticks AND the task bars must use the same t_min/t_max.
+        # We compute t_min = earliest startedAt, t_max = latest effective end time.
         ts_starts = [t["startedAt"] for t in day_tasks if t.get("startedAt")]
         ts_ends = []
         for t in day_tasks:
@@ -758,14 +774,17 @@ def _build_gantt_html(tasks: list) -> str:
                 ts_ends.append(t["startedAt"] + est * 60)
         if not ts_starts:
             continue
-        axis_start = min(ts_starts)
-        axis_end = max(ts_ends) if ts_ends else axis_start + 3600
-        axis_span = max(axis_end - axis_start, 3600)  # at least 1 hour
 
-        axis_start_dt = datetime.fromtimestamp(axis_start, tz=TZ_CST)
-        axis_end_dt = datetime.fromtimestamp(axis_end, tz=TZ_CST)
-        axis_start_label = axis_start_dt.strftime("%H:%M")
-        axis_end_label = axis_end_dt.strftime("%H:%M")
+        t_min = min(ts_starts)
+        t_max = max(ts_ends) if ts_ends else t_min + 3600
+        # Ensure minimum 1-hour span so the chart is readable
+        if t_max - t_min < 3600:
+            t_max = t_min + 3600
+        axis_span = t_max - t_min  # single source of truth
+
+        # Helper: convert a timestamp to a left% using the unified t_min/t_max
+        def to_pct(ts):
+            return (ts - t_min) / axis_span * 100
 
         STATUS_COLOR = {
             "done":    "#3fb950",
@@ -785,6 +804,31 @@ def _build_gantt_html(tasks: list) -> str:
             "Warden": "🛡️",
         }
 
+        # ── Step 2: Build axis tick marks ───────────────────────────────
+        # Generate ~5 evenly-spaced ticks from t_min to t_max.
+        # Their left% uses to_pct() — exactly the same formula as task bars.
+        num_ticks = 5
+        tick_step = axis_span / (num_ticks - 1)
+        axis_ticks_html = ""
+        for i in range(num_ticks):
+            tick_ts = t_min + i * tick_step
+            tick_pct = to_pct(tick_ts)  # 0% for first tick, 100% for last
+            tick_label = datetime.fromtimestamp(tick_ts, tz=TZ_CST).strftime("%H:%M")
+            # Anchor: first tick left-align, last tick right-align, others center
+            if i == 0:
+                transform = ""
+                text_anchor_style = "transform:translateX(0)"
+            elif i == num_ticks - 1:
+                transform = ""
+                text_anchor_style = "transform:translateX(-100%)"
+            else:
+                text_anchor_style = "transform:translateX(-50%)"
+            axis_ticks_html += (
+                f'<span class="gantt-axis-label" '
+                f'style="left:{tick_pct:.2f}%;{text_anchor_style}">'
+                f'{tick_label}</span>'
+            )
+
         # Build a map taskId → task for dependency arrows
         task_map = {t["taskId"]: t for t in day_tasks if t.get("taskId")}
 
@@ -802,17 +846,18 @@ def _build_gantt_html(tasks: list) -> str:
                 est = t.get("estimatedMinutes", 60)
                 end_ts = ts + est * 60
 
-            left_pct  = (ts - axis_start) / axis_span * 100
-            width_pct = (end_ts - ts) / axis_span * 100
-            left_pct  = max(0, min(99, left_pct))
-            width_pct = max(0.5, min(100 - left_pct, width_pct))
+            # ── Step 3: Task bar left/width — same formula as axis ticks ─
+            left_pct  = to_pct(ts)
+            width_pct = to_pct(end_ts) - left_pct
+            left_pct  = max(0.0, min(99.0, left_pct))
+            width_pct = max(0.5, min(100.0 - left_pct, width_pct))
 
             start_label = datetime.fromtimestamp(ts, tz=TZ_CST).strftime("%H:%M")
             end_label   = datetime.fromtimestamp(end_ts, tz=TZ_CST).strftime("%H:%M")
 
             pulse_style = ' animation: gantt-pulse 2s ease-in-out infinite;' if status == "running" else ''
             bar_style = (
-                f'left:{left_pct:.1f}%;width:{width_pct:.1f}%;'
+                f'left:{left_pct:.2f}%;width:{width_pct:.2f}%;'
                 f'background:{color};{pulse_style}'
             )
 
@@ -830,12 +875,11 @@ def _build_gantt_html(tasks: list) -> str:
                     dep_status = dep_task.get("status", "queued")
                     arrow_color = STATUS_COLOR.get(dep_status, "#8b949e")
                     dep_ts = dep_task["startedAt"]
-                    dep_left_pct = (dep_ts - axis_start) / axis_span * 100
-                    dep_left_pct = max(0, min(99, dep_left_pct))
+                    dep_left_pct = max(0.0, min(99.0, to_pct(dep_ts)))
                     dep_html += f'''<div class="gantt-dep-row">
   <div class="gantt-row-label"></div>
   <div class="gantt-row-track">
-    <span class="dependency-arrow" style="position:absolute;left:{dep_left_pct:.1f}%;color:{arrow_color}">↓</span>
+    <span class="dependency-arrow" style="position:absolute;left:{dep_left_pct:.2f}%;color:{arrow_color}">↓</span>
   </div>
 </div>'''
 
@@ -850,7 +894,7 @@ def _build_gantt_html(tasks: list) -> str:
                     sub_bars = ""
                     for i in range(total):
                         sc = color if i < completed else "#30363d"
-                        sub_bars += f'<span style="position:absolute;left:{left_pct + i*sub_width:.1f}%;width:{max(0.3,sub_width - 0.2):.1f}%;height:8px;top:4px;background:{sc};opacity:0.65;border-radius:2px;"></span>'
+                        sub_bars += f'<span style="position:absolute;left:{left_pct + i*sub_width:.2f}%;width:{max(0.3,sub_width - 0.2):.2f}%;height:8px;top:4px;background:{sc};opacity:0.65;border-radius:2px;"></span>'
                     sub_html = f'''<div class="gantt-dep-row">
   <div class="gantt-row-label" style="font-size:10px;color:#484f58">  {completed}/{total}</div>
   <div class="gantt-row-track" style="position:relative;height:16px">{sub_bars}</div>
@@ -868,13 +912,13 @@ def _build_gantt_html(tasks: list) -> str:
   </div>
   <div class="gantt-row-track">
     <div class="gantt-bar" style="{bar_style}"></div>
-    <span class="gantt-time-label" style="position:absolute;left:{left_pct + width_pct + 0.5:.1f}%;top:0;font-size:10px;color:#8b949e;white-space:nowrap">{status_icon} {time_label}</span>
+    <span class="gantt-time-label" style="position:absolute;left:{left_pct + width_pct + 0.5:.2f}%;top:0;font-size:10px;color:#8b949e;white-space:nowrap">{status_icon} {time_label}</span>
   </div>
 </div>{sub_html}'''
             if result_text:
                 rows_html += f'''<div class="gantt-result-row">
   <div class="gantt-row-label"></div>
-  <div class="gantt-row-track" style="font-size:10px;color:#484f58;padding-left:{left_pct:.1f}%">{result_text}</div>
+  <div class="gantt-row-track" style="font-size:10px;color:#484f58;padding-left:{left_pct:.2f}%">{result_text}</div>
 </div>'''
 
         date_label = date_str
@@ -888,10 +932,9 @@ def _build_gantt_html(tasks: list) -> str:
   </div>
   <div class="gantt-axis-row">
     <div class="gantt-row-label"></div>
-    <div class="gantt-row-track">
+    <div class="gantt-row-track gantt-axis-track">
       <div class="gantt-axis-line"></div>
-      <span class="gantt-axis-label" style="left:0">{axis_start_label}</span>
-      <span class="gantt-axis-label" style="right:0">{axis_end_label}</span>
+      {axis_ticks_html}
     </div>
   </div>
   {rows_html}
@@ -931,7 +974,7 @@ def _build_gantt_html(tasks: list) -> str:
 .gantt-axis-row {{
   display: flex;
   align-items: center;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }}
 .gantt-row-label {{
   width: 90px;
@@ -950,18 +993,26 @@ def _build_gantt_html(tasks: list) -> str:
   display: flex;
   align-items: center;
 }}
+/* Axis track: slightly taller to fit tick labels */
+.gantt-axis-track {{
+  height: 28px;
+}}
 .gantt-axis-line {{
   position: absolute;
   left: 0; right: 0;
   height: 1px;
-  background: #21262d;
-  top: 50%;
+  background: #30363d;
+  top: 100%;
 }}
+/* Tick labels: positioned by left% with transform for centering.
+   Uses the same to_pct() formula as task bars — guaranteed alignment. */
 .gantt-axis-label {{
   position: absolute;
   font-size: 10px;
-  color: #484f58;
-  top: 0;
+  color: #6e7681;
+  bottom: 0;
+  white-space: nowrap;
+  line-height: 1;
 }}
 .gantt-task-row {{
   display: flex;
@@ -1153,37 +1204,36 @@ def generate_dashboard(state):
             or _assignee_to_teammate_id(skill)
             or _assignee_to_teammate_id(label)
         )
-        # Find emoji for assignee
-        assignee_emoji = ""
-        if assignee_id:
-            for tm in TEAMMATES:
-                if tm["id"] == assignee_id:
-                    assignee_emoji = tm["emoji"] + " " + assignee_id
-                    break
+        # Find emoji + name for assignee badge (top-right)
+        assignee_badge_html = ""
+        if assignee_id and assignee_id in SKILL_PROFILES:
+            sp = SKILL_PROFILES[assignee_id]
+            assignee_badge_html = (
+                f'<span class="task-assignee-badge">'
+                f'{sp["emoji"]} {assignee_id}'
+                f'</span>'
+            )
 
+        # Running time (human-readable)
         elapsed_html = ""
         est_remain_html = ""
         if t.get("startedAt"):
             elapsed_s = int(time.time() - t["startedAt"])
             h, m = divmod(elapsed_s // 60, 60)
-            elapsed_str = f"{h}h{m:02d}m" if h else f"{m}m"
+            elapsed_str = f"{h}h {m:02d}m" if h else f"{m}m"
             elapsed_html = f'<span class="elapsed">运行 {elapsed_str}</span>'
             est = t.get("estimatedMinutes", 0)
             if est and status == "running":
                 remain_min = max(0, est - elapsed_s // 60)
                 est_remain_html = f'<span>预估剩余 {remain_min}m</span>'
 
+        # Cost: show "$0.32" if > 0, else "—"
         cost_raw = t.get("cost", 0) or 0
         if isinstance(cost_raw, dict):
             cost_raw = cost_raw.get("usd", 0)
         cost = cost_raw or 0
-        budget_raw = t.get("budget", 0) or 0
-        if isinstance(budget_raw, dict):
-            budget_raw = budget_raw.get("budget_usd", 0)
-        budget = budget_raw or 0
-        cost_html = ""
-        if cost or budget:
-            cost_html = f'<span class="cost">¥{cost:.1f}{"/" + "¥"+str(int(budget)) if budget else ""}</span>'
+        cost_display = f"${cost:.2f}" if cost > 0 else "—"
+        cost_html = f'<span class="cost">{cost_display}</span>'
 
         restart_html = f'<span class="restart-badge">⚠️ 重启{rc}次</span>' if rc > 0 else ""
 
@@ -1203,7 +1253,17 @@ def generate_dashboard(state):
   <span class="progress-text">{done_n}/{total}</span>
 </div>'''
 
-        goal_html = f'<div class="task-goal">{goal}</div>' if goal else ""
+        # Goal (one line, gray small text)
+        goal_html = f'<div class="task-goal">{goal[:80]}{"…" if len(goal) > 80 else ""}</div>' if goal else ""
+
+        # Dependencies
+        depends_on = t.get("dependsOn", [])
+        dep_html = ""
+        if depends_on:
+            dep_ids = ", ".join(str(d) for d in depends_on[:3])
+            if len(depends_on) > 3:
+                dep_ids += f" +{len(depends_on)-3}"
+            dep_html = f'<div class="task-deps">↑ 依赖: {dep_ids}</div>'
 
         # Buttons
         if status in ("failed", "queued", "paused"):
@@ -1218,17 +1278,18 @@ def generate_dashboard(state):
 
         footer_parts = [elapsed_html, est_remain_html, cost_html]
         footer_inner = "".join(p for p in footer_parts if p)
-        footer_html = f'<div class="task-footer">{footer_inner}{restart_html}</div>' if footer_inner or restart_html else ""
+        footer_html = f'<div class="task-footer">{footer_inner}{restart_html}</div>'
 
         return f'''<div class="task-card {status}">
   <div class="task-top">
     {make_status_badge(status)}
     <div class="task-meta-line">
-      <span class="task-assignee">{assignee_emoji}</span>
       <span class="task-label">{label}</span>
     </div>
+    {assignee_badge_html}
   </div>
   {goal_html}
+  {dep_html}
   {batch_html}
   {footer_html}
   {btns_html}
@@ -1236,12 +1297,24 @@ def generate_dashboard(state):
 
     tasks_by_date_parts = []
     for date_str in sorted(groups.keys(), reverse=True):
-        title = f"📅 {date_str}"
+        day_tasks_list = groups[date_str]
+        # Build stats: total / done / failed counts
+        n_total = len(day_tasks_list)
+        n_done  = sum(1 for t in day_tasks_list if t.get("status") == "done")
+        n_fail  = sum(1 for t in day_tasks_list if t.get("status") == "failed")
+        stats_str = f"{n_total} 个任务"
+        if n_done:
+            stats_str += f" · {n_done} ✅"
+        if n_fail:
+            stats_str += f" {n_fail} ❌"
+        # Color: today = blue, historical = gray
+        title_color = "#58a6ff" if date_str == today_str else "#8b949e"
+        title = f"📅 {date_str} · {stats_str}"
         if date_str == today_str:
             title += "（今天）"
-        cards = "".join(make_task_card(t) for t in groups[date_str])
+        cards = "".join(make_task_card(t) for t in day_tasks_list)
         tasks_by_date_parts.append(f'''<div class="date-group">
-  <div class="date-group-title">{title}</div>
+  <div class="date-group-title" style="color:{title_color}">{title}</div>
   {cards}
 </div>''')
 
@@ -1289,7 +1362,29 @@ def generate_dashboard(state):
         "manual_restart": "warn",
         "auto_restart": "warn",
     }
-    events_recent = list(reversed(events_lines[-20:]))
+    # 取最近 200 条原始事件，进行过滤 + 合并后再渲染
+    raw_events = events_lines[-200:]
+
+    # 合并连续相同 daemon_error（相邻去重），daemon_error 总量限制 ≤ 10 条
+    merged: list = []
+    daemon_error_count = 0
+    for ev in raw_events:
+        ename = ev.get("event", "")
+        if ename == "daemon_error":
+            # 与上一条相同则计数+1，不新增
+            if merged and merged[-1].get("event") == "daemon_error" and merged[-1].get("detail") == ev.get("detail"):
+                merged[-1]["_count"] = merged[-1].get("_count", 1) + 1
+            else:
+                if daemon_error_count < 10:
+                    ev2 = dict(ev)
+                    ev2["_count"] = 1
+                    merged.append(ev2)
+                    daemon_error_count += 1
+        else:
+            merged.append(ev)
+
+    # 最多显示最近 50 条（过滤后）
+    events_recent = list(reversed(merged[-50:]))
     events_html_parts = []
     for ev in events_recent:
         ts = ev.get("ts", 0)
@@ -1297,9 +1392,19 @@ def generate_dashboard(state):
         task_id_short = (ev.get("taskId", "") or "")[:24]
         time_str = datetime.fromtimestamp(ts).astimezone(TZ_CST).strftime("%H:%M:%S") if ts else ""
         ev_cls = EVENT_CLASS_MAP.get(event_name, "")
-        events_html_parts.append(f'''<div class="event-item {ev_cls}">
+        count = ev.get("_count", 1)
+        count_suffix = f" ×{count}" if count > 1 else ""
+        if event_name == "daemon_error":
+            # daemon_error 降权：暗灰色，不要和真正告警混淆
+            events_html_parts.append(f'''<div class="event-item" style="opacity:0.55">
+  <span class="event-time" style="color:#484f58">{time_str}</span>
+  <span class="event-name" style="color:#484f58">{event_name}{count_suffix}</span>
+  <span class="event-task" style="color:#484f58">{task_id_short}</span>
+</div>''')
+        else:
+            events_html_parts.append(f'''<div class="event-item {ev_cls}">
   <span class="event-time">{time_str}</span>
-  <span class="event-name">{event_name}</span>
+  <span class="event-name">{event_name}{count_suffix}</span>
   <span class="event-task">{task_id_short}</span>
 </div>''')
 
@@ -1473,7 +1578,9 @@ def main():
             print(f"[{datetime.now().strftime('%H:%M:%S')}] {state['summary']}")
         except Exception as e:
             print(f"[Claw Manager] Poll 错误: {e}", file=sys.stderr)
-            append_event({"event": "daemon_error", "detail": str(e)})
+            error_key = type(e).__name__ + ":" + str(e)
+            if _should_log_error(error_key):
+                append_event({"event": "daemon_error", "detail": str(e)})
         time.sleep(POLL_INTERVAL)
 
 

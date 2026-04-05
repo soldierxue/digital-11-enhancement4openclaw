@@ -191,7 +191,21 @@ body {
 .task-meta-line { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0; }
 .task-assignee { font-size: 12px; color: #8b949e; white-space: nowrap; }
 .task-label { font-weight: 600; color: #e6edf3; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.task-goal { font-size: 11px; color: #6e7681; margin-bottom: 8px; line-height: 1.4; }
+.task-goal { font-size: 11px; color: #6e7681; margin-bottom: 6px; line-height: 1.4; }
+/* Assignee badge: top-right pill */
+.task-assignee-badge {
+  margin-left: auto;
+  font-size: 10px;
+  color: #8b949e;
+  background: #21262d;
+  border: 1px solid #30363d;
+  border-radius: 10px;
+  padding: 1px 7px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+/* Dependencies line */
+.task-deps { font-size: 10px; color: #484f58; margin-bottom: 6px; }
 
 /* 进度条 */
 .batch-progress { margin-bottom: 8px; }
@@ -219,7 +233,7 @@ body {
   padding-top: 8px;
 }
 .task-footer .elapsed { color: #8b949e; }
-.task-footer .cost { color: #d29922; margin-left: auto; }
+.task-footer .cost { color: #6e7681; margin-left: auto; }
 .restart-badge { font-size: 10px; color: #d29922; }
 .task-btns { display: flex; gap: 6px; margin-top: 6px; }
 .btn {
