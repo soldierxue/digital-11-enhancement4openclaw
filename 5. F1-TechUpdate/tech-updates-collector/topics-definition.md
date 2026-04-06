@@ -1,6 +1,6 @@
 # Tech-Updates 主题分类定义
 
-**最后更新**: 2026-03-17  
+**最后更新**: 2026-03-22  
 **维护位置**: `skills/tech-updates-collector/topics-definition.md` (Single Source of Truth)
 
 ---
@@ -137,6 +137,7 @@
 | The Verge | theverge.com | 消费科技、AI 产品体验 | Exa web_search |
 | Hacker News | news.ycombinator.com | 开发者社区热点、技术讨论 | Exa web_search |
 | arXiv | arxiv.org | 前沿论文 (cs.AI, cs.LG, cs.CL) | Exa web_search (可选) |
+| Moltify | moltify.ai | AI Agent 定价、商业模式、企业部署成本分析 | Exa web_search |
 
 ---
 
@@ -184,6 +185,20 @@
 - **核心关键词**: AWS, Amazon Web Services, Bedrock, SageMaker, AWS AI, AWS team, AWS cloud
 - **来源**: Twitter/X + aboutamazon.com + Web
 - **说明**: 作为核心云平台，AWS 的 AI 服务动态需要专项跟踪
+
+### Dimension G: Anthropic 专项追踪（2026-04-04 新增）
+- **覆盖主题**: 主要映射到 openclaw、enterprise-ai、ai-dlc
+- **核心关键词**: Anthropic, Claude, Claude Code, Claude Opus, Claude Sonnet, MCP (Model Context Protocol), Constitutional AI
+- **重点人物**: Dario Amodei, Amanda Askell, Chris Olah, Jack Clark
+- **追踪 Twitter 账号**: @dariomadiel, @anthropicai
+- **追踪来源**: anthropic.com/news, anthropic.com/research
+- **搜索模式**:
+  - `Anthropic announcement` — 产品发布与公告
+  - `Anthropic Claude new` — 模型更新
+  - `Anthropic research safety` — 安全研究
+  - `Anthropic funding valuation` — 融资与商业动态
+  - `site:anthropic.com` — 官方博客直接抓取
+- **说明**: 用户要求主动追踪 Anthropic 最新动态，不依赖泛搜索中的被动覆盖。每次采集独立执行此 Dimension 的搜索。
 
 ---
 
