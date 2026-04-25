@@ -5,7 +5,7 @@ description: >
   完整管道：文章解析 → AI 生成双人对话脚本 → 多角色 TTS 语音合成 → 音频拼接后处理 → 元数据生成。
   支持 Edge TTS（免费）、ElevenLabs（高质量）、MiniMax（中文优化）三种 TTS 后端，auto 模式自动选择和降级。
   科技博主风格，主持人+嘉宾对话，中文语言。
-  全流程约 8 分钟（含多次 LLM 调用 + 38 段 TTS），建议通过 SubAgent 委托执行。
+  全流程约 5-15 分钟（含多次 LLM 调用 + 自适应轮次 TTS），建议通过 SubAgent 委托执行。
   Activate when: 用户要求将文章转播客, 文章生成播客, 博客转播客, article to podcast,
   生成播客, 做播客, 文章变播客, markdown to podcast, blog to podcast,
   播客生成, 对话播客, 多人播客, 自动生成播客, article2podcast,
@@ -14,19 +14,20 @@ description: >
 
 # Article2Podcast — 博客文章→多人对话播客
 
-将博客文章（3000-7000 字，平均 4500 字）自动转换为 25-35 分钟的双人对话播客音频，
+将博客文章（3000-7000 字，平均 4500 字）自动转换为 5-30 分钟的双人对话播客音频，
 包含主持人和嘉宾两个角色，科技博主风格，自然对话体。
+对话轮次根据文章信息密度自动计算（12-75 轮），也可手动指定。
 
 ## 执行架构
 
-本 Skill 执行时间约 8 分钟，**建议**通过 SubAgent 委托执行：
+本 Skill 执行时间约 5-15 分钟（取决于文章长度和信息密度），**建议**通过 SubAgent 委托执行：
 
 ```
 OpenClaw 主 Agent
   └── 用户触发 → sessions_spawn 启动 SubAgent
                     └── SubAgent 独立执行 Phase 1-5
-                          ├── Phase 1: 文章 → 对话脚本（~60 秒，可能多次 LLM 调用）
-                          ├── Phase 2: 多角色 TTS 合成（~5 分钟，38 段）
+                          ├── Phase 1: 文章 → 对话脚本（~60 秒，自适应轮次）
+                          ├── Phase 2: 多角色 TTS 合成（~3-8 分钟，12-75 段）
                           ├── Phase 3: 音频拼接 + 后处理（~30 秒）
                           ├── Phase 4: 元数据生成（~10 秒）
                           ├── Phase 5: S3 上传 + RSS Feed 更新（~15 秒）
@@ -41,7 +42,8 @@ sessions_spawn:
     你是 Article2Podcast 播客生成 Agent。
     请读取 ~/.openclaw/skills/article2podcast/SKILL.md 了解执行流程。
     用户要求将以下文章转为播客: <URL 或 .md 路径>
-    选项: --host-voice zh-CN-XiaoxiaoNeural --guest-voice zh-CN-YunyangNeural --turns 38
+    选项: --host-voice zh-CN-XiaoxiaoNeural --guest-voice zh-CN-YunyangNeural
+    对话轮次将根据文章信息密度自动计算，也可通过 --turns 手动指定。
     请执行 main.py 并汇报每个 Phase 的进度。
 ```
 
@@ -89,7 +91,7 @@ Show Notes：~/.openclaw/workspace/output/<slug>-show-notes.md
 ffmpeg -version 2>/dev/null && echo "✓ FFmpeg" || echo "✗ FFmpeg 未安装"
 
 # Python 依赖
-python3 -c "import edge_tts; import litellm" 2>/dev/null && echo "✓ Python deps" || echo "✗ pip install edge-tts litellm"
+python3 -c "import edge_tts; import boto3; import requests" 2>/dev/null && echo "✓ Python deps" || echo "✗ pip install edge-tts boto3 requests"
 ```
 
 ## 执行流程
@@ -97,14 +99,26 @@ python3 -c "import edge_tts; import litellm" 2>/dev/null && echo "✓ Python dep
 ### Phase 1: 文章 → 对话脚本
 
 ```bash
+# 自动根据文章信息密度计算轮次（默认最长 30 分钟）
 python3 scripts/generate_script.py <article_path_or_url> \
     --output podcast-script.json \
-    --turns 20 \
     --model anthropic/claude-sonnet-4-20250514
+
+# 限制最长 15 分钟
+python3 scripts/generate_script.py <article_path_or_url> \
+    --output podcast-script.json \
+    --max-duration 15
+
+# 手动指定轮次（跳过自适应计算）
+python3 scripts/generate_script.py <article_path_or_url> \
+    --output podcast-script.json \
+    --turns 40
 ```
 
 输入：文章 URL 或 .md 文件
 输出：`podcast-script.json`（对话脚本 JSON 数组）
+
+**自适应轮次计算**：根据文章信息密度（正文长度、标题数、列表密度、代码占比）自动计算 12-75 轮对话，对应约 5-30 分钟播客。可通过 `--max-duration` 控制上限，或 `--turns` 手动覆盖。
 
 脚本格式：
 ```json
@@ -262,24 +276,32 @@ python3 scripts/update_rss_feed.py --slug <slug> --dry-run
   "podcast_name": "军见数科·科技播客",
   "opening_line": "大家好，欢迎收听军见数科科技播客，我是主持人十一。今天请到的嘉宾是我们的老朋友薛以致用。",
   "ai_model": "anthropic/claude-sonnet-4-20250514",
-  "output_dir": "~/.openclaw/workspace/output"
+  "output_dir": "~/.openclaw/workspace/output",
+  "host_voice_options": [
+    {"backend": "minimax", "voice_id": "male-qn-jingying", "gender": "male", "label": "MiniMax 男声精英"},
+    {"backend": "elevenlabs", "voice_id": "APSIkVZudNbPAwyPoeVO", "gender": "female", "label": "ElevenLabs 女声"}
+  ]
 }
 ```
+
+> **注意**：`default_turns` 仅在手动指定 `--turns` 时作为参考。不传 `--turns` 时，轮次由文章信息密度自动计算。
 
 ## TTS 音色策略
 
 默认使用 `auto` 模式（`--tts-backend auto`），自动为主持人和嘉宾选择最优音色，并在后端不可用时自动降级。
 
-### 主持人（host）— 随机选择
+### 主持人（host）— 轮换选择
 
-每次生成播客时，从以下两个选项中**随机选择**一个作为主持人音色：
+每次生成播客时，从以下选项中**依次轮换**（round-robin）选择主持人音色，确保连续多期不会重复同一个声音。轮换状态持久化在 `~/.openclaw/workspace/.host_voice_state.json`。
 
-| 选项 | 后端 | voice_id | 说明 |
+| 序号 | 后端 | voice_id | 说明 |
 |------|------|----------|------|
-| 男声 | MiniMax | `male-qn-jingying` | MiniMax 男声精英 |
-| 女声 | ElevenLabs | `APSIkVZudNbPAwyPoeVO` | ElevenLabs 女声 |
+| 1 | MiniMax | `male-qn-jingying` | 男声精英 |
+| 2 | MiniMax | `female-shaonv` | 女声少女 |
+| 3 | MiniMax | `male-qn-daxuesheng` | 男声大学生 |
+| 4 | ElevenLabs | `APSIkVZudNbPAwyPoeVO` | ElevenLabs 女声 |
 
-**降级链路**：选中后端不可用 → 尝试另一个后端 → edge-tts（男声 `zh-CN-YunyangNeural` / 女声 `zh-CN-XiaoxiaoNeural`）
+**降级链路**：轮到的后端不可用 → 自动跳到下一个可用选项 → 所有选项不可用时降级到 edge-tts（男声 `zh-CN-YunyangNeural` / 女声 `zh-CN-XiaoxiaoNeural`）
 
 ### 嘉宾（guest）— 固定优先级
 
@@ -316,16 +338,22 @@ python3 scripts/update_rss_feed.py --slug <slug> --dry-run
 
 ### 向后兼容
 
-旧的 `--tts-backend edge-tts` / `--tts-backend elevenlabs` / `--tts-backend minimax` / `--tts-backend mixed` 参数仍然有效，行为不变。只有 `auto` 模式才启用随机主持人 + 嘉宾优先级逻辑。
+旧的 `--tts-backend edge-tts` / `--tts-backend elevenlabs` / `--tts-backend minimax` / `--tts-backend mixed` 参数仍然有效，行为不变。只有 `auto` 模式才启用主持人轮换 + 嘉宾优先级逻辑。
 
 ## 使用方法
 
 ```bash
-# 基本用法（默认 auto 模式：随机主持人 + 嘉宾优先级降级）
+# 基本用法（默认 auto 模式：主持人轮换 + 嘉宾优先级降级 + 自适应轮次）
 python3 main.py https://example.com/blog-post
 
 # 本地 Markdown
 python3 main.py ~/articles/my-article.md
+
+# 限制最长 15 分钟播客
+python3 main.py article.md --max-duration 15
+
+# 手动指定轮次
+python3 main.py article.md --turns 50
 
 # 自定义音色（使用 edge-tts 后端）
 python3 main.py article.md --tts-backend edge-tts --host-voice zh-CN-XiaoxiaoNeural --guest-voice zh-CN-YunyangNeural
@@ -348,4 +376,4 @@ python3 main.py article.md --bgm assets/bgm/tech-ambient.mp3 --bgm-volume 0.08
 | LLM 调用失败 | 重试 1 次，仍失败则报错退出 |
 | TTS 单段失败 | 跳过该段，在最终报告中标注 |
 | FFmpeg 不可用 | 直接拼接 MP3（不做后处理） |
-| 音频时长异常（<1min 或 >30min） | 警告用户，建议调整 --turns |
+| 音频时长异常（<1min 或 >30min） | 警告用户，建议调整 --turns 或 --max-duration |

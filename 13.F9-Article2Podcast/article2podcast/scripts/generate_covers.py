@@ -112,18 +112,25 @@ def generate_image_prompts(article_text: str, styles: list) -> dict:
         except Exception as e:
             print(f"  ⚠️ kiro-cli 调用失败: {e}", flush=True)
     
-    # Fallback: try litellm
+    # Fallback: try llm_client (direct Bedrock/MiniMax)
     try:
-        import litellm
-        print("  kiro-cli 不可用，尝试 litellm...", flush=True)
+        from llm_client import llm_completion
+        cfg = {}
+        cfg_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "config.json")
+        if os.path.exists(cfg_path):
+            with open(cfg_path, encoding="utf-8") as f:
+                cfg = json.load(f)
+        model = cfg.get("ai_model", "bedrock/us.anthropic.claude-sonnet-4-20250514-v1:0")
+        print(f"  kiro-cli 不可用，尝试 {model}...", flush=True)
         
-        response = litellm.completion(
-            model="anthropic/claude-sonnet-4-20250514",
-            messages=[{"role": "user", "content": prompt}],
+        raw = llm_completion(
+            model=model,
+            prompt=prompt,
             max_tokens=2000,
-        )
+            temperature=0.8,
+            config=cfg,
+        ).strip()
         
-        raw = response.choices[0].message.content.strip()
         json_match = re.search(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}', raw, re.DOTALL)
         if json_match:
             prompts = json.loads(json_match.group())
@@ -134,10 +141,10 @@ def generate_image_prompts(article_text: str, styles: list) -> dict:
                 elif style in COVER_STYLES:
                     final[style] = _fallback_prompt(style)
             if final:
-                print(f"  ✅ litellm 生成了 {len(final)} 个定制化 prompt", flush=True)
+                print(f"  ✅ LLM 生成了 {len(final)} 个定制化 prompt", flush=True)
                 return final
     except Exception as e:
-        print(f"  ⚠️ litellm 也失败: {e}", flush=True)
+        print(f"  ⚠️ LLM 调用也失败: {e}", flush=True)
     
     # Final fallback: generic prompts
     print("  使用默认通用 prompt...", flush=True)

@@ -73,7 +73,7 @@ def main():
     parser.add_argument("--guest-voice", default=None,
                         help="TTS voice for guest (default: from config)")
     parser.add_argument("--turns", type=int, default=None,
-                        help="Number of dialogue turns (default: from config)")
+                        help="Number of dialogue turns (default: auto-adaptive based on article density)")
     parser.add_argument("--tts-backend", choices=["edge-tts", "elevenlabs", "minimax", "mixed", "auto"],
                         default=None, help="TTS backend (default: from config, 'auto' enables random host + guest priority)")
     parser.add_argument("--bgm", default=None,
@@ -91,7 +91,7 @@ def main():
     cfg = load_config()
     host_voice = args.host_voice or cfg.get("default_host_voice", "zh-CN-YunxiNeural")
     guest_voice = args.guest_voice or cfg.get("default_guest_voice", "jasonsh")
-    turns = args.turns or cfg.get("default_turns", 20)
+    turns = args.turns  # None means auto-adaptive in generate_script.py
     tts_backend = args.tts_backend or cfg.get("default_tts_backend", "edge-tts")
     bgm_volume = args.bgm_volume if args.bgm_volume is not None else cfg.get("bgm_volume", 0.08)
     gap_ms = cfg.get("gap_ms", 400)
@@ -129,7 +129,7 @@ def main():
 ║              Article2Podcast Pipeline                    ║
 ╠══════════════════════════════════════════════════════════╣
 ║  Article  : {args.article[:44]:<44s} ║
-║  Turns    : {str(turns):<44s} ║
+║  Turns    : {str(turns or 'auto (adaptive)'):<44s} ║
 ║  Host     : {host_voice:<44s} ║
 ║  Guest    : {guest_voice:<44s} ║
 ║  TTS      : {tts_backend:<44s} ║
@@ -146,12 +146,14 @@ def main():
         print(f"✅ Phase 1: podcast-script.json already exists, skipping.", flush=True)
     else:
         print("📝 Phase 1: Generating dialogue script from article...", flush=True)
-        run_script("generate_script.py", [
+        phase1_args = [
             args.article,
             "--output", podcast_script,
-            "--turns", turns,
-            "--model", cfg.get("ai_model", "anthropic/claude-sonnet-4-20250514"),
-        ])
+            "--model", cfg.get("ai_model", "bedrock/us.anthropic.claude-sonnet-4-20250514-v1:0"),
+        ]
+        if turns:
+            phase1_args.extend(["--turns", turns])
+        run_script("generate_script.py", phase1_args)
     with open(podcast_script, encoding="utf-8") as f:
         script_data = json.load(f)
     num_turns = len(script_data)

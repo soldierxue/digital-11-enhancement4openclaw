@@ -8,7 +8,7 @@ Supports multiple TTS backends:
   - edge-tts: Free, Microsoft Edge TTS
   - elevenlabs: High-quality, supports custom cloned voices (requires API key)
   - minimax: Chinese-optimized TTS (requires API key)
-  - auto: Random host voice selection + guest priority fallback (default)
+  - auto: Round-robin host voice rotation + guest priority fallback (default)
 
 Usage:
     python3 generate_podcast_audio.py podcast-script.json \
@@ -23,7 +23,6 @@ import argparse
 import asyncio
 import json
 import os
-import random
 import subprocess
 import sys
 
@@ -68,10 +67,42 @@ def check_backend_available(backend: str, credentials: dict) -> bool:
     return False
 
 
+# ── Host Voice Rotation State ────────────────────────────────────────
+
+# Persists the index of the last-used host voice so consecutive episodes
+# always rotate through host_voice_options instead of repeating.
+
+HOST_VOICE_STATE_FILE = os.path.join(
+    os.path.expanduser("~/.openclaw/workspace"), ".host_voice_state.json"
+)
+
+
+def _load_host_voice_state() -> dict:
+    """Load the last-used host voice index from disk."""
+    try:
+        if os.path.exists(HOST_VOICE_STATE_FILE):
+            with open(HOST_VOICE_STATE_FILE, encoding="utf-8") as f:
+                return json.load(f)
+    except (json.JSONDecodeError, OSError):
+        pass
+    return {}
+
+
+def _save_host_voice_state(state: dict):
+    """Persist the host voice state to disk."""
+    os.makedirs(os.path.dirname(HOST_VOICE_STATE_FILE), exist_ok=True)
+    with open(HOST_VOICE_STATE_FILE, "w", encoding="utf-8") as f:
+        json.dump(state, f, ensure_ascii=False, indent=2)
+
+
 # ── Auto Mode: Voice Selection with Fallback ────────────────────────
 
 def select_host_voice(config: dict, credentials: dict) -> dict:
-    """Select host voice: random choice from host_voice_options with fallback.
+    """Select host voice by round-robin rotation across host_voice_options.
+
+    Each call picks the *next* option after the one used last time (persisted
+    in HOST_VOICE_STATE_FILE), ensuring consecutive episodes never repeat the
+    same host voice.  Falls back gracefully when a backend is unavailable.
 
     Returns dict with keys: backend, voice_id, gender, label, edge_voice
     """
@@ -88,27 +119,34 @@ def select_host_voice(config: dict, credentials: dict) -> dict:
             "edge_voice": edge_fallback.get("female", "zh-CN-XiaoxiaoNeural"),
         }
 
-    # Randomly pick one option
-    chosen = random.choice(options)
-    gender = chosen.get("gender", "female")
-    edge_voice = edge_fallback.get(gender, "zh-CN-XiaoxiaoNeural")
+    # --- Round-robin: pick the next index after last used ---------------
+    state = _load_host_voice_state()
+    last_index = state.get("last_host_voice_index", -1)
+    n = len(options)
 
-    # Check if chosen backend is available
-    if check_backend_available(chosen["backend"], credentials):
-        print(f"  🎲 主持人随机选择: {chosen['label']} ({chosen['backend']})", flush=True)
-        return {**chosen, "edge_voice": edge_voice}
+    # Try each option starting from the one after last_index
+    for offset in range(1, n + 1):
+        candidate_index = (last_index + offset) % n
+        chosen = options[candidate_index]
+        gender = chosen.get("gender", "female")
+        edge_voice = edge_fallback.get(gender, "zh-CN-XiaoxiaoNeural")
 
-    print(f"  ⚠️ 主持人首选 {chosen['label']} 不可用（{chosen['backend']} API key 缺失）", flush=True)
+        if check_backend_available(chosen["backend"], credentials):
+            # Persist the choice for next run
+            state["last_host_voice_index"] = candidate_index
+            state["last_host_voice_label"] = chosen.get("label", chosen["voice_id"])
+            _save_host_voice_state(state)
 
-    # Try the other option
-    for alt in options:
-        if alt["backend"] != chosen["backend"] and check_backend_available(alt["backend"], credentials):
-            alt_gender = alt.get("gender", "female")
-            alt_edge_voice = edge_fallback.get(alt_gender, "zh-CN-XiaoxiaoNeural")
-            print(f"  ↪ 降级到: {alt['label']} ({alt['backend']})", flush=True)
-            return {**alt, "edge_voice": alt_edge_voice}
+            print(f"  🔄 主持人轮换选择: {chosen['label']} ({chosen['backend']}) "
+                  f"[index {candidate_index}/{n-1}]", flush=True)
+            return {**chosen, "edge_voice": edge_voice}
+
+        print(f"  ⚠️ 主持人选项 {chosen['label']} 不可用（{chosen['backend']} API key 缺失），"
+              f"尝试下一个", flush=True)
 
     # All premium backends unavailable, fall back to edge-tts
+    gender = options[0].get("gender", "female")
+    edge_voice = edge_fallback.get(gender, "zh-CN-XiaoxiaoNeural")
     print(f"  ↪ 所有后端不可用，最终降级到 edge-tts ({edge_voice})", flush=True)
     return {
         "backend": "edge-tts",
@@ -195,7 +233,6 @@ def generate_turn_audio_minimax(turn_data: dict, output_dir: str,
         },
         "audio_setting": {
             "sample_rate": 32000,
-            "bitrate": 192000,
             "format": "mp3",
         },
     }
@@ -415,74 +452,60 @@ async def generate_single_turn(turn_data: dict, output_dir: str,
 async def generate_episode_auto(turns: list, output_dir: str,
                                  host_info: dict, guest_info: dict,
                                  credentials: dict, config: dict,
-                                 rate: str, pitch: str) -> list:
-    """Generate all turns for an episode using auto mode with episode-level fallback.
+                                 rate: str, pitch: str,
+                                 max_retries: int = 3) -> list:
+    """Generate all turns for an episode using auto mode with per-turn retry.
 
     Key rule: within one episode, each role (host/guest) uses exactly ONE voice
-    from start to finish. If a backend fails on any turn, the ENTIRE episode
-    is retried with the next backend in the fallback chain for that role.
+    from start to finish. Voice IDs NEVER change mid-episode.
+    If a turn fails, retry up to max_retries times. If still failing, abort.
+    Already-generated audio files are cached and reused on re-run.
     """
-    import shutil
+    h_backend = host_info["backend"]
+    h_voice = host_info["voice_id"]
+    g_backend = guest_info["backend"]
+    g_voice = guest_info["voice_id"]
 
-    def build_attempt_chain(voice_info):
-        """Build ordered list of (backend, voice_id) attempts for a role."""
-        chain = [(voice_info["backend"], voice_info["voice_id"])]
-        for fb in voice_info.get("fallback_chain", []):
-            chain.append((fb["backend"], fb["voice_id"]))
-        edge = voice_info.get("edge_voice", "zh-CN-YunxiNeural")
-        if not any(b == "edge-tts" for b, _ in chain):
-            chain.append(("edge-tts", edge))
-        return chain
+    label = f"host={h_backend}/{h_voice}, guest={g_backend}/{g_voice}"
+    print(f"  🎯 Voices: {label}", flush=True)
 
-    host_chain = build_attempt_chain(host_info)
-    guest_chain = build_attempt_chain(guest_info)
+    results = []
+    for i, turn in enumerate(turns):
+        role = turn["role"]
+        backend = h_backend if role == "host" else g_backend
+        voice_id = h_voice if role == "host" else g_voice
 
-    # Try each combination: iterate guest chain (outer) × host chain (inner)
-    # because guest voice consistency matters most (clone voice)
-    for gi, (g_backend, g_voice) in enumerate(guest_chain):
-        for hi, (h_backend, h_voice) in enumerate(host_chain):
-            label = f"host={h_backend}/{h_voice[:20]}, guest={g_backend}/{g_voice[:20]}"
-            attempt_num = gi * len(host_chain) + hi + 1
+        last_error = None
+        for attempt in range(1, max_retries + 1):
+            try:
+                result = await generate_single_turn(
+                    turn, output_dir, backend, voice_id,
+                    credentials, config, rate, pitch)
+                results.append(result)
+                last_error = None
+                break
+            except Exception as e:
+                last_error = e
+                if attempt < max_retries:
+                    wait = attempt * 5  # 5s, 10s backoff
+                    print(f"  ⚠️ Turn {turn['turn']} ({role}): 第 {attempt} 次失败 ({e})，"
+                          f"{wait}s 后重试...", flush=True)
+                    # Remove partial/corrupt file before retry
+                    remove_cached_turn(output_dir, turn)
+                    await asyncio.sleep(wait)
 
-            if attempt_num > 1:
-                print(f"\n  🔄 Episode retry #{attempt_num}: {label}", flush=True)
-                # Clear all audio from previous failed attempt
-                if os.path.isdir(output_dir):
-                    for f in os.listdir(output_dir):
-                        if f.endswith(".mp3"):
-                            os.remove(os.path.join(output_dir, f))
-                    print(f"  🗑️  Cleared partial audio from previous attempt", flush=True)
-            else:
-                print(f"  🎯 Voices: {label}", flush=True)
+        if last_error:
+            print(f"  ❌ Turn {turn['turn']} ({role}): {max_retries} 次重试均失败，终止生成", flush=True)
+            raise RuntimeError(
+                f"Turn {turn['turn']} ({role}) 在 {backend} 上 {max_retries} 次重试均失败: {last_error}"
+            )
 
-            results = []
-            failed = False
-            for i, turn in enumerate(turns):
-                role = turn["role"]
-                backend = h_backend if role == "host" else g_backend
-                voice_id = h_voice if role == "host" else g_voice
+        # Rate-limit protection between turns
+        if i < len(turns) - 1:
+            await asyncio.sleep(1.5)
 
-                try:
-                    result = await generate_single_turn(
-                        turn, output_dir, backend, voice_id,
-                        credentials, config, rate, pitch)
-                    results.append(result)
-                except Exception as e:
-                    print(f"  ❌ Turn {turn['turn']} ({role}): {backend} 失败 ({e})", flush=True)
-                    print(f"  🔄 将切换整集到下一个后端组合", flush=True)
-                    failed = True
-                    break
-
-                # Rate-limit protection
-                if i < len(turns) - 1:
-                    await asyncio.sleep(1.5)
-
-            if not failed:
-                print(f"  ✅ 全集 {len(results)} turns 完成 (host={h_backend}, guest={g_backend})", flush=True)
-                return results
-
-    # All combinations exhausted
-    raise RuntimeError("所有 TTS 后端组合均失败，无法生成本集音频")
+    print(f"  ✅ 全集 {len(results)} turns 完成 (host={h_backend}, guest={g_backend})", flush=True)
+    return results
 
 
 # ── Main ────────────────────────────────────────────────────────────
@@ -506,12 +529,30 @@ async def main_async(args):
     print(f"🔊 Generating {len(turns)} audio clips (multi-speaker)", flush=True)
     print(f"   TTS backend: {tts_backend}", flush=True)
 
-    # ── Auto mode: random host + priority guest with fallback ────────
+    # ── Auto mode: round-robin host + priority guest with fallback ────
     if tts_backend == "auto":
-        print(f"   🤖 Auto 模式: 随机选择主持人 + 嘉宾优先级降级", flush=True)
+        print(f"   🤖 Auto 模式: 主持人轮换 + 嘉宾优先级降级", flush=True)
 
-        host_info = select_host_voice(config, credentials)
-        guest_info = select_guest_voice(config, credentials)
+        # Per-episode voice persistence: reuse previous selection on re-run
+        workdir = os.path.dirname(args.output_dir) if os.path.basename(args.output_dir) == "audio" \
+                  else args.output_dir
+        voice_selection_file = os.path.join(workdir, "voice_selection.json")
+
+        saved_selection = None
+        if os.path.exists(voice_selection_file):
+            try:
+                with open(voice_selection_file, encoding="utf-8") as f:
+                    saved_selection = json.load(f)
+                print(f"   ♻️  复用上次选定的音色 (voice_selection.json)", flush=True)
+            except (json.JSONDecodeError, OSError):
+                saved_selection = None
+
+        if saved_selection:
+            host_info = saved_selection["host"]
+            guest_info = saved_selection["guest"]
+        else:
+            host_info = select_host_voice(config, credentials)
+            guest_info = select_guest_voice(config, credentials)
 
         # Build fallback chains for runtime call failures
         # Host fallback: try the other premium option, then edge-tts
@@ -541,6 +582,13 @@ async def main_async(args):
 
         print(f"   Host:  {host_info['label']} ({host_info['backend']}, {host_info['voice_id']})", flush=True)
         print(f"   Guest: {guest_info['label']} ({guest_info['backend']}, {guest_info['voice_id']})", flush=True)
+
+        # Persist voice selection for this episode (enables safe re-run)
+        if not saved_selection:
+            os.makedirs(os.path.dirname(voice_selection_file) or ".", exist_ok=True)
+            with open(voice_selection_file, "w", encoding="utf-8") as f:
+                json.dump({"host": host_info, "guest": guest_info},
+                          f, ensure_ascii=False, indent=2)
 
         results = await generate_episode_auto(
             turns, args.output_dir,

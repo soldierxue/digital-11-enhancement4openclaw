@@ -59,7 +59,7 @@ def compute_turn_timestamps(timing: list, gap_ms: int = 400) -> dict:
 def generate_metadata_and_shownotes(script: list, timing: list, article_path: str,
                                      model: str, config: dict, gap_ms: int) -> dict:
     """Single LLM call to generate title, description, chapters, and show notes."""
-    from litellm import completion
+    from llm_client import llm_completion
 
     podcast_name = config.get("podcast_name", "科技播客")
     host_name = config.get("host_name", "主持人")
@@ -152,14 +152,13 @@ def generate_metadata_and_shownotes(script: list, timing: list, article_path: st
 
 只输出 JSON，不要其他文字。"""
 
-    response = completion(
+    content = llm_completion(
         model=model,
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.7,
+        prompt=prompt,
         max_tokens=4000,
-    )
-
-    content = response.choices[0].message.content.strip()
+        temperature=0.7,
+        config=config,
+    ).strip()
     json_match = re.search(r"\{[\s\S]*\}", content)
     raw = json_match.group() if json_match else content
     try:
@@ -287,7 +286,7 @@ def main():
     parser.add_argument("--output", required=True, help="Output metadata JSON path")
     parser.add_argument("--show-notes-output", default=None,
                         help="Output show notes Markdown path (default: same dir as --output, .show-notes.md)")
-    parser.add_argument("--model", default=None, help="LiteLLM model name")
+    parser.add_argument("--model", default=None, help="Model name (bedrock/<id> or minimax/<id>)")
     parser.add_argument("--gap-ms", type=int, default=400, help="Gap between turns (ms)")
     args = parser.parse_args()
 

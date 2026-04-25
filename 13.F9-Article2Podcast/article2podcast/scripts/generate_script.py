@@ -45,11 +45,83 @@ def load_config() -> dict:
     return {}
 
 
+# ---------------------------------------------------------------------------
+# Adaptive turn calculation based on article information density
+# ---------------------------------------------------------------------------
+# Assumptions for duration estimation:
+#   - Average Chinese TTS speed: ~250 chars/min
+#   - Each dialogue turn: 50-150 chars → avg ~100 chars → ~24 sec/turn
+#   - 30-min podcast ≈ 7500 chars spoken ≈ 75 turns (upper bound)
+#   - 5-min podcast  ≈ 1250 chars spoken ≈ 12 turns (lower bound)
+
+MIN_TURNS = 12          # ~5 min podcast
+MAX_TURNS = 75          # ~30 min podcast
+CHARS_PER_TURN = 100    # average spoken chars per turn
+TTS_CHARS_PER_MIN = 250 # Chinese TTS speaking rate
+
+
+def estimate_information_density(article_text: str) -> float:
+    """Return a density score (0.0-1.0) for the article.
+
+    Heuristics considered:
+      - code block ratio (code-heavy → lower spoken density)
+      - heading count (more structure → more topics to cover)
+      - unique technical term density
+      - list / bullet point density
+    """
+    total_len = max(len(article_text), 1)
+
+    # 1. Code blocks — strip them for density calc; they inflate char count
+    #    but don't translate well to spoken dialogue
+    code_blocks = re.findall(r"```[\s\S]*?```", article_text)
+    code_chars = sum(len(b) for b in code_blocks)
+    code_ratio = code_chars / total_len  # 0-1, higher = more code
+
+    # 2. Headings → topic breadth
+    headings = re.findall(r"^#{1,4}\s+.+", article_text, re.MULTILINE)
+    heading_score = min(len(headings) / 20.0, 1.0)  # cap at 20 headings
+
+    # 3. Bullet / numbered list items → detail density
+    list_items = re.findall(r"^[\s]*[-*+]\s+|^\s*\d+\.\s+", article_text, re.MULTILINE)
+    list_score = min(len(list_items) / 40.0, 1.0)
+
+    # 4. Prose length (excluding code)
+    prose_len = total_len - code_chars
+    prose_score = min(prose_len / 8000.0, 1.0)  # 8000 chars = fairly long article
+
+    # Weighted combination
+    density = (
+        0.35 * prose_score
+        + 0.25 * heading_score
+        + 0.20 * list_score
+        + 0.20 * (1.0 - code_ratio)  # less code → more speakable content
+    )
+    return round(max(0.0, min(density, 1.0)), 3)
+
+
+def compute_adaptive_turns(article_text: str, max_duration_min: int = 30) -> int:
+    """Compute the number of dialogue turns based on article content.
+
+    Returns a value between MIN_TURNS and MAX_TURNS, capped by max_duration_min.
+    """
+    density = estimate_information_density(article_text)
+
+    # Map density linearly to turn range
+    duration_cap_turns = int(max_duration_min * TTS_CHARS_PER_MIN / CHARS_PER_TURN)
+    upper = min(MAX_TURNS, duration_cap_turns)
+
+    turns = int(MIN_TURNS + density * (upper - MIN_TURNS))
+    turns = max(MIN_TURNS, min(turns, upper))
+
+    return turns
+
+
 def generate_dialogue_script(article_text: str, num_turns: int, model: str,
                               host_name: str, guest_name: str,
-                              opening_line: str, closing_line: str) -> list:
-    """Use LiteLLM to generate a podcast dialogue script from the article."""
-    from litellm import completion
+                              opening_line: str, closing_line: str,
+                              config: dict = None) -> list:
+    """Generate a podcast dialogue script from the article via LLM."""
+    from llm_client import llm_completion
 
     opening_instruction = ""
     if opening_line:
@@ -59,7 +131,23 @@ def generate_dialogue_script(article_text: str, num_turns: int, model: str,
     if closing_line:
         closing_instruction = f'\n   - 最后一轮（host）的 text 必须以此结尾："{closing_line}"'
 
-    prompt = f"""你是一个科技播客脚本编剧。请将以下文章改写为一期双人对话播客脚本，约 {num_turns} 轮对话。
+    # Estimate podcast duration for the prompt
+    est_duration_min = round(num_turns * CHARS_PER_TURN / TTS_CHARS_PER_MIN)
+
+    # Scale max_tokens with turn count: ~80 tokens per turn is a safe estimate
+    max_tokens = max(6000, num_turns * 120)
+
+    # For longer articles with many turns, allow more source text
+    article_budget = min(len(article_text), 6000 + num_turns * 100)
+
+    prompt = f"""你是一个科技播客脚本编剧。请将以下文章改写为一期双人对话播客脚本。
+
+## 目标时长与轮次
+
+- 目标时长：约 **{est_duration_min} 分钟**
+- 对话轮次：约 **{num_turns} 轮**（根据文章信息密度自动计算）
+- 如果文章内容丰富，请充分展开讨论，不要压缩遗漏重要信息
+- 如果文章较短或信息密度低，保持精炼，不要注水
 
 ## 角色设定
 
@@ -100,17 +188,16 @@ def generate_dialogue_script(article_text: str, num_turns: int, model: str,
 
 ## 文章内容
 
-{article_text[:10000]}
+{article_text[:article_budget]}
 """
 
-    response = completion(
+    content = llm_completion(
         model=model,
-        messages=[{"role": "user", "content": prompt}],
+        prompt=prompt,
+        max_tokens=max_tokens,
         temperature=0.8,
-        max_tokens=6000,
-    )
-
-    content = response.choices[0].message.content.strip()
+        config=config,
+    ).strip()
     json_match = re.search(r"\[[\s\S]*\]", content)
     raw = json_match.group() if json_match else content
     try:
@@ -141,13 +228,15 @@ def main():
     parser = argparse.ArgumentParser(description="Generate podcast dialogue script")
     parser.add_argument("article", help="Path to Markdown file or URL")
     parser.add_argument("--output", required=True, help="Output JSON path")
-    parser.add_argument("--turns", type=int, default=None, help="Number of dialogue turns")
-    parser.add_argument("--model", default=None, help="LiteLLM model name")
+    parser.add_argument("--turns", type=int, default=None,
+                        help="Number of dialogue turns (omit to auto-detect from article density)")
+    parser.add_argument("--max-duration", type=int, default=30,
+                        help="Maximum podcast duration in minutes (default: 30)")
+    parser.add_argument("--model", default=None, help="Model name (bedrock/<id> or minimax/<id>)")
     args = parser.parse_args()
 
     cfg = load_config()
-    num_turns = args.turns or cfg.get("default_turns", 20)
-    model = args.model or cfg.get("ai_model", "anthropic/claude-sonnet-4-20250514")
+    model = args.model or cfg.get("ai_model", "bedrock/us.anthropic.claude-sonnet-4-20250514-v1:0")
     host_name = cfg.get("host_name", "小薛")
     guest_name = cfg.get("guest_name", "老张")
     opening_line = cfg.get("opening_line", "")
@@ -157,11 +246,24 @@ def main():
     article_text = load_article(args.article)
     print(f"   Article length: {len(article_text)} chars", flush=True)
 
+    # Determine turn count: explicit > auto-adaptive > config default
+    if args.turns:
+        num_turns = args.turns
+        print(f"   Turn count: {num_turns} (explicit --turns)", flush=True)
+    else:
+        density = estimate_information_density(article_text)
+        num_turns = compute_adaptive_turns(article_text, args.max_duration)
+        est_min = round(num_turns * CHARS_PER_TURN / TTS_CHARS_PER_MIN)
+        print(f"   Information density: {density:.2f}", flush=True)
+        print(f"   Adaptive turns: {num_turns} (~{est_min} min podcast, "
+              f"max {args.max_duration} min)", flush=True)
+
     print(f"🤖 Generating {num_turns}-turn dialogue script with {model}...", flush=True)
     print(f"   Roles: {host_name} (host) + {guest_name} (guest)", flush=True)
     script = generate_dialogue_script(
         article_text, num_turns, model,
-        host_name, guest_name, opening_line, closing_line
+        host_name, guest_name, opening_line, closing_line,
+        config=cfg
     )
 
     # Validate structure
@@ -182,7 +284,9 @@ def main():
     total_chars = sum(len(s["text"]) for s in script)
     host_turns = sum(1 for s in script if s["role"] == "host")
     guest_turns = sum(1 for s in script if s["role"] == "guest")
-    print(f"✅ Generated {len(script)} turns ({host_turns} host, {guest_turns} guest), ~{total_chars} chars", flush=True)
+    est_duration = round(total_chars / TTS_CHARS_PER_MIN, 1)
+    print(f"✅ Generated {len(script)} turns ({host_turns} host, {guest_turns} guest), "
+          f"~{total_chars} chars, ~{est_duration} min", flush=True)
     print(f"   Output: {args.output}", flush=True)
 
 
