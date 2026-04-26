@@ -1,0 +1,21 @@
+{
+  "default_voice": "zh-CN-YunyangNeural",
+  "default_style": "photo",
+  "default_slides": 10,
+  "tts_rate": "-5%",
+  "tts_pitch": "+0Hz",
+  "whisper_binary": "~/whisper.cpp/main",
+  "whisper_model": "~/whisper.cpp/models/ggml-small.bin",
+  "remotion_composition_id": "AgentVideo",
+  "video_width": 1920,
+  "video_height": 1080,
+  "video_fps": 30,
+  "video_crf": 23,
+  "compress_target_mb": 20,
+  "compress_video_bitrate": "280k",
+  "compress_audio_bitrate": "96k",
+  "bedrock_region": "us-east-1",
+  "bedrock_model_id": "amazon.nova-canvas-v1:0",
+  "ai_model": "bedrock/us-east-1/us.anthropic.claude-sonnet-4-20250514-v1:0",
+  "output_dir": "~/.openclaw/workspace/output"
+}
