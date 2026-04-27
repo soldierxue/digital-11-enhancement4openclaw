@@ -193,10 +193,65 @@ def select_guest_voice(config: dict, credentials: dict) -> dict:
 
 # ── MiniMax TTS Backend ─────────────────────────────────────────────
 
+# MiniMax reference audio file_id cache (uploaded once per session)
+_minimax_ref_audio_file_id = None
+
+
+def _upload_minimax_ref_audio(credentials: dict, config: dict) -> int:
+    """Upload the guest reference audio to MiniMax once, return file_id.
+
+    Uses audio_sample_file_id approach: instead of a pre-cloned voice_id,
+    we pass a short reference audio in every T2A request so MiniMax mimics
+    the voice on-the-fly.  This avoids clone voice training-data leakage.
+    """
+    global _minimax_ref_audio_file_id
+    if _minimax_ref_audio_file_id is not None:
+        return _minimax_ref_audio_file_id
+
+    import requests
+
+    ref_path = config.get("guest_voice_ref_audio", "")
+    if not ref_path:
+        # Default: look in assets/bgm/
+        ref_path = os.path.join(SKILL_DIR, "assets", "bgm", "jason_voice_prompt_5s.m4a")
+
+    # Resolve relative paths against SKILL_DIR
+    ref_path = os.path.expanduser(ref_path)
+    if not os.path.isabs(ref_path):
+        ref_path = os.path.join(SKILL_DIR, ref_path)
+    if not os.path.exists(ref_path):
+        raise FileNotFoundError(f"Guest voice reference audio not found: {ref_path}")
+
+    api_key = credentials.get("minimax_api_key", "")
+    upload_url = "https://api.minimaxi.com/v1/files/upload"
+    headers = {"Authorization": f"Bearer {api_key}"}
+
+    with open(ref_path, "rb") as f:
+        resp = requests.post(
+            upload_url, headers=headers,
+            data={"purpose": "voice_clone"},
+            files={"file": (os.path.basename(ref_path), f)},
+            timeout=60)
+    resp.raise_for_status()
+    result = resp.json()
+    if result.get("base_resp", {}).get("status_code", 0) != 0:
+        raise RuntimeError(f"MiniMax upload failed: {result}")
+
+    _minimax_ref_audio_file_id = result["file"]["file_id"]
+    print(f"  📤 嘉宾参考音频已上传: file_id={_minimax_ref_audio_file_id}", flush=True)
+    return _minimax_ref_audio_file_id
+
+
 def generate_turn_audio_minimax(turn_data: dict, output_dir: str,
                                  voice_id: str, credentials: dict,
-                                 config: dict) -> dict:
-    """Generate audio for a single turn using MiniMax T2A API."""
+                                 config: dict,
+                                 use_ref_audio: bool = False) -> dict:
+    """Generate audio for a single turn using MiniMax T2A API.
+
+    If use_ref_audio is True, uses audio_sample_file_id for instant voice
+    reference instead of a pre-cloned voice_id.  This avoids clone voice
+    training-data leakage where the cloned voice prepends a fixed greeting.
+    """
     import requests
 
     idx = turn_data["turn"]
@@ -213,7 +268,7 @@ def generate_turn_audio_minimax(turn_data: dict, output_dir: str,
 
     api_key = credentials.get("minimax_api_key", "")
     group_id = credentials.get("minimax_group_id", "")
-    api_base = config.get("minimax_api_base", "https://api.minimax.chat/v1")
+    api_base = "https://api.minimaxi.com/v1"
     model = config.get("minimax_model", "speech-02-hd")
 
     url = f"{api_base}/t2a_v2?GroupId={group_id}"
@@ -221,23 +276,31 @@ def generate_turn_audio_minimax(turn_data: dict, output_dir: str,
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
     }
+
+    voice_setting = {
+        "voice_id": voice_id,
+        "speed": 1.0,
+        "vol": 1.0,
+        "pitch": 0,
+    }
+
+    # Use reference audio for instant voice mimicry (no clone needed)
+    if use_ref_audio:
+        ref_file_id = _upload_minimax_ref_audio(credentials, config)
+        voice_setting["audio_sample_file_id"] = ref_file_id
+
     payload = {
         "model": model,
         "text": text,
         "stream": False,
-        "voice_setting": {
-            "voice_id": voice_id,
-            "speed": 1.0,
-            "vol": 1.0,
-            "pitch": 0,
-        },
+        "voice_setting": voice_setting,
         "audio_setting": {
             "sample_rate": 32000,
             "format": "mp3",
         },
     }
 
-    resp = requests.post(url, headers=headers, json=payload, timeout=120)
+    resp = requests.post(url, headers=headers, json=payload, timeout=180)
     resp.raise_for_status()
     resp_data = resp.json()
 
@@ -434,12 +497,14 @@ def remove_cached_turn(output_dir: str, turn_data: dict):
 async def generate_single_turn(turn_data: dict, output_dir: str,
                                 backend: str, voice_id: str,
                                 credentials: dict, config: dict,
-                                rate: str, pitch: str) -> dict:
+                                rate: str, pitch: str,
+                                use_ref_audio: bool = False) -> dict:
     """Generate audio for a single turn using a specific backend. No fallback.
     Raises on failure so the caller can handle episode-level fallback."""
     if backend == "minimax":
         return generate_turn_audio_minimax(
-            turn_data, output_dir, voice_id, credentials, config)
+            turn_data, output_dir, voice_id, credentials, config,
+            use_ref_audio=use_ref_audio)
     elif backend == "elevenlabs":
         api_key = credentials.get("elevenlabs_api_key", "")
         return generate_turn_audio_elevenlabs(
@@ -475,12 +540,17 @@ async def generate_episode_auto(turns: list, output_dir: str,
         backend = h_backend if role == "host" else g_backend
         voice_id = h_voice if role == "host" else g_voice
 
+        # Use reference audio for guest MiniMax turns (avoids clone leakage)
+        use_ref = (role == "guest" and backend == "minimax"
+                   and config.get("guest_voice_ref_audio", ""))
+
         last_error = None
         for attempt in range(1, max_retries + 1):
             try:
                 result = await generate_single_turn(
                     turn, output_dir, backend, voice_id,
-                    credentials, config, rate, pitch)
+                    credentials, config, rate, pitch,
+                    use_ref_audio=use_ref)
                 results.append(result)
                 last_error = None
                 break

@@ -25,18 +25,51 @@
   "audio_bitrate": "192k",
   "audio_sample_rate": 44100,
   "host_voice_options": [
-    {"backend": "minimax", "voice_id": "male-qn-jingying", "gender": "male", "label": "MiniMax 男声精英"},
-    {"backend": "minimax", "voice_id": "female-shaonv", "gender": "female", "label": "MiniMax 女生"},
-    {"backend": "minimax", "voice_id": "male-qn-daxuesheng", "gender": "male", "label": "MiniMax 男声大学生"},
-    {"backend": "elevenlabs", "voice_id": "APSIkVZudNbPAwyPoeVO", "gender": "female", "label": "ElevenLabs 女声"}
+    {
+      "backend": "minimax",
+      "voice_id": "male-qn-jingying",
+      "gender": "male",
+      "label": "MiniMax 男声精英"
+    },
+    {
+      "backend": "minimax",
+      "voice_id": "female-shaonv",
+      "gender": "female",
+      "label": "MiniMax 女生"
+    },
+    {
+      "backend": "minimax",
+      "voice_id": "male-qn-daxuesheng",
+      "gender": "male",
+      "label": "MiniMax 男声大学生"
+    },
+    {
+      "backend": "elevenlabs",
+      "voice_id": "APSIkVZudNbPAwyPoeVO",
+      "gender": "female",
+      "label": "ElevenLabs 女声"
+    }
   ],
   "guest_voice": {
-    "primary": {"backend": "minimax", "voice_id": "jason_podcast_voice_001", "label": "MiniMax 薛以致用（克隆）"},
-    "fallback": {"backend": "elevenlabs", "voice_id": "Vki3eB7XF9nxH50xK1s9", "label": "ElevenLabs 薛以致用"},
-    "edge_fallback": {"backend": "edge-tts", "voice_id": "zh-CN-YunyangNeural", "label": "Edge 男声"}
+    "primary": {
+      "backend": "minimax",
+      "voice_id": "male-qn-jingying",
+      "label": "MiniMax 薛以致用（参考音频）"
+    },
+    "fallback": {
+      "backend": "elevenlabs",
+      "voice_id": "Vki3eB7XF9nxH50xK1s9",
+      "label": "ElevenLabs 薛以致用"
+    },
+    "edge_fallback": {
+      "backend": "edge-tts",
+      "voice_id": "zh-CN-YunyangNeural",
+      "label": "Edge 男声"
+    }
   },
   "host_edge_fallback": {
     "male": "zh-CN-YunyangNeural",
     "female": "zh-CN-XiaoxiaoNeural"
-  }
+  },
+  "guest_voice_ref_audio": "assets/bgm/jason_voice_prompt_5s.m4a"
 }

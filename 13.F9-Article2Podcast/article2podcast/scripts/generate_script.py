@@ -275,6 +275,30 @@ def main():
         if "emotion" not in item:
             item["emotion"] = "cheerful" if item["role"] == "host" else "thoughtful"
 
+    # Detect degenerate repetition: if the same text appears in multiple turns,
+    # the LLM likely got stuck in a loop. Warn and deduplicate.
+    seen_texts = {}
+    duplicates = []
+    for item in script:
+        normalized = item["text"].strip()
+        if normalized in seen_texts:
+            duplicates.append((item["turn"], seen_texts[normalized]))
+        else:
+            seen_texts[normalized] = item["turn"]
+
+    if duplicates:
+        print(f"⚠️  检测到 {len(duplicates)} 处重复对话（LLM 退化）：", flush=True)
+        for dup_turn, orig_turn in duplicates[:5]:
+            print(f"     Turn {dup_turn} 与 Turn {orig_turn} 内容完全相同", flush=True)
+        # Remove duplicate turns, keeping the first occurrence
+        dup_turns = {d[0] for d in duplicates}
+        original_count = len(script)
+        script = [s for s in script if s["turn"] not in dup_turns]
+        # Re-number turns sequentially
+        for i, item in enumerate(script):
+            item["turn"] = i + 1
+        print(f"     已去重: {original_count} → {len(script)} 轮", flush=True)
+
     out_dir = os.path.dirname(args.output)
     if out_dir:
         os.makedirs(out_dir, exist_ok=True)
