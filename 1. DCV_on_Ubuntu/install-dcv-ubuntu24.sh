@@ -273,6 +273,32 @@ EOF
 fi
 
 # ============================================================
+# Step 7.5: 创建开机自动创建会话的 systemd service
+# ============================================================
+log_step "Step 7.5: 创建 dcv-session.service (ARM64/Ubuntu 24.04 兜底)"
+
+# automatic-console-session 在 ARM64/Ubuntu 24.04 上不可靠，用显式 service 兜底
+cat > /etc/systemd/system/dcv-session.service << EOF
+[Unit]
+Description=Create DCV Console Session
+After=dcvserver.service
+Requires=dcvserver.service
+
+[Service]
+Type=oneshot
+ExecStartPre=/bin/sleep 5
+ExecStart=/usr/bin/dcv create-session --type=console --owner ${DCV_USER} ${SESSION_NAME}
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+systemctl enable dcv-session.service
+log_info "dcv-session.service 已创建并启用"
+
+# ============================================================
 # Step 8: 设置用户密码
 # ============================================================
 log_step "Step 8/8: 设置用户密码"
