@@ -155,7 +155,10 @@ def generate_metadata_and_shownotes(script: list, timing: list, article_path: st
     content = llm_completion(
         model=model,
         prompt=prompt,
-        max_tokens=4000,
+        # Higher budget so MiniMax-M2 (reasoning model) has room for both
+        # internal reasoning tokens and the final JSON; Claude models ignore
+        # the extra headroom.
+        max_tokens=8000,
         temperature=0.7,
         config=config,
     ).strip()
