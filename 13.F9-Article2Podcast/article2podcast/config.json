@@ -12,11 +12,16 @@
   "opening_line": "大家好，欢迎收听军见数科科技播客，我是主持人十一。今天请到的嘉宾是我们的老朋友薛以致用。",
   "closing_line": "好的，感谢大家收听本期节目，我们下期再见。",
   "ai_model": "bedrock/us.anthropic.claude-opus-4-6-v1",
+  "ai_model_fallback": ["minimax/MiniMax-M2"],
   "ai_model_region": "us-east-1",
   "output_dir": "~/.openclaw/workspace/output",
   "bgm_volume": 0.08,
   "minimax_model": "speech-2.8-hd",
-  "minimax_api_base": "https://api.minimax.chat/v1",
+  "_comment_minimax_api_base": "中文开放平台 (platform.minimaxi.com) 签发的 key 用 https://api.minimaxi.com/v1；国际站 (platform.minimax.io) 签发的 key 用 https://api.minimax.io/v1；大陆专用 (api.minimax.chat) 功能缩水不支持 voice clone。详见 README 5.3。",
+  "minimax_api_base": "https://api.minimaxi.com/v1",
+  "minimax_anthropic_api_base": "https://api.minimaxi.com",
+  "minimax_voice_host": "female-shaonv",
+  "minimax_voice_guest": "male-qn-jingying",
   "elevenlabs_voice_host": "",
   "elevenlabs_voice_guest": "Vki3eB7XF9nxH50xK1s9",
   "elevenlabs_model": "eleven_multilingual_v2",
@@ -25,12 +30,6 @@
   "audio_bitrate": "192k",
   "audio_sample_rate": 44100,
   "host_voice_options": [
-    {
-      "backend": "minimax",
-      "voice_id": "male-qn-jingying",
-      "gender": "male",
-      "label": "MiniMax 男声精英"
-    },
     {
       "backend": "minimax",
       "voice_id": "female-shaonv",

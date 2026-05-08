@@ -77,7 +77,8 @@ def _call_bedrock(model_id: str, prompt: str, max_tokens: int,
 
 
 def _call_minimax(model_id: str, prompt: str, max_tokens: int,
-                  temperature: float, credentials: dict) -> str:
+                  temperature: float, credentials: dict,
+                  config: dict) -> str:
     """Call MiniMax via Anthropic-compatible API."""
     import requests
 
@@ -85,7 +86,15 @@ def _call_minimax(model_id: str, prompt: str, max_tokens: int,
     if not api_key:
         raise ValueError("minimax_api_key not found in credentials.json")
 
-    url = "https://api.minimaxi.com/anthropic/v1/messages"
+    # The Anthropic-compatible endpoint lives at a different path prefix
+    # (/anthropic/v1/messages) than the TTS endpoint (/v1/...), and may
+    # be served on a different host depending on the account region.  We
+    # therefore keep a separate config key instead of reusing
+    # minimax_api_base.
+    api_base = config.get(
+        "minimax_anthropic_api_base", "https://api.minimaxi.com"
+    ).rstrip("/")
+    url = f"{api_base}/anthropic/v1/messages"
     headers = {
         "x-api-key": api_key,
         "Content-Type": "application/json",
@@ -118,17 +127,54 @@ def _call_minimax(model_id: str, prompt: str, max_tokens: int,
     return "".join(text_parts)
 
 
+def _call_one_model(model: str, prompt: str, max_tokens: int,
+                     temperature: float, config: dict,
+                     credentials: dict) -> str:
+    """Dispatch a single call to the specified model.
+
+    Raises on any backend failure so the caller can decide whether to
+    fall through to a different model.
+    """
+    if model.startswith("bedrock/"):
+        model_id = model[len("bedrock/"):]
+        region = config.get("ai_model_region", "us-east-1")
+        return _call_bedrock(model_id, prompt, max_tokens, temperature, region)
+
+    if model.startswith("minimax/"):
+        model_id = model[len("minimax/"):]
+        return _call_minimax(model_id, prompt, max_tokens, temperature,
+                             credentials, config)
+
+    raise ValueError(
+        f"Unsupported model format: '{model}'. "
+        f"Use 'bedrock/<model_id>' or 'minimax/<model_id>'."
+    )
+
+
+def _resolve_fallback_models(config: dict, primary: str) -> list:
+    """Return the fallback chain from config, excluding the primary.
+
+    ``ai_model_fallback`` may be either a string or a list of strings.
+    """
+    raw = config.get("ai_model_fallback", [])
+    if isinstance(raw, str):
+        raw = [raw]
+    return [m for m in raw if m and m != primary]
+
+
 def llm_completion(model: str, prompt: str, max_tokens: int = 4000,
                    temperature: float = 0.8, config: dict = None,
                    credentials: dict = None) -> str:
-    """统一 LLM 调用入口。
+    """统一 LLM 调用入口，支持主备降级。
 
     Args:
-        model: "bedrock/<model_id>" 或 "minimax/<model_id>"
+        model: 主模型。"bedrock/<model_id>" 或 "minimax/<model_id>"
         prompt: 用户 prompt 文本
-        max_tokens: 最大输出 token 数
+        max_tokens: 最大输出 token 数（注意 MiniMax-M2 是 reasoning 模型，
+            推理过程会消耗 tokens，预算要给得比正常 completion 大一些）
         temperature: 采样温度
-        config: config.json 内容（用于读取 region 等）
+        config: config.json 内容。可选 ``ai_model_fallback`` 字段
+            （字符串或字符串列表），当主模型失败时依次尝试
         credentials: credentials.json 内容（MiniMax 需要 API key）
 
     Returns:
@@ -137,17 +183,23 @@ def llm_completion(model: str, prompt: str, max_tokens: int = 4000,
     config = config or {}
     credentials = credentials or _load_credentials()
 
-    if model.startswith("bedrock/"):
-        model_id = model[len("bedrock/"):]
-        region = config.get("ai_model_region", "us-east-1")
-        return _call_bedrock(model_id, prompt, max_tokens, temperature, region)
+    chain = [model] + _resolve_fallback_models(config, model)
+    errors = []
 
-    elif model.startswith("minimax/"):
-        model_id = model[len("minimax/"):]
-        return _call_minimax(model_id, prompt, max_tokens, temperature, credentials)
+    for idx, candidate in enumerate(chain):
+        try:
+            if idx > 0:
+                print(f"   ↪ LLM 降级到 {candidate}", flush=True)
+            return _call_one_model(candidate, prompt, max_tokens,
+                                    temperature, config, credentials)
+        except Exception as e:
+            errors.append((candidate, e))
+            # Keep the primary error concise in logs; surface the full
+            # stack only if all candidates fail.
+            print(f"   ⚠️ {candidate} 调用失败 ({type(e).__name__}: {e})",
+                  flush=True)
+            continue
 
-    else:
-        raise ValueError(
-            f"Unsupported model format: '{model}'. "
-            f"Use 'bedrock/<model_id>' or 'minimax/<model_id>'."
-        )
+    # All candidates exhausted
+    summary = "; ".join(f"{m}: {type(e).__name__} {e}" for m, e in errors)
+    raise RuntimeError(f"All LLM candidates failed: {summary}")

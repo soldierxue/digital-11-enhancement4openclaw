@@ -51,6 +51,39 @@ def load_config() -> dict:
     return {}
 
 
+# ── MiniMax Helpers ─────────────────────────────────────────────────
+
+def get_minimax_api_base(config: dict) -> str:
+    """Return MiniMax API base URL from config, without trailing slash.
+
+    Default: ``https://api.minimaxi.com/v1`` — this matches MiniMax's own
+    documentation (platform.minimaxi.com) and is the host that keys issued
+    via the Chinese open platform expect. Accounts registered at
+    platform.minimax.io should override to ``https://api.minimax.io/v1``.
+    The mainland-only ``https://api.minimax.chat/v1`` does NOT support voice
+    cloning. See README 5.3 for the full matrix.
+    """
+    base = config.get("minimax_api_base", "https://api.minimaxi.com/v1")
+    return base.rstrip("/")
+
+
+def resolve_minimax_voice(role: str, provided_voice: str, config: dict) -> str:
+    """Resolve a voice_id suitable for the MiniMax T2A API.
+
+    ``--host-voice`` / ``--guest-voice`` are CLI options shared across all
+    backends, and their defaults are Edge TTS voice names
+    (e.g. ``zh-CN-XiaoxiaoNeural``).  Those names are meaningless to MiniMax.
+    When the provided value looks like an Edge TTS voice we fall back to
+    ``config.minimax_voice_{role}``; otherwise we trust the caller and pass
+    it through as a MiniMax voice_id.
+    """
+    if provided_voice and not provided_voice.endswith("Neural"):
+        return provided_voice
+    key = f"minimax_voice_{role}"
+    fallback = "female-shaonv" if role == "host" else "male-qn-jingying"
+    return config.get(key, fallback)
+
+
 # ── Backend Availability Check ──────────────────────────────────────
 
 def check_backend_available(backend: str, credentials: dict) -> bool:
@@ -223,7 +256,8 @@ def _upload_minimax_ref_audio(credentials: dict, config: dict) -> int:
         raise FileNotFoundError(f"Guest voice reference audio not found: {ref_path}")
 
     api_key = credentials.get("minimax_api_key", "")
-    upload_url = "https://api.minimaxi.com/v1/files/upload"
+    api_base = get_minimax_api_base(config)
+    upload_url = f"{api_base}/files/upload"
     headers = {"Authorization": f"Bearer {api_key}"}
 
     with open(ref_path, "rb") as f:
@@ -268,7 +302,7 @@ def generate_turn_audio_minimax(turn_data: dict, output_dir: str,
 
     api_key = credentials.get("minimax_api_key", "")
     group_id = credentials.get("minimax_group_id", "")
-    api_base = "https://api.minimaxi.com/v1"
+    api_base = get_minimax_api_base(config)
     model = config.get("minimax_model", "speech-02-hd")
 
     url = f"{api_base}/t2a_v2?GroupId={group_id}"
@@ -307,7 +341,18 @@ def generate_turn_audio_minimax(turn_data: dict, output_dir: str,
     # MiniMax returns hex-encoded audio in data.audio
     audio_hex = resp_data.get("data", {}).get("audio", "")
     if not audio_hex:
-        raise ValueError(f"MiniMax returned empty audio for turn {idx}")
+        base_resp = resp_data.get("base_resp", {}) or {}
+        status_code = base_resp.get("status_code")
+        status_msg = base_resp.get("status_msg", "")
+        trace_id = resp_data.get("trace_id", "") or resp_data.get("id", "")
+        # Keep the message short but informative; strip audio payloads just in case.
+        safe_data = {k: v for k, v in resp_data.items() if k != "data"}
+        raise ValueError(
+            f"MiniMax returned empty audio for turn {idx} "
+            f"(host={url}, model={model}, voice_id={voice_id}, "
+            f"status={status_code} {status_msg!r}, trace_id={trace_id!r}, "
+            f"resp_keys={list(resp_data.keys())}, meta={safe_data})"
+        )
 
     audio_bytes = bytes.fromhex(audio_hex)
     with open(out_mp3, "wb") as f:
@@ -514,36 +559,29 @@ async def generate_single_turn(turn_data: dict, output_dir: str,
             turn_data, output_dir, rate, pitch, voice_override=voice_id)
 
 
-async def generate_episode_auto(turns: list, output_dir: str,
-                                 host_info: dict, guest_info: dict,
-                                 credentials: dict, config: dict,
-                                 rate: str, pitch: str,
-                                 max_retries: int = 3) -> list:
-    """Generate all turns for an episode using auto mode with per-turn retry.
+async def _generate_role_turns(role: str, turns: list, output_dir: str,
+                                role_info: dict, credentials: dict,
+                                config: dict, rate: str, pitch: str,
+                                max_retries: int) -> tuple:
+    """Generate all turns for a single role using the given backend/voice.
 
-    Key rule: within one episode, each role (host/guest) uses exactly ONE voice
-    from start to finish. Voice IDs NEVER change mid-episode.
-    If a turn fails, retry up to max_retries times. If still failing, abort.
-    Already-generated audio files are cached and reused on re-run.
+    Returns (results_by_turn_idx, succeeded).  On first unrecoverable failure
+    we clear every audio file produced for this role so a retry on a different
+    backend starts from a clean slate. Other roles' files are untouched.
     """
-    h_backend = host_info["backend"]
-    h_voice = host_info["voice_id"]
-    g_backend = guest_info["backend"]
-    g_voice = guest_info["voice_id"]
+    backend = role_info["backend"]
+    voice_id = role_info["voice_id"]
+    label = role_info.get("label", voice_id)
 
-    label = f"host={h_backend}/{h_voice}, guest={g_backend}/{g_voice}"
-    print(f"  🎯 Voices: {label}", flush=True)
+    use_ref = (role == "guest" and backend == "minimax"
+               and bool(config.get("guest_voice_ref_audio", "")))
 
-    results = []
-    for i, turn in enumerate(turns):
-        role = turn["role"]
-        backend = h_backend if role == "host" else g_backend
-        voice_id = h_voice if role == "host" else g_voice
+    results_by_idx = {}
+    role_turns = [t for t in turns if t["role"] == role]
+    print(f"  🎙️  {role} ← {label} ({backend}, {voice_id})"
+          f" — {len(role_turns)} turns", flush=True)
 
-        # Use reference audio for guest MiniMax turns (avoids clone leakage)
-        use_ref = (role == "guest" and backend == "minimax"
-                   and config.get("guest_voice_ref_audio", ""))
-
+    for turn in role_turns:
         last_error = None
         for attempt in range(1, max_retries + 1):
             try:
@@ -551,31 +589,104 @@ async def generate_episode_auto(turns: list, output_dir: str,
                     turn, output_dir, backend, voice_id,
                     credentials, config, rate, pitch,
                     use_ref_audio=use_ref)
-                results.append(result)
+                results_by_idx[turn["turn"]] = result
                 last_error = None
                 break
             except Exception as e:
                 last_error = e
                 if attempt < max_retries:
-                    wait = attempt * 5  # 5s, 10s backoff
-                    print(f"  ⚠️ Turn {turn['turn']} ({role}): 第 {attempt} 次失败 ({e})，"
-                          f"{wait}s 后重试...", flush=True)
-                    # Remove partial/corrupt file before retry
+                    wait = attempt * 5
+                    print(f"  ⚠️ Turn {turn['turn']} ({role}): 第 {attempt} 次失败 "
+                          f"({e})，{wait}s 后重试...", flush=True)
                     remove_cached_turn(output_dir, turn)
                     await asyncio.sleep(wait)
 
         if last_error:
-            print(f"  ❌ Turn {turn['turn']} ({role}): {max_retries} 次重试均失败，终止生成", flush=True)
-            raise RuntimeError(
-                f"Turn {turn['turn']} ({role}) 在 {backend} 上 {max_retries} 次重试均失败: {last_error}"
-            )
+            print(f"  ❌ Turn {turn['turn']} ({role}): {backend} 上 "
+                  f"{max_retries} 次重试均失败 ({last_error})", flush=True)
+            # Clear everything this role already produced on this backend so
+            # that a fallback run regenerates the whole role with a single
+            # consistent voice.
+            for t in role_turns:
+                remove_cached_turn(output_dir, t)
+            return results_by_idx, False
 
-        # Rate-limit protection between turns
-        if i < len(turns) - 1:
-            await asyncio.sleep(1.5)
+        await asyncio.sleep(1.5)  # rate-limit protection
 
-    print(f"  ✅ 全集 {len(results)} turns 完成 (host={h_backend}, guest={g_backend})", flush=True)
-    return results
+    return results_by_idx, True
+
+
+async def _run_role_with_fallback(role: str, turns: list, output_dir: str,
+                                   role_info: dict, credentials: dict,
+                                   config: dict, rate: str, pitch: str,
+                                   max_retries: int) -> tuple:
+    """Run a role through its fallback chain. Returns (results, final_info).
+
+    Maintains the invariant: every turn for this role uses the SAME voice.
+    Voice changes happen only between full-role retries, never mid-role.
+    """
+    # Primary attempt
+    results, ok = await _generate_role_turns(
+        role, turns, output_dir, role_info, credentials,
+        config, rate, pitch, max_retries)
+    if ok:
+        return results, role_info
+
+    # Walk the fallback chain
+    for fb in role_info.get("fallback_chain", []):
+        print(f"  ↪ {role} 降级到 {fb.get('label', fb['voice_id'])} "
+              f"({fb['backend']})", flush=True)
+        # Skip unavailable backends (e.g. missing API key)
+        if not check_backend_available(fb["backend"], credentials):
+            print(f"     跳过：{fb['backend']} 不可用 (API key 缺失)", flush=True)
+            continue
+        fb_info = {**fb}
+        results, ok = await _generate_role_turns(
+            role, turns, output_dir, fb_info, credentials,
+            config, rate, pitch, max_retries)
+        if ok:
+            return results, fb_info
+
+    raise RuntimeError(
+        f"{role} 在所有 fallback 后端上均失败，无法继续生成"
+    )
+
+
+async def generate_episode_auto(turns: list, output_dir: str,
+                                 host_info: dict, guest_info: dict,
+                                 credentials: dict, config: dict,
+                                 rate: str, pitch: str,
+                                 max_retries: int = 3) -> tuple:
+    """Generate all turns for an episode in auto mode with episode-level fallback.
+
+    Invariant: within one episode, each role (host/guest) uses exactly ONE
+    voice from start to finish. Voice IDs never change mid-role.
+    If a role's primary backend fails, we clear that role's partial audio,
+    step through its fallback_chain, and regenerate the whole role on the
+    next backend. The other role's cached mp3s are reused.
+
+    Returns (results, final_host_info, final_guest_info).  The caller is
+    expected to persist the final voice selection so re-runs reuse it.
+    """
+    print(f"  🎯 Primary: host={host_info['backend']}/{host_info['voice_id']}, "
+          f"guest={guest_info['backend']}/{guest_info['voice_id']}", flush=True)
+
+    host_results, final_host = await _run_role_with_fallback(
+        "host", turns, output_dir, host_info,
+        credentials, config, rate, pitch, max_retries)
+
+    guest_results, final_guest = await _run_role_with_fallback(
+        "guest", turns, output_dir, guest_info,
+        credentials, config, rate, pitch, max_retries)
+
+    # Merge by original turn order
+    combined = {**host_results, **guest_results}
+    results = [combined[t["turn"]] for t in turns]
+
+    print(f"  ✅ 全集 {len(results)} turns 完成 "
+          f"(host={final_host['backend']}, guest={final_guest['backend']})",
+          flush=True)
+    return results, final_host, final_guest
 
 
 # ── Main ────────────────────────────────────────────────────────────
@@ -625,14 +736,28 @@ async def main_async(args):
             guest_info = select_guest_voice(config, credentials)
 
         # Build fallback chains for runtime call failures
-        # Host fallback: try the other premium option, then edge-tts
+        # Host fallback: try the other premium options, then edge-tts terminal
         host_fallback_chain = []
         for opt in config.get("host_voice_options", []):
-            if opt["backend"] != host_info["backend"]:
-                host_fallback_chain.append({
-                    "backend": opt["backend"],
-                    "voice_id": opt["voice_id"],
-                })
+            if (opt["backend"] == host_info["backend"]
+                    and opt["voice_id"] == host_info["voice_id"]):
+                continue
+            host_fallback_chain.append({
+                "backend": opt["backend"],
+                "voice_id": opt["voice_id"],
+                "label": opt.get("label", opt["voice_id"]),
+            })
+        # Ultimate edge-tts fallback based on host gender
+        edge_fallback = config.get("host_edge_fallback", {})
+        host_gender = host_info.get("gender", "female")
+        edge_terminal = edge_fallback.get(host_gender, "zh-CN-XiaoxiaoNeural")
+        if not any(fb["backend"] == "edge-tts" and fb["voice_id"] == edge_terminal
+                   for fb in host_fallback_chain):
+            host_fallback_chain.append({
+                "backend": "edge-tts",
+                "voice_id": edge_terminal,
+                "label": f"Edge {'男声' if host_gender == 'male' else '女声'}",
+            })
         host_info["fallback_chain"] = host_fallback_chain
 
         # Guest fallback chain from config priority
@@ -645,6 +770,7 @@ async def main_async(args):
                     guest_fallback_chain.append({
                         "backend": fb["backend"],
                         "voice_id": fb["voice_id"],
+                        "label": fb.get("label", fb["voice_id"]),
                     })
         guest_info["fallback_chain"] = guest_fallback_chain
 
@@ -653,18 +779,33 @@ async def main_async(args):
         print(f"   Host:  {host_info['label']} ({host_info['backend']}, {host_info['voice_id']})", flush=True)
         print(f"   Guest: {guest_info['label']} ({guest_info['backend']}, {guest_info['voice_id']})", flush=True)
 
-        # Persist voice selection for this episode (enables safe re-run)
+        # Persist voice selection for this episode (enables safe re-run).
+        # Note: this captures the PRIMARY selection. If fallback kicks in
+        # during generation, we rewrite the file afterwards so subsequent
+        # re-runs reuse the backend that actually succeeded.
         if not saved_selection:
             os.makedirs(os.path.dirname(voice_selection_file) or ".", exist_ok=True)
             with open(voice_selection_file, "w", encoding="utf-8") as f:
                 json.dump({"host": host_info, "guest": guest_info},
                           f, ensure_ascii=False, indent=2)
 
-        results = await generate_episode_auto(
+        results, final_host, final_guest = await generate_episode_auto(
             turns, args.output_dir,
             host_info, guest_info,
             credentials, config,
             args.rate, args.pitch)
+
+        # If runtime fallback changed the effective voice, rewrite the
+        # selection file so re-runs pick up the working backend directly.
+        host_changed = (final_host.get("backend") != host_info.get("backend")
+                        or final_host.get("voice_id") != host_info.get("voice_id"))
+        guest_changed = (final_guest.get("backend") != guest_info.get("backend")
+                         or final_guest.get("voice_id") != guest_info.get("voice_id"))
+        if host_changed or guest_changed:
+            print(f"   💾 Fallback 生效，更新 voice_selection.json", flush=True)
+            with open(voice_selection_file, "w", encoding="utf-8") as f:
+                json.dump({"host": final_host, "guest": final_guest},
+                          f, ensure_ascii=False, indent=2)
 
     else:
         # ── Legacy modes: edge-tts, elevenlabs, minimax, mixed ───────
@@ -702,9 +843,15 @@ async def main_async(args):
             backend = role_backend.get(role, "edge-tts")
 
             if backend == "minimax":
-                voice_id = VOICE_MAP.get(role, "male-qn-jingying")
+                voice_id = resolve_minimax_voice(role, VOICE_MAP.get(role, ""), config)
+                # Guest turns should use the reference audio clone (if
+                # configured) just like auto mode does, so this branch
+                # doesn't silently lose voice fidelity.
+                use_ref = (role == "guest"
+                           and bool(config.get("guest_voice_ref_audio", "")))
                 result = generate_turn_audio_minimax(
-                    turn, args.output_dir, voice_id, credentials, config)
+                    turn, args.output_dir, voice_id, credentials, config,
+                    use_ref_audio=use_ref)
             elif backend == "elevenlabs":
                 result = generate_turn_audio_elevenlabs(
                     turn, args.output_dir, api_key, config)

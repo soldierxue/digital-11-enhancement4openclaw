@@ -195,6 +195,39 @@ vim credentials.json
 
 `credentials.json` 已在 `.gitignore` 中排除，不会被提交到 Git 仓库。
 
+### 5.3 MiniMax API 域名选择
+
+MiniMax 在不同地区/不同平台签发的 API Key**并不可跨域名使用**，每把 Key 只对某一个域名有效。选错域名会得到 `status_code: 2049 invalid api key`。在 `config.json` 中通过 `minimax_api_base`（TTS 用）和 `minimax_anthropic_api_base`（LLM Anthropic 兼容接口用）分别指定。
+
+| 域名 | 适用场景 | 备注 |
+|------|----------|------|
+| `https://api.minimaxi.com/v1` | 中文开放平台 [platform.minimaxi.com](https://platform.minimaxi.com) 签发的 Key（**默认值**） | 支持 TTS / voice clone / LLM 全量能力 |
+| `https://api.minimax.io/v1` | 国际站 [platform.minimax.io](https://platform.minimax.io) 签发的 Key | 官方英文文档示例使用此域名 |
+| `https://api.minimaxi.chat/v1` | 国际备用域名 | SillyTavern 等第三方文档列为国际服务器之一 |
+| `https://api.minimax.chat/v1` | 中国大陆专用域名 | ⚠️ **不支持 voice cloning**，功能受限 |
+
+选择建议：
+
+- **你的 Key 从哪个平台申请的？** 从 [platform.minimaxi.com](https://platform.minimaxi.com) 申请的用 `api.minimaxi.com`（默认），从 [platform.minimax.io](https://platform.minimax.io) 申请的改成 `api.minimax.io`。
+- **不确定？** 用下面的 curl 片段分别 ping 两个域名，哪个返回 `status_code: 0 success` 就用哪个。
+- **LLM Anthropic 兼容接口**（`llm_client.py` 里 `minimax/<model>` 前缀）：由 `minimax_anthropic_api_base` 配置，默认 `https://api.minimaxi.com`，路径前缀是 `/anthropic/v1/messages`，和 TTS 的 `/v1/t2a_v2` 用同一 host 不同路径。
+
+**Key-域名匹配快速验证：**
+
+```bash
+# 替换 $MINIMAX_API_KEY 和 $GROUP_ID 后依次尝试两个域名
+for BASE in https://api.minimaxi.com/v1 https://api.minimax.io/v1; do
+  echo "== $BASE =="
+  curl -s -X POST "$BASE/t2a_v2?GroupId=$GROUP_ID" \
+    -H "Authorization: Bearer $MINIMAX_API_KEY" \
+    -H "Content-Type: application/json" \
+    -d '{"model":"speech-2.8-hd","text":"测试","voice_setting":{"voice_id":"male-qn-jingying"},"audio_setting":{"sample_rate":32000,"format":"mp3"}}' \
+    | python3 -c 'import sys,json;d=json.load(sys.stdin);print(d.get("base_resp"))'
+done
+```
+
+返回 `{'status_code': 0, 'status_msg': 'success'}` 的就是你 Key 对应的域名。
+
 ### 6. 管道架构
 
 ```

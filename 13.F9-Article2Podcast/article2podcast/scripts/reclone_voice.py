@@ -12,7 +12,7 @@ This script:
   4. Runs a validation test to confirm no leakage
 
 API reference: https://platform.minimaxi.com/docs/guides/speech-voice-clone
-Endpoint: api.minimaxi.com
+Endpoint: configured via config.json "minimax_api_base"
 
 Audio sample requirements:
   - Format: mp3, m4a, or wav
@@ -42,9 +42,6 @@ import requests
 SKILL_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_AUDIO = os.path.join(SKILL_DIR, "assets", "bgm", "jason_voice_prompt_5s.m4a")
 
-UPLOAD_URL = "https://api.minimaxi.com/v1/files/upload"
-CLONE_URL = "https://api.minimaxi.com/v1/voice_clone"
-
 
 def load_credentials():
     with open(os.path.join(SKILL_DIR, "credentials.json")) as f:
@@ -56,6 +53,17 @@ def load_config():
         return json.load(f)
 
 
+def get_minimax_api_base(config):
+    """Return the MiniMax API base URL from config (without trailing slash).
+
+    Default is ``https://api.minimaxi.com/v1`` (matches MiniMax's own
+    documentation and Chinese open-platform keys). Voice cloning is NOT
+    supported on the mainland-only ``api.minimax.chat`` host, so override
+    accordingly if your key was issued there.
+    """
+    return config.get("minimax_api_base", "https://api.minimaxi.com/v1").rstrip("/")
+
+
 def get_duration(path):
     r = subprocess.run(
         ["ffprobe", "-v", "quiet", "-show_entries", "format=duration", "-of", "csv=p=0", path],
@@ -63,11 +71,11 @@ def get_duration(path):
     return float(r.stdout.strip())
 
 
-def upload_file(api_key, filepath, purpose):
+def upload_file(api_key, filepath, purpose, upload_url):
     """Upload a file to MiniMax and return the file_id."""
     with open(filepath, "rb") as f:
         resp = requests.post(
-            UPLOAD_URL, headers={"Authorization": "Bearer %s" % api_key},
+            upload_url, headers={"Authorization": "Bearer %s" % api_key},
             data={"purpose": purpose},
             files={"file": (os.path.basename(filepath), f)},
             timeout=60)
@@ -128,7 +136,10 @@ def main():
     api_key = creds.get("minimax_api_key_clone") or creds["minimax_api_key"]
     group_id = creds["minimax_group_id"]
     model = config.get("minimax_model", "speech-2.8-hd")
-    tts_url = "https://api.minimaxi.com/v1/t2a_v2?GroupId=%s" % group_id
+    api_base = get_minimax_api_base(config)
+    upload_url = "%s/files/upload" % api_base
+    clone_url = "%s/voice_clone" % api_base
+    tts_url = "%s/t2a_v2?GroupId=%s" % (api_base, group_id)
     auth = {"Authorization": "Bearer %s" % api_key}
 
     print("=" * 60, flush=True)
@@ -145,10 +156,10 @@ def main():
 
     # Step 2: Upload files
     print("\nStep 2: Uploading files...", flush=True)
-    clone_file_id = upload_file(api_key, clone_src, "voice_clone")
+    clone_file_id = upload_file(api_key, clone_src, "voice_clone", upload_url)
 
     # Use original (short) audio as prompt
-    prompt_file_id = upload_file(api_key, args.audio, "prompt_audio")
+    prompt_file_id = upload_file(api_key, args.audio, "prompt_audio", upload_url)
 
     # Step 3: Clone
     print("\nStep 3: Cloning voice '%s'..." % args.voice_id, flush=True)
@@ -162,7 +173,7 @@ def main():
         "model": model,
     }
     resp = requests.post(
-        CLONE_URL,
+        clone_url,
         headers=dict(auth, **{"Content-Type": "application/json"}),
         json=clone_payload, timeout=120)
     resp.raise_for_status()
