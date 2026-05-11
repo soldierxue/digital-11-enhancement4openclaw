@@ -158,6 +158,11 @@ dcv list-sessions
 
 期望输出包含一个 console 类型的会话。如果无会话，创建：
 
+> ### ⚠️ 注意 (ARM64/Ubuntu 24.04)
+> `dcv.conf` 中的 `[session-management/automatic-console-session]` 配置
+> 在 aarch64 + Ubuntu 24.04 环境下可能不生效。安装脚本已通过
+> `dcv-session.service` 提供兜底方案，确保重启后会话自动创建。
+
 ```bash
 sudo dcv create-session --type=console --owner ubuntu my-session
 ```
@@ -252,6 +257,7 @@ DCV 远程桌面已就绪。
 | DCV 服务未运行 | `sudo journalctl -u dcvserver -n 50 --no-pager` | 根据日志定位错误 |
 | 8443 端口未监听 | `ss -tlnp \| grep 8443` | `sudo systemctl restart dcvserver` |
 | 无 DCV 会话 | `dcv list-sessions` | `sudo dcv create-session --type=console --owner ubuntu my-session` |
+| 重启后 dcv list-sessions 为空 | `systemctl status dcv-session.service` | 确认 dcv-session.service 已启用；如未安装，手动创建（见安装脚本 Step 7.5） |
 | X Server 未运行 | `ps aux \| grep X \| grep -v grep` | `sudo systemctl isolate multi-user.target && sudo systemctl isolate graphical.target` |
 | Wayland 未禁用 | `grep WaylandEnable /etc/gdm3/custom.conf` | 应含 `WaylandEnable=false`，否则手动添加后 `sudo systemctl restart gdm3` |
 | SSM 端口转发失败 | `aws ssm describe-instance-information --filters Key=InstanceIds,Values=<Instance-ID>` | 确认实例 SSM Agent 在线，IAM Role 包含 `AmazonSSMManagedInstanceCore` |
